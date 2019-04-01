@@ -1,25 +1,25 @@
 #!/bin/bash
 #	Command syntax is `sasync inputfile1 inputfile2'
-JSON_FOLDER=/opt/sa							#Location of folder with service account .json files. No trailing slash
-EXCLUDES=/opt/exclude.txt					#Location of file types to exclude from copy/sync
-MIN_JSON=1; MAX_JSON=1200					#MIN and MAX json file numbers assuming file format 1.json, 2.json
+JSON_FOLDER=/opt/sa                         #Location of folder with service account .json files. No trailing slash
+EXCLUDES=/opt/exclude.txt                   #Location of file types to exclude from copy/sync
+MIN_JSON=1; MAX_JSON=1200                   #MIN and MAX json file numbers assuming file format 1.json, 2.json
 
 set_rclone_flags () {
-  sync=(`echo ${syncsets[$set]}`)			#Pull sync set from input file one at a time
+  sync=(`echo ${syncsets[$set]}`)           #Pull sync set from input file one at a time
   source="${sync[0]}"
   destination="${sync[1]}"
   transfers="${sync[2]}"
   checkers="${sync[3]}"
   chunks="${sync[4]}"
-  SAs="${sync[5]}"							#Number of SAs used for each rclone remote sync set
-  maxtransfer="${sync[6]}"					#MAX transfer in GB, then move to next SA
+  SAs="${sync[5]}"                          #Number of SAs used for each rclone remote sync set
+  maxtransfer="${sync[6]}"                  #MAX transfer in GB, then move to next SA
 }
 
 get_json_count () {
-  read COUNT < json.count					#Pull current json number from json.count file
+  read COUNT < json.count                   #Pull current json number from json.count file
   if [[ "$COUNT" -gt "$MAX_JSON"  ]];
   then let COUNT=$MIN_JSON; fi
-  echo $(($COUNT+1)) > json.count			#Increment +1 or reset to MIN if at MAX
+  echo $(($COUNT+1)) > json.count           #Increment +1 or reset to MIN if at MAX
 }
 run_rclone_with_flags () {
   get_json_count
@@ -36,23 +36,23 @@ run_rclone_with_flags () {
 }
 
 clean_tds () {
-  rclone dedupe $destination -v --dedupe-mode largest		#Optional run dedupe and rmdirs for destination and/or source
+  rclone dedupe $destination -v --dedupe-mode largest       #Optional run dedupe and rmdirs for destination and/or source
   rclone rmdirs $destination -v
 #  rclone dedupe $source -v --dedupe-mode largest
 #  rclone rmdirs $source -v
 }
 
 process_all_sets_and_SAs () {
-  for set in $(seq 0 $(( $number_of_sync_sets-1 ))); do		#Do a loop for each source/destination pair
+  for set in $(seq 0 $(( $number_of_sync_sets-1 ))); do     #Do a loop for each source/destination pair
     set_rclone_flags
-    for SA in $(seq 1 $SAs); do								#Do a loop for each SA
-      run_rclone_with_flags									#Run rclone with flags from input file
+    for SA in $(seq 1 $SAs); do                             #Do a loop for each SA
+      run_rclone_with_flags                                 #Run rclone with flags from input file
     done
 #    clean_tds
   done
 }
 
-for input_files in $*; do									#Do a loop for each input file in the command line
+for input_files in $*; do                                   #Do a loop for each input file in the command line
   readarray syncsets < <( sed '/^#/d' $input_files )
   number_of_sync_sets=$(( ${#syncsets[@]} ))
   process_all_sets_and_SAs
