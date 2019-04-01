@@ -1,0 +1,92 @@
+#!/bin/bash
+#	Command syntax is `sasync inputfile1 inputfile2'
+JSON_FOLDER=/opt/sa							#Location of folder with service account .json files. No trailing slash
+EXCLUDES=/opt/exclude.txt					#Location of file types to exclude from copy/sync
+MIN_JSON=1; MAX_JSON=1200					#MIN and MAX json file numbers assuming file format 1.json, 2.json
+
+set_rclone_flags () {
+  sync=(`echo ${syncsets[$set]}`)			#Pull sync set from input file one at a time
+  source="${sync[0]}"
+  destination="${sync[1]}"
+  transfers="${sync[2]}"
+  checkers="${sync[3]}"
+  chunks="${sync[4]}"
+  SAs="${sync[5]}"							#Number of SAs used for each rclone remote sync set
+  maxtransfer="${sync[6]}"					#MAX transfer in GB, then move to next SA
+}
+
+get_json_count () {
+  read COUNT < json.count					#Pull current json number from json.count file
+  if [[ "$COUNT" -gt "$MAX_JSON"  ]];
+  then let COUNT=$MIN_JSON; fi
+  echo $(($COUNT+1)) > json.count			#Increment +1 or reset to MIN if at MAX
+}
+run_rclone_with_flags () {
+  get_json_count
+  echo SYNCING $source to $destination w $COUNT/$MAX_JSON.json from $input_files
+# timeout 30m\
+  rclone copy $source $destination\
+  --transfers $transfers --checkers $checkers\
+  --max-transfer $maxtransfer --drive-chunk-size $chunks\
+  --fast-list --no-update-modtime -v -P --stats 5s --ignore-errors\
+  --tpslimit 5 --tpslimit-burst 50 --max-backlog 1000000\
+  --exclude-from $EXCLUDES --stats-file-name-length 0\
+  --drive-service-account-file $JSON_FOLDER/$COUNT.json
+  echo FINISHED $source to $destination wJSON $COUNT.json
+}
+
+clean_tds () {
+  rclone dedupe $destination -v --dedupe-mode largest		#Optional run dedupe and rmdirs for destination and/or source
+  rclone rmdirs $destination -v
+#  rclone dedupe $source -v --dedupe-mode largest
+#  rclone rmdirs $source -v
+}
+
+process_all_sets_and_SAs () {
+  for set in $(seq 0 $(( $number_of_sync_sets-1 ))); do		#Do a loop for each source/destination pair
+    set_rclone_flags
+    for SA in $(seq 1 $SAs); do								#Do a loop for each SA
+      run_rclone_with_flags									#Run rclone with flags from input file
+    done
+#    clean_tds
+  done
+}
+
+for input_files in $*; do									#Do a loop for each input file in the command line
+  readarray syncsets < <( sed '/^#/d' $input_files )
+  number_of_sync_sets=$(( ${#syncsets[@]} ))
+  process_all_sets_and_SAs
+done
+
+#  The sample format of the input file is below. You can name it anything you like.
+#  Each input file can have as many sync sets as you want.
+#  You can process up to 9 input files at once using the command syntax of
+#  ``sasync inputfile1 inputfile2`` and so on. Files will process in sequence not in parallel.
+#  Or you can run in parallel using ``sasync inputfile1 && sasync inputefile2 &&`` and so on.
+#
+#  Column order is critical. Column labels are ignored, but useful for reference.
+#  Colon ':` is critical at the end of source and destination names.
+#  When setting maxtransfer allow a buffer between 750G/SA upload allowance and
+#  residual files being transferred when rclone hits the maxtransfer limit.
+#  Example: If 4k movies average 50GB in size and you have 4 in `transfers` then set
+#  maxtransfers at (750G - (4 X 50G))= 550G or less. Otherwise rclone may hang.
+#
+#  inputfile1 named `set.movies`
+#  # 1source      2destination   3transfers 4checkers 5chunks  6SAs  7maxtransfer
+#  zd_movies:     my_movies:     10         20        16M      10    600G
+#  zd_movies_4k:  my_movies_4k:  2          20        16M      4     500G
+#
+#  inputfile2 named `set.tv`
+#  # 1source    2destination   3transfers 4checkers 5chunks  6SAs  7maxtransfer
+#  zd_tv1:      my_tv1:        20         20        16M         2        700G
+#  zd_tv2:      my_tv2:        20         20        16M         5        700G
+#  zd_tv_4k:    my_tv_4k:      4          20        16M         2        600G
+#
+#  There is also an external counter file named `json.count` which keeps track of the
+#  current json being used and is then incremented with each cycle. By being external it
+#  allows multiple instances of sasync to use the same json pool and it is persistent over
+#  time when sasync terminates. When the last json in the pool is used the script loops back
+#  to the first json in the pool.
+#  If it does not already exist then create a text file names json.count and add the initial
+#  json number to it (typically simply the number `1` without quotes).
+#
