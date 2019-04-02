@@ -8,9 +8,9 @@ There are 5 files in the repo at the moment.
 3. Two sample files with rclone source, destination, transfers, checkers, chunks, number of service accounts and max-transfer size.
 4. An exclude.txt file with file patterns to exclude from rclone copy/sync. At the moment these are files that sometimes hang rclone service side copying, so we skip them. Typically it is only a handful of files. Until this gets fixed you will need to do an occasional 'sweep' sync/copy using the --disable move,copy flag which copies without hanging.
 
-The set.* files specify which sync pairs you would like to run along with rclone flags for that sync pair. The format would be as follows:
+The set.* files specify which sync pairs you would like to run along with rclone flags for that sync pair. The format would be as follows
 
-filename: set.tv
+filename set.tv
 1source    2destination   3transfers 4checkers 5chunks     6SAs     7maxtransfer
 td_tv:       my_tv:         20         20        16M         5        700G
 td_tv_4k:    my_tv_4k:      4          20        16M         2        600G
