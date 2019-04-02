@@ -1,4 +1,5 @@
 #!/bin/bash
+# Test use of `#!/usr/bin/env bash` to allow different bash locations; help on MacOS
 #	Command syntax is `sasync inputfile1 inputfile2'
 JSON_FOLDER=/opt/sa                         #Location of folder with service account .json files. No trailing slash
 EXCLUDES=/opt/exclude.txt                   #Location of file types to exclude from copy/sync
