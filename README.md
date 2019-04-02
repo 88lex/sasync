@@ -10,13 +10,13 @@ There are 5 files in the repo at the moment.
 
 The set.* files specify which sync pairs you would like to run along with rclone flags for that sync pair. The format would be as follows:
 
-```# set.tv```
+``# set.tv``
 
-```# 1source    2destination   3transfers 4checkers 5chunks     6SAs     7maxtransfer```
+``# 1source    2destination   3transfers 4checkers 5chunks     6SAs     7maxtransfer``
 
-```td_tv:       my_tv:         20         20        16M         5        700G```
+``td_tv:       my_tv:         20         20        16M         5        700G``
 
-```td_tv_4k:    my_tv_4k:      4          20        16M         2        600G```
+``td_tv_4k:    my_tv_4k:      4          20        16M         2        600G``
 
 The script will ignore lines that begin with a hash '#'
 
