@@ -3,7 +3,7 @@
 This script uses rclone with service accounts to copy large volumes of files between two rclone remotes.
 
 There are 5 files in the repo at the moment.
-1. sasync is the main script
+1. sasync is the main script. You can manually specify 'copy' or 'sync' in the rclone command in the script (may automate later).
 2. json.count is an external counter for the json set. This allows running multiple instances of sasync that pull in sequence from the jsons without wasting or duplicating usage.
 3. Two sample files with rclone source, destination, transfers, checkers, chunks, number of service accounts and max-transfer size.
 4. An exclude.txt file with file patterns to exclude from rclone copy/sync. At the moment these are files that sometimes hang rclone service side copying, so we skip them. Typically it is only a handful of files. Until this gets fixed you will need to do an occasional 'sweep' sync/copy using the --disable move,copy flag which copies without hanging.
