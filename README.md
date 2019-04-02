@@ -1,6 +1,6 @@
 # sasync
 
-The main purpose of this script is to use rclone with service accounts to copy large volumes of files
+This script uses rclone with service accounts to copy large volumes of files between two rclone remotes.
 
 There are 5 files in the repo at the moment.
 1. sasync is the main script
