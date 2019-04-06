@@ -1,6 +1,7 @@
 #!/bin/bash
 # Test use of `#!/usr/bin/env bash` to allow different bash locations; help on MacOS
 #	Command syntax is `sasync inputfile1 inputfile2'
+SYNCCOPY=sync
 JSON_FOLDER=/opt/sa                         #Location of folder with service account .json files. No trailing slash
 EXCLUDES=/opt/exclude.txt                   #Location of file types to exclude from copy/sync
 MIN_JSON=1; MAX_JSON=1200                   #MIN and MAX json file numbers assuming file format 1.json, 2.json
@@ -26,7 +27,7 @@ run_rclone_with_flags () {
   get_json_count
   echo SYNCING $source to $destination w $COUNT/$MAX_JSON.json from $input_files
 # timeout 30m\
-  rclone copy $source $destination\
+  rclone $SYNCCOPY $source $destination\
   --transfers $transfers --checkers $checkers\
   --max-transfer $maxtransfer --drive-chunk-size $chunks\
   --fast-list --no-update-modtime -v -P --stats 5s --ignore-errors\
@@ -54,9 +55,13 @@ process_all_sets_and_SAs () {
 }
 
 for input_files in $*; do                                   #Do a loop for each input file in the command line
-  readarray syncsets < <( sed '/^#/d' $input_files )
-  number_of_sync_sets=$(( ${#syncsets[@]} ))
-  process_all_sets_and_SAs
+  if [ $input_files = "-c" ]; then
+      SYNCCOPY=copy
+  else
+    readarray syncsets < <( sed '/^#/d' $input_files )
+    number_of_sync_sets=$(( ${#syncsets[@]} ))
+    process_all_sets_and_SAs
+  fi
 done
 
 #  The sample format of the input file is below. You can name it anything you like.
