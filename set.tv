@@ -1,4 +1,4 @@
 # set.tv
 # 1source    2destination   3transfers 4checkers 5chunks     6SAs     7maxtransfer
-td_tv:       my_tv:         20         20        16M         5        700G
-td_tv_4k:    my_tv_4k:      4          20        16M         2        600G
+td_tv:       my_tv:         20         20        16M         1        700G
+td_tv_4k:    my_tv_4k:      4          20        16M         1        600G
