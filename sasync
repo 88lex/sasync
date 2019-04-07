@@ -1,5 +1,5 @@
-#!/bin/bash
-# Test use of `#!/usr/bin/env bash` to allow different bash locations; help on MacOS
+#!/usr/bin/env bash
+# Testing use of `#!/usr/bin/env bash` rather than `#!/bin/bash`. Allows difft bash locations; can help on MacOS
 #	Command syntax is `sasync inputfile1 inputfile2'
 SYNCCOPY=sync
 JSON_FOLDER=/opt/sa                         #Location of folder with service account .json files. No trailing slash
