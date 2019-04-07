@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Testing use of `#!/usr/bin/env bash` rather than `#!/bin/bash`. Allows difft bash locations; can help on MacOS
 #	Command syntax is `sasync inputfile1 inputfile2' to sync or `sasync -c inputfile` to copy
-SYNCCOPY=sync
+SYNCCOPY=sync                               #Default action is rclone sync. -c flag to change to rclone copy
 JSON_FOLDER=/opt/sa                         #Location of folder with service account .json files. No trailing slash
 EXCLUDES=/opt/exclude.txt                   #Location of file types to exclude from copy/sync
 MIN_JSON=1; MAX_JSON=1200                   #MIN and MAX json file numbers assuming file format 1.json, 2.json
