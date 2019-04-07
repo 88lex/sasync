@@ -29,6 +29,7 @@ run_rclone_with_flags () {
   timeout 30m\
   rclone $SYNCCOPY $source $destination\
   --transfers $transfers --checkers $checkers\
+  --drive-use-trash false\
   --max-transfer $maxtransfer --drive-chunk-size $chunks\
   --fast-list --no-update-modtime -v -P --stats 5s --ignore-errors\
   --tpslimit 5 --tpslimit-burst 50 --max-backlog 1000000\
