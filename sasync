@@ -28,9 +28,9 @@ run_rclone_with_flags () {
   echo Starting $SYNCCOPY of $source to $destination w $COUNT/$MAX_JSON.json from $input_files
   timeout 30m\
   rclone $SYNCCOPY $source $destination\
-  --transfers $transfers --checkers $checkers --delete-during\
+  --transfers $transfers --checkers $checkers\
   --max-transfer $maxtransfer --drive-chunk-size $chunks\
-  --fast-list --no-update-modtime -v -P --stats 5s --ignore-errors\
+  --fast-list -v -P --stats 5s --delete-during\
   --tpslimit 5 --tpslimit-burst 50 --max-backlog 1000000\
   --exclude-from $EXCLUDES --stats-file-name-length 0\
   --drive-service-account-file $JSON_FOLDER/$COUNT.json
