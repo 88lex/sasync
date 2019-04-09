@@ -30,7 +30,7 @@ run_rclone_with_flags () {
   rclone $SYNCCOPY $source $destination\
   --transfers $transfers --checkers $checkers\
   --max-transfer $maxtransfer --drive-chunk-size $chunks\
-  --fast-list -v -P --stats 5s --delete-during\
+  --fast-list -c -v -P --stats 5s --delete-during\
   --tpslimit 5 --tpslimit-burst 50 --max-backlog 1000000\
   --exclude-from $EXCLUDES --stats-file-name-length 0\
   --drive-service-account-file $JSON_FOLDER/$COUNT.json
