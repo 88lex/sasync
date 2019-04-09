@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# Testing use of `#!/usr/bin/env bash` rather than `#!/bin/bash`. Allows difft bash locations; can help on MacOS
-#	Command syntax is `sasync inputfile1 inputfile2' to sync or `sasync -c inputfile` to copy
+#`#!/usr/bin/env bash` allows difft bash locations. e.g w MacOS. Use #!/bin/bash if needed
 SYNCCOPY=sync                               #Default action is rclone sync. -c flag to change to rclone copy
 JSON_FOLDER=/opt/sa                         #Location of folder with service account .json files. No trailing slash
 EXCLUDES=/opt/exclude.txt                   #Location of file types to exclude from copy/sync
@@ -23,6 +22,7 @@ get_json_count () {
   then let COUNT=$MIN_JSON; fi
   echo $(($COUNT+1)) > json.count           #Increment +1 or reset to MIN if at MAX
 }
+
 run_rclone_with_flags () {
   get_json_count
   echo Starting $SYNCCOPY of $source to $destination w $COUNT/$MAX_JSON.json from $input_files
@@ -40,8 +40,8 @@ run_rclone_with_flags () {
 clean_tds () {
   rclone dedupe $destination -v --dedupe-mode largest       #Optional run dedupe and rmdirs for destination and/or source
   rclone rmdirs $destination -v
-#  rclone dedupe $source -v --dedupe-mode largest
-#  rclone rmdirs $source -v
+  #rclone dedupe $source -v --dedupe-mode largest
+  #rclone rmdirs $source -v
 }
 
 process_all_sets_and_SAs () {
@@ -50,20 +50,25 @@ process_all_sets_and_SAs () {
     for SA in $(seq 1 $SAs); do                             #Do a loop for each SA
       run_rclone_with_flags                                 #Run rclone with flags from input file
     done
-#    clean_tds
+    clean_tds
   done
 }
 
-for input_files in $*; do                                   #Do a loop for each input file in the command line
-  if [ $input_files = "-c" ]; then
+main() {
+  for input_files in $*; do                                   #Do a loop for each input file in the command line
+    if [ $input_files = "-c" ]; then
       SYNCCOPY=copy
-  else
-    readarray syncsets < <( sed '/^#/d' $input_files )
-    number_of_sync_sets=$(( ${#syncsets[@]} ))
-    process_all_sets_and_SAs
-  fi
-done
+    else
+      readarray syncsets < <( sed '/^#/d' $input_files )
+      number_of_sync_sets=$(( ${#syncsets[@]} ))
+      process_all_sets_and_SAs
+    fi
+  done
+}
 
+main "$@"
+
+#  Command syntax is `sasync inputfile1 inputfile2' to sync or `sasync -c inputfile` to copy
 #  The sample format of the input file is below. You can name it anything you like.
 #  Each input file can have as many sync sets as you want.
 #  You can process up to 9 input files at once using the command syntax of
