@@ -54,7 +54,7 @@ process_all_sets_and_SAs () {
   done
 }
 
-main() {
+main () {
   for input_files in $*; do                                   #Do a loop for each input file in the command line
     if [ $input_files = "-c" ]; then
       SYNCCOPY=copy
