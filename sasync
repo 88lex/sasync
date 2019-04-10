@@ -23,13 +23,13 @@ get_json_count () {
   then let COUNT=$MIN_JSON; fi
   echo $(($COUNT+1)) > json.count           #Increment +1 or reset to MIN if at MAX
 }
+
 run_rclone_with_flags () {
   get_json_count
-  echo Starting $SYNCCOPY of $source to $destination w $COUNT/$MAX_JSON.json from $input_files
+  echo Starting $SYNCCOPY of $source to $destination w $COUNT/$MAX_JSON.json from $input_f$
   timeout 30m\
   rclone $SYNCCOPY $source $destination\
   --transfers $transfers --checkers $checkers\
-  --drive-use-trash false\
   --max-transfer $maxtransfer --drive-chunk-size $chunks\
   --fast-list -c -v -P --stats 5s --delete-during\
   --tpslimit 5 --tpslimit-burst 50 --max-backlog 1000000\
