@@ -26,7 +26,7 @@ get_json_count () {
 
 run_rclone_with_flags () {
   get_json_count
-  echo Starting $SYNCCOPY of $source to $destination w $COUNT/$MAX_JSON.json from $input_f$
+  echo Starting $SYNCCOPY of $source to $destination w $COUNT/$MAX_JSON.json from $input_files
   timeout 30m\
   rclone $SYNCCOPY $source $destination\
   --transfers $transfers --checkers $checkers\
