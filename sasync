@@ -54,7 +54,6 @@ process_all_sets_and_SAs () {
   done
 }
 
-main () {
   for input_files in $*; do                                   #Do a loop for each input file in the command line
     if [ $input_files = "-c" ]; then
       SYNCCOPY=copy
@@ -64,9 +63,7 @@ main () {
       process_all_sets_and_SAs
     fi
   done
-}
 
-main "$@"
 
 #  Command syntax is `sasync inputfile1 inputfile2' to sync or `sasync -c inputfile` to copy
 #  The sample format of the input file is below. You can name it anything you like.
