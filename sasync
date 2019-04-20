@@ -38,7 +38,7 @@ run_rclone_with_flags () {
 }
 
 clean_tds () {
-  rclone dedupe $destination -v --dedupe-mode largest       #Optional run dedupe and rmdirs for destination and/or source
+  rclone dedupe $destination -v --dedupe-mode skip       #Optional run dedupe and rmdirs for destination and/or source
   rclone rmdirs $destination -v
   #rclone dedupe $source -v --dedupe-mode largest
   #rclone rmdirs $source -v
