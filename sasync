@@ -3,7 +3,7 @@
 SYNCCOPY=sync                               #Default action is rclone sync. -c flag to change to rclone copy
 JSON_FOLDER=/opt/sa                         #Location of folder with service account .json files. No trailing slash
 EXCLUDES=/opt/exclude.txt                   #Location of file types to exclude from copy/sync
-MIN_JSON=1; MAX_JSON=1200                   #MIN and MAX json file numbers assuming file format 1.json, 2.json
+MIN_JSON=1; MAX_JSON=100                   #MIN and MAX json file numbers assuming file format 1.json, 2.json
 
 set_rclone_flags () {
   sync=(`echo ${syncsets[$set]}`)           #Pull sync set from input file one at a time
