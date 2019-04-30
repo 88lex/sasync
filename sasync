@@ -3,7 +3,7 @@
 SYNCCOPY=sync                               #Default action is rclone sync. -c flag to change to rclone copy
 JSON_FOLDER=/opt/sa                         #Location of folder with service account .json files. No trailing slash
 EXCLUDES=/opt/exclude.txt                   #Location of file types to exclude from copy/sync
-MIN_JSON=1; MAX_JSON=100                   #MIN and MAX json file numbers assuming file format 1.json, 2.json
+MIN_JSON=1; MAX_JSON=100                    #Set MIN and MAX json file numbers assuming file format is 1.json, 2.json
 
 set_rclone_flags () {
   sync=(`echo ${syncsets[$set]}`)           #Pull sync set from input file one at a time
@@ -25,9 +25,10 @@ get_json_count () {
 
 run_rclone_with_flags () {
   get_json_count
-  echo Starting $SYNCCOPY of $source to $destination w $COUNT/$MAX_JSON.json from $input_files
+  echo Starting $SYNCCOPY of $source to $destination w $COUNT/$MAX_JSON.json from $input_files; echo
   timeout 30m\
   rclone $SYNCCOPY $source $destination\
+  --drive-use-trash=false\
   --transfers $transfers --checkers $checkers\
   --max-transfer $maxtransfer --drive-chunk-size $chunks\
   --fast-list -c -v -P --stats 5s --delete-during\
@@ -38,10 +39,10 @@ run_rclone_with_flags () {
 }
 
 clean_tds () {
-  rclone dedupe $destination -v --dedupe-mode skip       #Optional run dedupe and rmdirs for destination and/or source
-  rclone rmdirs $destination -v
-  #rclone dedupe $source -v --dedupe-mode skip
-  #rclone rmdirs $source -v
+  rclone dedupe skip $destination -v --drive-use-trash=false --fast-list --transfers=40  #Optional run dedupe and rmdirs for destination and/or source
+  rclone rmdirs $destination -v --drive-use-trash=false --fast-list --transfers=40
+  #rclone dedupe skip $source -v --drive-use-trash=false --fast-list --transfers=40
+  #rclone rmdirs $source -v --drive-use-trash=false --fast-list --transfers=40
 }
 
 process_all_sets_and_SAs () {
