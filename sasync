@@ -44,7 +44,7 @@ clean_tds () {
   rclone rmdirs $destination -v --drive-use-trash=false --fast-list --transfers=40
   rclone delete $destination -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40
   #echo; echo STARTING DEDUPE of $source; echo
-  #rclone dedupe skip $source -v --drive-use-trash=false --fast-list --transfers=40
+  #rclone dedupe skip $source -v --drive-use-trash=false --no-traverse --transfers=40
   #rclone rmdirs $source -v --drive-use-trash=false --fast-list --transfers=40
   #rclone delete $source -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40
 }
