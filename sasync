@@ -26,12 +26,12 @@ get_json_count () {
 run_rclone_with_flags () {
   get_json_count
   echo Starting $SYNCCOPY of $source to $destination w $COUNT/$MAX_JSON.json from $input_files; echo
-  timeout 30m\
+  #timeout 30m\
   rclone $SYNCCOPY $source $destination\
   --drive-use-trash=false\
   --transfers $transfers --checkers $checkers\
   --max-transfer $maxtransfer --drive-chunk-size $chunks\
-  --fast-list -c -v -P --stats 5s --delete-during\
+  --fast-list -c -vP --stats 5s --delete-during\
   --tpslimit 5 --tpslimit-burst 50 --max-backlog 1000000\
   --exclude-from $EXCLUDES --stats-file-name-length 0\
   --drive-service-account-file $JSON_FOLDER/$COUNT.json
@@ -39,10 +39,14 @@ run_rclone_with_flags () {
 }
 
 clean_tds () {
+  echo; echo STARTING DEDUPE of $destination; echo
   rclone dedupe skip $destination -v --drive-use-trash=false --fast-list --transfers=40  #Optional run dedupe and rmdirs for destination and/or source
   rclone rmdirs $destination -v --drive-use-trash=false --fast-list --transfers=40
+  rclone delete $destination -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40
+  #echo; echo STARTING DEDUPE of $source; echo
   #rclone dedupe skip $source -v --drive-use-trash=false --fast-list --transfers=40
   #rclone rmdirs $source -v --drive-use-trash=false --fast-list --transfers=40
+  #rclone delete $source -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40
 }
 
 process_all_sets_and_SAs () {
