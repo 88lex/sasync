@@ -4,15 +4,17 @@ This basic script uses rclone with service accounts to do server-side copy or sy
 If you only use a few service accounts then this may be overkill. But if you have many SAs or many TDs it can be helpful.
 It is written in bash to allow it to function in most OSes without installing dependencies. Feel free to adapt it to other languages.
 
-Rclone documentation describes how to use service accounts. https://rclone.org/drive/#service-account-support . 
-In most cases if you are having problems it is your permissions. Permission for Team Drive copy/sync is pretty straighforward. 
+Before using this script it is important that you understand how to use service accounts with rclone. There are plenty of 
+threads in the rclone forum as well as discord channels to learn about SAs (i.e. Don't ask me). 
+Rclone documentation describes the basics of creating and using service accounts. https://rclone.org/drive/#service-account-support .
+In most cases if you are having problems it is your permissions. Permissions for Team Drive copy/sync are pretty straighforward. 
 Copy/sync with My Drive can be done but is a bit more tricky. You may need --drive-shared-with-me and --drive-impersonate, as SA accounts
 only see My Drive files in Shared with Me.
 
 There are several files in the repo:
 
 1. sasync is the main script that pulls sync sets from 'set' files and runs rclone sync (or copy with the -c flag).
-2. json.count is an external counter for the json set. This allows running multiple instances of sasync that pull in sequence from the jsons without wasting or duplicating usage.
+2. json.count is an external counter file for the json set. The easiest setup is to number your jsons 1.json, 2.json etc.
 3. set.* files specify rclone source, destination, transfers, checkers, chunks, number of service accounts and max-transfer size.
 4. exclude.txt specifies file patterns to exclude. Some files hang rclone server-side copying. If that happens to you add them to exclude.txt .
 
