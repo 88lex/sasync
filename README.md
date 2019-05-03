@@ -17,13 +17,14 @@ There are several files in the repo:
 2. json.count is an external counter file for the json set. The easiest setup is to number your jsons 1.json, 2.json etc.
 3. set.* files specify rclone source, destination, transfers, checkers, chunks, number of service accounts and max-transfer size.
 4. exclude.txt specifies file patterns to exclude. Some files hang rclone server-side copying. If that happens to you add them to exclude.txt .
+5. sacopy simply runs sasync with the -c script. Sometimes easier to use for clarity (copy vs sync batches)
 
 Each set.* file specifies which sync pairs you would like to run along with rclone flags for that sync pair. The set file format is:
 <pre>
 # set.tv
-# 1source    2destination   3transfers  4checkers  5chunks     6SAs     7maxtransfer
-td_tv:       my_tv:         20          20         16M         5        700G
-td_tv_4k:    my_tv_4k:      4           20         16M         2        600G
+# 1source    2destination   3transfers  4checkers  5chunksize     6SAs     7maxtransfer
+td_tv:       my_tv:         20          20         16M            5        700G
+td_tv_4k:    my_tv_4k:      4           20         16M            2        600G
 </pre>
 
 Run the script with this syntax "./sasync set.tv" to cycle rclone sync for each source-destination pair and each block of SAs in your set.* file.
@@ -36,8 +37,11 @@ If you prefer to create smaller/separate sets then you can create individual set
 
 If you have multiple sets then you can run them in sequence with "./sasync set.tv set.movies set.books" or in parallel with "./sasync set.tv & ./sasync set.movies &" .
 
+If you don't have many SAs but you want to run multiple source-destination pairs try setting --max-transfer to a lower number (100G, 200G ...)
+
 Resource usage for this script is very light as the copy/move actions are all executed server side. 
-The script can be modified to use the --disable move,copy flag if you prefer, in which case I/O and CPU usage will rise.
+The script can be modified to use the --disable move,copy flag if you prefer, in which case I/O and CPU usage will rise. chunk size in the set files to speed up copying.
+If you do use --disable move,copy you may want to increase 
 
 One flag that increases RAM usage is --fast-list. You can delete the fast list flag and the script will run fine, but scans will take a bit longer. 
 You can also try using --no-traverse rather than --fast-list.
