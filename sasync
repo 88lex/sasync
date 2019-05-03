@@ -40,7 +40,7 @@ run_rclone_with_flags () {
 
 clean_tds () {
   echo; echo STARTING DEDUPE of $destination; echo
-  rclone dedupe skip $destination -v --drive-use-trash=false --fast-list --transfers=40  #Optional run dedupe and rmdirs for destination and/or source
+  rclone dedupe skip $destination -v --drive-use-trash=false --no-traverse --transfers=40  #Optional run dedupe and rmdirs for destination and/or source
   rclone rmdirs $destination -v --drive-use-trash=false --fast-list --transfers=40
   rclone delete $destination -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40
   #echo; echo STARTING DEDUPE of $source; echo
