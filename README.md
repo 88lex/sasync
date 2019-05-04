@@ -1,13 +1,14 @@
 # sasync
 
-This basic script uses rclone with service accounts to do server-side copy or sync between rclone remotes using sync 'sets'.
-If you only use a few service accounts then this may be overkill. But if you have many SAs or many TDs it can be helpful.
+This basic script uses rclone with google service accounts to do server-side copy or sync between rclone remotes using sync 'sets'.
+If you only use a few service accounts then this may be overkill. But if you have many SAs or many TDs it can help automate syncs/backups.
 It is written in bash to allow it to function in most OSes without installing dependencies. Feel free to adapt it to other languages.
 
 Before using this script it is important that you understand how to use service accounts with rclone. There are plenty of 
 threads in the rclone forum as well as discord channels to learn about SAs (i.e. Don't ask me). 
-Rclone documentation describes the basics of creating and using service accounts. https://rclone.org/drive/#service-account-support .
-In most cases if you are having problems it is your permissions. Permissions for Team Drive copy/sync are pretty straighforward. 
+See  https://rclone.org/drive/#service-account-support 
+
+In most cases if you are having problems the culprit will be your permissions. Permissions for Team Drive copy/sync are pretty straighforward. 
 Copy/sync with My Drive can be done but is a bit more tricky. You may need --drive-shared-with-me and --drive-impersonate, as SA accounts
 only see My Drive files in Shared with Me.
 
@@ -39,11 +40,20 @@ If you have multiple sets then you can run them in sequence with "./sasync set.t
 
 If you don't have many SAs but you want to run multiple source-destination pairs try setting --max-transfer to a lower number (100G, 200G ...)
 
+WARNING: At the moment there is an issue with rclone and server side copies/syncs when you hit the hard limit of 750G uploads per day. 
+If there are files in the transfer 'buffer' and you hit the hard limit then rclone can hang indefinitely. There are a few ways to mitigate this problem.
+1. Use a hard timeout. This is embedded in the sasync script but can be hashed out # if you want to omit it
+2. Use conservative --max-transfer settings so that the number of --transfers times typical library file size will never hit the hard upload limit. 
+e.g. If 4k file sizes are typically 40-80GB and you are doing 4 simultaneous transfers then set --max-transfer to < (750 - (4 x 80)) , say 400GB.
+3. Add --disable move,copy to the rclone script. This will slow down your transfers as they are downloaded then uploaded rather than server side. 
+But rclone will finish non-server-side transfers that are have been started rather than hanging.
+
+
 Resource usage for this script is very light as the copy/move actions are all executed server side. 
 The script can be modified to use the --disable move,copy flag if you prefer, in which case I/O and CPU usage will rise. chunk size in the set files to speed up copying.
-If you do use --disable move,copy you may want to increase 
+If you do use --disable move,copy you may want to increase allocated resources when running the script.
 
-One flag that increases RAM usage is --fast-list. You can delete the fast list flag and the script will run fine, but scans will take a bit longer. 
+NOTE: --fast-list increases RAM usage. You can delete the fast list flag and the script will run fine, but scans will take a bit longer. 
 You can also try using --no-traverse rather than --fast-list.
 
 There is a clean_tds option in the script to dedupe and remove empty directores from source or destination and to delete trash. 
