@@ -1,7 +1,7 @@
 # sasync
 
-This basic script uses rclone with google service accounts to do server-side copy or sync between rclone remotes using sync 'sets'.
-If you only use a few service accounts then this may be overkill. But if you have many SAs or many TDs it can help automate syncs/backups.
+This basic script uses rclone with google service accounts to do server-side one-way copy or sync between rclone remotes using sync 'sets'.
+If you only use a few service accounts then this may be overkill. But if you have many SAs or many TDs it can help automate rclone syncs/backups.
 It is written in bash to allow it to function in most OSes without installing dependencies. Feel free to adapt it to other languages.
 
 Before using this script it is important that you understand how to use service accounts with rclone. There are plenty of 
