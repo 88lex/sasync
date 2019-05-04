@@ -12,7 +12,7 @@ In most cases if you are having problems the culprit will be your permissions. P
 Copy/sync with My Drive can be done but is a bit more tricky. You may need --drive-shared-with-me and --drive-impersonate, as SA accounts
 only see My Drive files in Shared with Me.
 
-There are several files in the repo:
+There are several files in the repo. When you run the script check that the files exist on your local machine and that the script points to them correctly.
 
 1. sasync is the main script that pulls sync sets from 'set' files and runs rclone sync (or copy with the -c flag).
 2. json.count is an external counter file for the json set. The easiest setup is to number your jsons 1.json, 2.json etc.
@@ -30,7 +30,7 @@ td_tv_4k:    my_tv_4k:      2           20          16M            2        500G
 
 Run the script with this syntax "./sasync set.tv" to cycle rclone sync for each source-destination pair and each block of SAs in your set.* file.
 
-You can run rclone copy rather than sync by using the -c flag.  e.g. "./sasync -c set.tv"
+You can run rclone copy rather than sync by using the -c flag.  e.g. "./sasync -c set.tv".  I also added 'sacopy' to the repo, which just runs this line.
 
 Each sync set can have an unlimited number of sync pairs.
 
