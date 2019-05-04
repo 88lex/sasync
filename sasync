@@ -2,7 +2,7 @@
 # `#!/usr/bin/env bash` allows difft bash locations. e.g w MacOS. Use #!/bin/bash if needed
 SYNCCOPY=sync                               # Default action is rclone sync. -c flag to change to rclone copy
 JSON_FOLDER=/opt/sa                         # Location of folder with service account .json files. No trailing slash
-EXCLUDES=/opt/exclude.txt                   # Location of file types to exclude from copy/sync
+EXCLUDES=/opt/sasync/exclude.txt            # Location of file types to exclude from copy/sync
 MIN_JSON=1; MAX_JSON=100                    # Set MIN and MAX json file numbers assuming file format is 1.json, 2.json
 
 # For each source-destination pair set_rclone_flags reads the rclone flags from the set.* file
