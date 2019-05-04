@@ -8,9 +8,10 @@ Before using this script it is important that you understand how to use service 
 threads in the rclone forum as well as discord channels to learn about SAs (i.e. Don't ask me). 
 See  https://rclone.org/drive/#service-account-support 
 
-In most cases if you are having problems the culprit will be your permissions. Permissions for Team Drive copy/sync are pretty straighforward. 
-Copy/sync with My Drive can be done but is a bit more tricky. You may need --drive-shared-with-me and --drive-impersonate, as SA accounts
-only see My Drive files in Shared with Me.
+In most cases if you are having problems the culprit will be your permissions. Permissions for Team Drive copy/sync are pretty straighforward:
+EACH SA MUST HAVE READ/WRITE PERMISSION FOR EACH SOURCE/DESTINATION ACCOUNT. You can do this individually or with a Group.
+This script will work with My Drive but can be a bit more tricky. You may need --drive-shared-with-me and/or --drive-impersonate, as SA accounts
+have their own (empty) My Drive but SAs cannot directly add shared folders to My Drive.
 
 There are several files in the repo. When you run the script check that the files exist on your local machine and that the script points to them correctly.
 
