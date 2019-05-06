@@ -1,8 +1,12 @@
-# sasync - one-way rclone sync/copy using multiple service accounts
+# sasync : one-way rclone sync/copy between TDs using multiple service accounts
 
-This basic script uses rclone with google service accounts to do server-side one-way copy or sync between rclone remotes using sync 'sets'.
+USAGE: ./sasync set.tv
+
+This script uses rclone with google service accounts to do server-side one-way copy or sync between rclone remotes using sync 'sets'.
+It works between Team Drives as-is. It is possible to get it working with My Drive but takes a bit of manual config (see below, and Google to learn).
+
 If you only use a few service accounts then this may be overkill. But if you have many SAs or many TDs it can help automate rclone syncs/backups.
-It is written in bash to allow it to function in most OSes without installing dependencies. Feel free to adapt it to other languages.
+The script is written in bash to allow it to function in most OSes without installing dependencies. Feel free to adapt it to other languages.
 
 Before using this script it is important that you understand how to use service accounts with rclone. There are plenty of 
 threads in the rclone forum as well as discord channels to learn about SAs (i.e. Don't ask me). 
@@ -10,16 +14,18 @@ See  https://rclone.org/drive/#service-account-support
 
 In most cases if you are having problems the culprit will be your permissions. Permissions for Team Drive copy/sync are pretty straighforward:
 EACH SA MUST HAVE READ/WRITE PERMISSION FOR EACH SOURCE/DESTINATION ACCOUNT. You can do this individually or with a Group.
-This script will work with My Drive but can be a bit more tricky. You may need --drive-shared-with-me and/or --drive-impersonate, as SA accounts
-have their own (empty) My Drive but SAs cannot directly add shared folders to My Drive.
 
-There are several files in the repo. When you run the script check that the files exist on your local machine and that the script points to them correctly.
+This script will work with My Drive but can be a bit more tricky. You need --drive-shared-with-me and/or --drive-impersonate, as SA accounts
+have their own (empty) My Drive but SAs cannot add shared folders to My Drive as you do with a normal account.
+
+There are several files in the repo. Before running, check that the files exist on your local machine and that the script points to each file
+in its correct location.
 
 1. sasync is the main script that pulls sync sets from 'set' files and runs rclone sync (or copy with the -c flag).
 2. json.count is an external counter file for the json set. The easiest setup is to number your jsons 1.json, 2.json etc.
 3. set.* files specify rclone source, destination, transfers, checkers, chunks, number of service accounts and max-transfer size.
-4. exclude.txt specifies file patterns to exclude. Some files hang rclone server-side copying. If that happens to you add them to exclude.txt .
-5. sacopy simply runs sasync with the -c script. Sometimes easier to use for clarity (copy vs sync batches)
+4. exclude.txt specifies file patterns to exclude. Some files hang rclone server-side copying. If that happens then add those file types to exclude.txt .
+5. sacopy runs sasync with the -c script. Sometimes it's easier to use sacopy for clarity (copy vs sync batches).
 
 Each set.* file specifies which sync pairs you would like to run along with rclone flags for that sync pair. The set file format is:
 <pre>
@@ -31,15 +37,11 @@ td_tv_4k:    my_tv_4k:      2           20          16M            2        500G
 
 Run the script with this syntax "./sasync set.tv" to cycle rclone sync for each source-destination pair and each block of SAs in your set.* file.
 
-You can run rclone copy rather than sync by using the -c flag.  e.g. "./sasync -c set.tv".  I also added 'sacopy' to the repo, which just runs this line.
-
 Each sync set can have an unlimited number of sync pairs.
 
-If you prefer to create smaller/separate sets then you can create individual set.* files for each subset. e.g. tv, movies, etc.
+If you prefer to create smaller/separate sets then you can create set.* files for each subset. e.g. set.tv, set.movies, set.books etc.
 
 If you have multiple sets then you can run them in sequence with "./sasync set.tv set.movies set.books" or in parallel with "./sasync set.tv & ./sasync set.movies &" .
-
-If you don't have many SAs but you want to run multiple source-destination pairs try setting --max-transfer to a lower number (100G, 200G ...)
 
 WARNING: At the moment there is an issue with rclone and server side copies/syncs when you hit the hard limit of 750G uploads per day. 
 If there are files in the transfer 'buffer' and you hit the hard limit then rclone can hang indefinitely. There are a few ways to mitigate this problem.
