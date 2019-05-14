@@ -88,7 +88,7 @@ process_all_sets_and_SAs () {
 #  Each input file can have as many sync sets as you want.
 #  You can process up to 9 input files at once using the command syntax of
 #  ``sasync inputfile1 inputfile2`` and so on. Files will process in sequence not in parallel.
-#  Or you can run in parallel using ``sasync inputfile1 && sasync inputefile2 &&`` and so on.
+#  Or you can run in parallel using ``sasync inputfile1 & sasync inputefile2 &`` and so on.
 #
 #  Column order is critical. Column labels are ignored, but useful for reference.
 #  Colon ':` is critical at the end of source and destination names.
