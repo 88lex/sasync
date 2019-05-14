@@ -1,6 +1,9 @@
 # sasync : one-way rclone sync/copy between TDs using multiple service accounts
 
-USAGE: ./sasync set.tv
+USAGE: ./sasync set.tv set.movies
+
+NOTE: Two older, simple versions of sasync are included in the repo. The first works with a single source/destination pair. The second
+works with multiple, embedded source/destination pairs rather than using external files.
 
 This script uses rclone with google service accounts to do server-side one-way copy or sync between rclone remotes using sync 'sets'.
 It works between Team Drives as-is. It is possible to get it working with My Drive but takes a bit of manual config (see below, and Google to learn).
