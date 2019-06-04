@@ -2,6 +2,9 @@
 
 USAGE: ./sasync set.tv set.movies
 
+NOTE: sasync won't run properly if it cannot find your set files, json files, json.count or exclude.txt. Always double check
+that you are pointing sasync to the correct file locations. If in doubt use absolute locations throughout e.g. `/opt/sasync/set.tv` `opt/myjsons`
+
 NOTE: Two older, simple versions of sasync are included in the repo (sasync-simple1, sasync-simple2). 
 The first works with a single source/destination pair. The second works with multiple, embedded source/destination pairs 
 rather than using external files to specific sync sets, a counter and excluded file types.
