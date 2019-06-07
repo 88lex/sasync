@@ -38,8 +38,8 @@ Each set.* file specifies which sync pairs you would like to run along with rclo
 <pre>
 # set.tv
 # 1source    2destination   3transfers  4checkers   5chunksize     6SAs     7maxtransfer
-td_tv:       my_tv:         4           200         16M            5        600G
-td_tv_4k:    my_tv_4k:      2           200         16M            2        500G
+td_tv:       my_tv:         4           20          16M            5        600G
+td_tv_4k:    my_tv_4k:      2           20          16M            2        500G
 </pre>
 
 Run the script with this syntax "./sasync set.tv" to cycle rclone sync for each source-destination pair and each block of SAs in your set.* file.
