@@ -2,20 +2,33 @@
 # `#!/usr/bin/env bash` allows difft bash locations. e.g w MacOS. Use #!/bin/bash if needed
 SYNCCOPY=sync                               # Default action is rclone sync. -c flag to change to rclone copy
 JSON_FOLDER=/opt/sa                         # Location of folder with service account .json files. No trailing slash
-EXCLUDES=/opt/sasync/exclude.txt            # Location of file types to exclude from copy/sync
-MIN_JSON=1; MAX_JSON=100                    # Set MIN and MAX json file numbers assuming file format is 1.json, 2.json
-# NOTE: YOU NEED TO CHANGE `MAX_JSON` TO EQUAL THE NUMBER OF JSON FILES YOU ACTUALLY HAVE IN YOUR JSON_FOLDER
+EXCLUDES=/opt/sasync/exclude.txt                   # Location of file types to exclude from copy/sync
+MIN_JSON=1; MAX_JSON=1200                    # Set MIN and MAX json file numbers assuming file format is 1.json, 2.json
+
+sacalc() {
+let sourcesize=`rclone size $source --fast-list | sed -e"s/(//" | grep -i "Bytes" | cut -f5 -d " "`
+echo sourcesize of $source = $sourcesize; echo;
+let destsize=`rclone size $destination --fast-list | sed -e"s/(//" | grep -i "Bytes" | cut -f5 -d " "`
+echo destsize of $destination = $destsize; echo;
+let srcdestdiff=$(( $sourcesize<=$destsize?1:$sourcesize - $destsize ))
+echo diff between $source and $destination is $srcdestdiff; echo;
+let maxtransfer00=$( echo $maxtransfer | cut -d "G" -f1 | echo -e "$(cat -)000000000" )
+echo maxtransfer = $maxtransfer; echo;
+let SAs=$(( $srcdestdiff / $maxtransfer00 + 1 ))
+echo Number of Service Accounts = $SAs; echo;
+}
 
 # For each source-destination pair set_rclone_flags reads the rclone flags from the set.* file
 set_rclone_flags () {
-  sync=(`echo ${syncsets[$set]}`)           
+  sync=(`echo ${syncsets[$set]}`)
   source="${sync[0]}"                       # Be sure that your SAs have permission to read/write to each source and destination
   destination="${sync[1]}"
   transfers="${sync[2]}"
   checkers="${sync[3]}"
   chunks="${sync[4]}"                       # sets --drive-chunk-size ; irrelevant unless you add --disable move,copy to rclone below
-  SAs="${sync[5]}"                          # Number of SAs used for each rclone remote sync set
   maxtransfer="${sync[6]}"                  # MAX transfer in GB, then move to next SA
+  sacalc                                    # sacalc will automatically calculate the number of SAs needed for each source/dest pair
+#  SAs="${sync[5]}"                          # Number of SAs used for each rclone remote sync set
 }
 
 # Read the current json to be used from the json.count file, then increment by +1 for the next call
@@ -89,7 +102,7 @@ process_all_sets_and_SAs () {
 #  Each input file can have as many sync sets as you want.
 #  You can process up to 9 input files at once using the command syntax of
 #  ``sasync inputfile1 inputfile2`` and so on. Files will process in sequence not in parallel.
-#  Or you can run in parallel using ``sasync inputfile1 & sasync inputefile2 &`` and so on.
+#  Or you can run in parallel using ``sasync inputfile1 && sasync inputefile2 &&`` and so on.
 #
 #  Column order is critical. Column labels are ignored, but useful for reference.
 #  Colon ':` is critical at the end of source and destination names.
