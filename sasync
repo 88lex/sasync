@@ -1,63 +1,60 @@
 #!/usr/bin/env bash
-# `#!/usr/bin/env bash` allows difft bash locations. e.g w MacOS. Use #!/bin/bash if needed
-SYNCCOPY=sync                               # Default action is rclone sync. -c flag to change to rclone copy
 JSON_FOLDER=/opt/sa                         # Location of folder with service account .json files. No trailing slash
-EXCLUDES=/opt/sasync/exclude.txt                   # Location of file types to exclude from copy/sync
-MIN_JSON=1; MAX_JSON=1200                    # Set MIN and MAX json file numbers assuming file format is 1.json, 2.json
+EXCLUDES=/opt/sasync/exclude.txt            # Location of exclude.txt file with list of file types to exclude
+MIN_JSON=1; MAX_JSON=1200                   # Set MIN and MAX json file numbers assuming file format is 1.json, 2.json
 
-sacalc() {
-let sourcesize=`rclone size $source --fast-list | sed -e"s/(//" | grep -i "Bytes" | cut -f5 -d " "`
-echo sourcesize of $source = $sourcesize; echo;
-let destsize=`rclone size $destination --fast-list | sed -e"s/(//" | grep -i "Bytes" | cut -f5 -d " "`
-echo destsize of $destination = $destsize; echo;
-let srcdestdiff=$(( $sourcesize<=$destsize?1:$sourcesize - $destsize ))
-echo diff between $source and $destination is $srcdestdiff; echo;
-let maxtransfer00=$( echo $maxtransfer | cut -d "G" -f1 | echo -e "$(cat -)000000000" )
-echo maxtransfer = $maxtransfer; echo;
-let SAs=$(( $srcdestdiff / $maxtransfer00 + 1 ))
-echo Number of Service Accounts = $SAs; echo;
+sacalc () {
+  echo;echo Calculating size of $source and $destination;echo;echo WAIT, TAKES A COUPLE SECONDS/MINUTES;echo;
+  let sourcesize=`rclone size $source --fast-list | sed -e"s/(//" | grep -i "Bytes" | cut -f5 -d " "`+1
+  let destsize=`rclone size $destination --fast-list | sed -e"s/(//" | grep -i "Bytes" | cut -f5 -d " "`+1
+  let srcdestdiff=$(( $sourcesize<=$destsize?1:$sourcesize - $destsize ))
+  let maxtransfer00=$( echo $maxtransfer | cut -d "G" -f1 | echo -e "$(cat -)000000000" )
+  let SAs=$(( $srcdestdiff / ( $maxtransfer00 + 1 ) + 1 ))
+  echo Source $source size is $(( $sourcesize / 1000000000 ))GB, Destination $destination size is $(( $destsize / 1000000000 ))GB
+  echo Difference of $(( $srcdestdiff / 1000000000 ))GB requires $SAs SAs with maxtransfer of $maxtransfer; sleep 4s
 }
 
-# For each source-destination pair set_rclone_flags reads the rclone flags from the set.* file
 set_rclone_flags () {
-  sync=(`echo ${syncsets[$set]}`)
-  source="${sync[0]}"                       # Be sure that your SAs have permission to read/write to each source and destination
-  destination="${sync[1]}"
-  transfers="${sync[2]}"
-  checkers="${sync[3]}"
-  chunks="${sync[4]}"                       # sets --drive-chunk-size ; irrelevant unless you add --disable move,copy to rclone below
-  maxtransfer="${sync[6]}"                  # MAX transfer in GB, then move to next SA
-  sacalc                                    # sacalc will automatically calculate the number of SAs needed for each source/dest pair
-#  SAs="${sync[5]}"                          # Number of SAs used for each rclone remote sync set
+  sync=(`echo ${syncsets[$set]}`); echo Line $(( $set + 1 )) of your set is:; echo ${syncsets[$set]};
+  if [ ${#sync[@]} -lt 8 ]; then echo Check your "set" file ERRORS; exit; fi
+  synccopymove="${sync[0]}"; echo;echo SYNCCOPYMOVE = $synccopymove;
+  source="${sync[1]}"; echo SOURCE = $source;
+  destination="${sync[2]}"; echo DESTINATION = $destination;
+  transfers="${sync[3]}"; echo TRANSFERS = $transfers;
+  checkers="${sync[4]}"; echo CHECKERS = $checkers;
+  chunks="${sync[5]}"; echo DRIVE CHUNK SIZE = $chunks;
+  maxtransfer="${sync[7]}"; echo MAX TRANSFER = $maxtransfer;
+  rcloneextraflags=`echo ${sync[@]} | cut -f 9- -d ' '`; echo Additional rclone flags are $rcloneextraflags;
+  sacalc
+  # SAs="${sync[6]}"
 }
 
-# Read the current json to be used from the json.count file, then increment by +1 for the next call
 get_json_count () {
-  read COUNT < json.count                   # Pull current json number from json.count file
-  if [[ "$COUNT" -gt "$MAX_JSON"  ]];
+  read COUNT < json.count
+  if [[ "$COUNT" -gt "$MAX_JSON" ]];
   then let COUNT=$MIN_JSON; fi
-  echo $(($COUNT+1)) > json.count           # Increment +1 or reset to MIN if at MAX
+  echo $(($COUNT+1)) > json.count
 }
 
-# For a source-destination pair and an SA run rclone sync (or copy with sasync -c flag)
-# Feel free to play with the rclone flags to optimize. --fast-list can be problematic. The script works without it, more slowly.
 run_rclone_with_flags () {
-  get_json_count
-  echo; echo Starting $SYNCCOPY of $source to $destination w $COUNT/$MAX_JSON.json from $input_files; echo
-  #timeout 30m\
-  rclone $SYNCCOPY $source $destination\
-  --drive-use-trash=false\
-  --transfers $transfers --checkers $checkers\
-  --max-transfer $maxtransfer --drive-chunk-size $chunks\
-  --fast-list --size-only -vP --stats 5s --delete-during\
-  --tpslimit 5 --tpslimit-burst 50 --max-backlog 1000000\
-  --exclude-from $EXCLUDES --stats-file-name-length 0\
-  --drive-service-account-file $JSON_FOLDER/$COUNT.json
-  echo FINISHED $source to $destination wJSON $COUNT.json
+  if [ "$sourcesize" == "$destsize" ]; then
+    echo Size of source $sourcesize equals size of destination $destsize. Skipping to next source-destination pair.; sleep 2s
+  else
+    get_json_count
+    echo; echo Starting $synccopymove of $source to $destination w $COUNT/$MAX_JSON.json from $input_files; echo
+    #timeout 30m\
+echo    rclone $synccopymove $source $destination\
+    --drive-use-trash=false\
+    --transfers $transfers --checkers $checkers\
+    --max-transfer $maxtransfer --drive-chunk-size $chunks\
+    --fast-list --size-only -vP --stats 5s --delete-during\
+    --tpslimit 5 --tpslimit-burst 50 --max-backlog 1000000\
+    --exclude-from $EXCLUDES --stats-file-name-length 0 $rcloneextraflags\
+    --drive-service-account-file $JSON_FOLDER/$COUNT.json
+    echo;echo FINISHED $synccopymove from $source to $destination wJSON $COUNT.json;echo
+  fi
 }
 
-# clean_tds is an optional function with 3 features. Use hash # to omit any line. For source or destination it can:
-# 1. dedupe identical files  2. remove empty directories  3. permanently empty trash <= be sure you really want to do this.
 clean_tds () {
   echo; echo STARTING DEDUPE of identical files from $destination; echo
   rclone dedupe skip $destination -v --drive-use-trash=false --no-traverse --transfers=40
@@ -65,68 +62,27 @@ clean_tds () {
   rclone rmdirs $destination -v --drive-use-trash=false --fast-list --transfers=40
   echo; echo PERMANENTLY DELETING TRASH from $destination; echo
   rclone delete $destination -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40
-  #echo; echo STARTING DEDUPE of identical files from $source; echo
-  #rclone dedupe skip $source -v --drive-use-trash=false --no-traverse --transfers=40
-  #echo; echo REMOVING EMPTY DIRECTORIES from source; echo
-  #rclone rmdirs $source -v --drive-use-trash=false --fast-list --transfers=40
-  #echo; echo PERMANENTLY DELETING TRASH from source; echo
-  #rclone delete $source -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40
+  #echo; echo STARTING DEDUPE of identical files from $source; rclone dedupe skip $source -v --drive-use-trash=false --no-traverse --transfers=40
+  #echo; echo REMOVING EMPTY DIRECTORIES from source; rclone rmdirs $source -v --drive-use-trash=false --fast-list --transfers=40
+  #echo; echo PERMANENTLY DELETING TRASH from source; rclone delete $source -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40
 }
 
-# Run rclone for each source-dest in the set file and repeat for specified # of SAs.
 process_all_sets_and_SAs () {
-  for set in $(seq 0 $(( $number_of_sync_sets-1 ))); do     # Do a loop for each source/destination pair
+  for set in $(seq 0 $(( $number_of_sync_sets-1 ))); do
     set_rclone_flags
-    for SA in $(seq 1 $SAs); do                             # Do a loop for each SA
-      run_rclone_with_flags                                 # Run rclone with flags from input file
+    for SA in $(seq 1 $SAs); do
+      run_rclone_with_flags
     done
-    clean_tds                                               # Hash out this line if you want to entirely skip clean_tds
+#    clean_tds
   done
 }
 
-# sasync lets you use multiple sets in one command. e.g. sasync set.tv set.movies set.books will run them in sequence.
-# Do a loop for each input file in the command line
+main () {
   for input_files in $*; do
-    if [ $input_files = "-c" ]; then
-      SYNCCOPY=copy
-    else
       readarray syncsets < <( sed '/^#/d' $input_files )
       number_of_sync_sets=$(( ${#syncsets[@]} ))
       process_all_sets_and_SAs
-    fi
   done
+}
 
-
-#  Command syntax is `sasync inputfile1 inputfile2' to sync or `sasync -c inputfile` to copy
-#  The sample format of the input file is below. You can name it anything you like.
-#  Each input file can have as many sync sets as you want.
-#  You can process up to 9 input files at once using the command syntax of
-#  ``sasync inputfile1 inputfile2`` and so on. Files will process in sequence not in parallel.
-#  Or you can run in parallel using ``sasync inputfile1 && sasync inputefile2 &&`` and so on.
-#
-#  Column order is critical. Column labels are ignored, but useful for reference.
-#  Colon ':` is critical at the end of source and destination names.
-#  When setting maxtransfer allow a buffer between 750G/SA upload allowance and
-#  residual files being transferred when rclone hits the maxtransfer limit.
-#  Example: If 4k movies average 50GB in size and you have 4 in `transfers` then set
-#  maxtransfers at (750G - (4 X 50G))= 550G or less. Otherwise rclone may hang.
-#
-#  inputfile1 named `set.movies`
-#  # 1source      2destination   3transfers 4checkers 5chunks  6SAs  7maxtransfer
-#  movies:        my_movies:     2          20        16M      10    600G
-#  movies_4k:     my_movies_4k:  2          20        16M      4     500G
-#
-#  inputfile2 named `set.tv`
-#  # 1source    2destination   3transfers 4checkers 5chunks  6SAs  7maxtransfer
-#  zd_tv1:      my_tv1:        4          20        16M         2        700G
-#  zd_tv2:      my_tv2:        4          20        16M         5        700G
-#  zd_tv_4k:    my_tv_4k:      2          20        16M         2        600G
-#
-#  There is also an external counter file named `json.count` which keeps track of the
-#  current json being used and is then incremented with each cycle. By being external it
-#  allows multiple instances of sasync to use the same json pool and it is persistent over
-#  time when sasync terminates. When the last json in the pool is used the script loops back
-#  to the first json in the pool.
-#  If it does not already exist then create a text file names json.count and add the initial
-#  json number to it (typically simply the number `1` without quotes).
-#
+main $@
