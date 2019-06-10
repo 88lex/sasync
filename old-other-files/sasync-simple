@@ -1,0 +1,9 @@
+#!/bin/bash
+COUNT=1
+SOURCE="google:tv"
+DESTINATION="bak:tv"
+while [ $COUNT -le 5 ]; do
+echo SERVICE ACCOUNT IS "$COUNT".json
+rclone sync $SOURCE $DESTINATION -vP --fast-list --tpslimit=4 --tpslimit-burst=50 --max-transfer=600G --drive-service-account-file=/opt/jsons/"$COUNT".json
+let COUNT+=1
+done
