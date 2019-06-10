@@ -1,6 +1,10 @@
 # set.tv
-# Note: 8rcloneflags is optional and can contain additional or override rclone flags
-# The additional flags will override any existing or conflicting flags
 #syncpymv 1source    2dest      3transf  4check  5chnks  6SAs 7maxtran  8rcloneflags
 sync      td_tv:     my_tv:     20       20      16M     1    500G      --tpslimit-burst=100
 copy      td_tv_4k:  my_tv_4k:  4        20      16M     1    500G      --no-traverse --other-options
+#
+# Note: 8rcloneflags is optional and can contain additional or override rclone flags
+# The additional flags will override any existing or conflicting rclone flags
+# Adjust 3transfers (number of parallel transfers) higher if you like. 
+# But then set maxtransfer carefully to avoid having rclone hang.
+# Max transfer should not exceed (750G minus (transfers times average file size for your source drive)).
