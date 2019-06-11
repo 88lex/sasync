@@ -6,7 +6,7 @@
 1. Includes a function which calculates the size of the source and destination for each pair in the set.* file, then estimates the number of SAs required based on the --max-transfer setting.
 2. Allows adding rclone flags to each/all pairs in the set.* file. Flags which conflict with default flags in the sasync script will override them.
 3. Allows the user to set sync, copy or move within the set file. This setting can be different for each source-destination pair.
-4. Requires changing your set.* files 
+4. Requires changing your set.* files if you were running a previous version of sasync 
 5. Skips a pair if source and destination are exactly equal in size.
 6. Has a light check of set.* source destination pairs. If there are too few the script aborts with an error.
 
