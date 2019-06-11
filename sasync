@@ -4,7 +4,7 @@ EXCLUDES=/opt/sasync/exclude.txt            # Location of exclude.txt file with 
 MIN_JSON=1; MAX_JSON=1200                   # Set MIN and MAX json file numbers assuming file format is 1.json, 2.json
 
 rclone_remote_check () {
-  rclone lsd $1;  if [ $? != 0 ];  then  echo;echo THE REMOTE $1 FAILED. PLEASE CHECK rclone.conf;echo;  exit;  fi
+  rclone lsd $1;  if [ $? != 0 ];  then  echo;echo THE REMOTE $1 FAILED. PLEASE CHECK set.* file and rclone.conf;echo;  exit;  fi
 }
 
 sacalc () {
