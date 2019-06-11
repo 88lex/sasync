@@ -24,9 +24,9 @@ delete the flag from sasync.
 The set.* files specify which sync pairs you would like to run along with rclone flags for that sync pair. The format would be as follows:
 <pre>
 # set.tv
-#synccopymove  1source    2destination  3maxtransfer  4rcloneflags
-sync           td_tv:     my_tv:        350G          --dry-run
-copy           td_tv_4k:  my_tv_4k:     350G          --dry-run --no-traverse
+#0synccopymove  1source    2destination  3maxtransfer  4rcloneflags
+sync            td_tv:     my_tv:        350G          --dry-run
+copy            td_tv_4k:  my_tv_4k:     350G          --dry-run --no-traverse
 </pre>
 
 The script will ignore lines that begin with a hash '#'
