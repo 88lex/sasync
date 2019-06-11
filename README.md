@@ -7,11 +7,11 @@
 **The new version of sasync:**
 1. Includes a function which calculates the size of the SOURCE and DESTINATION for each pair in the set.* file, then estimates the number 
 of SAs required based on the --max-transfer setting. If you wish to set the number of SAs manually, put a # before sacalc and unhash the `SAs=` line.
-2. Allows adding rclone flags to each/all pairs in the set.* file. Flags which conflict with default flags in the sasync script will override the defaults.
-3. Allows the user to set sync, copy or move within the set file. This setting can be different for each source-destination pair.
-4. Requires changing your set.* files if you were running a previous version of sasync 
+2. Allows the user to set sync, copy or move within the set file. This setting can be different for each source-destination pair. 
+3. Allows adding rclone flags to each/all pairs in the set.* file. Flags which conflict with default flags in the sasync script will override the defaults.
+3. Requires changing your set.* files if you were running a previous version of sasync 
 5. Skips a sync pair if source and destination are exactly equal in size, then moves on to the next sync pair.
-6. Has a light check of set.* source destination pairs. If there are too few the script aborts with an error.
+6. If there are too few items in any set.* line then the script aborts with an error.
 
 **NOTE:** Recent betas of rclone require a new flag `--drive-server-side-across-configs` in order to do server-side sync/copy. This flag has been
 added to this version of sasync as a default. If you are running an older version of rclone or wish to not execute server-side copies simply
