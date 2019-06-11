@@ -1,5 +1,5 @@
 # set.tv.sample
 # Note: rcloneflags are optional and will override any existing or conflicting flags
-#syncpymv 1source    2dest     3maxtran  4rcloneflags
-sync      td_tv1:    my_tv1:   350G      --dry-run
-copy      td_tv2:    my_tv2:   350G      --no-traverse --dry-run
+#synccopymove 1source    2destination   3maxtransfer  4rclone_flags
+sync          td_tv1:    my_tv1:        350G          --dry-run
+copy          td_tv2:    my_tv2:        350G          --no-traverse --dry-run
