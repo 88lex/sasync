@@ -1,4 +1,5 @@
 # **sasync**
+**Usage:  ./sasync set.tv**
 
 **This script uses rclone with service accounts to sync, copy or move files between rclone remotes.**
 
