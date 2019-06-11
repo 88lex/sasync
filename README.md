@@ -10,6 +10,9 @@
 5. Skips a pair if source and destination are exactly equal in size.
 6. Has a light check of set.* source destination pairs. If there are too few the script aborts with an error.
 
+**NOTE:** Recent betas of rclone require a new flag `--drive-server-side-across-configs` in order to do server-side sync/copy. This flag has been
+added to this version of sasync as a default. If you are running an older version of rclone or wish to not execute server-side copies simply
+delete the flag from sasync.
 
 **There are several files in the repo at the moment.**
 1. sasync is the main script that pulls sync sets from 'set' files and runs rclone sync/copy/move.
