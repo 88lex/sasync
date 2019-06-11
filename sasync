@@ -43,7 +43,7 @@ run_rclone_with_flags () {
     get_json_count
     echo; echo Starting $synccopymove of $source to $destination w $COUNT/$MAX_JSON.json from $input_files; echo
     #timeout 30m\
-echo    rclone $synccopymove $source $destination\
+    rclone $synccopymove $source $destination\
     --drive-use-trash=false\
     --transfers $transfers --checkers $checkers\
     --max-transfer $maxtransfer --drive-chunk-size $chunks\
