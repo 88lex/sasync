@@ -3,6 +3,10 @@ JSON_FOLDER=/opt/sa                         # Location of folder with service ac
 EXCLUDES=/opt/sasync/exclude.txt            # Location of exclude.txt file with list of file types to exclude
 MIN_JSON=1; MAX_JSON=1200                   # Set MIN and MAX json file numbers assuming file format is 1.json, 2.json
 
+rclone_remote_check () {
+  rclone lsd $1;  if [ $? != 0 ];  then  echo;echo THE REMOTE $1 FAILED. PLEASE CHECK rclone.conf;echo;  exit;  fi
+}
+
 sacalc () {
   echo;echo CHECKING SIZE of $source and $destination... BE PATIENT, LARGE REMOTES TAKE MINUTES;echo;
   let sourcesize=`rclone size $source --fast-list | sed -e"s/(//" | grep -i "Bytes" | cut -f5 -d " "`+1
@@ -14,13 +18,12 @@ sacalc () {
   echo DESTINATION $destination size is $(( $destsize / 1000000000 ))GB
   echo DIFFERENCE of $(( $srcdestdiff / 1000000000 ))GB requires $SAs SAs with maxtransfer of $maxtransfer
 }
-
 set_rclone_flags () {
   sync=(`echo ${syncsets[$set]}`); echo Line $(( $set + 1 )) of your set is:; echo ${syncsets[$set]};
   if [ ${#sync[@]} -lt 4 ]; then echo Check your "set" file ERRORS; exit; fi
   synccopymove="${sync[0]}"; echo;echo SYNCCOPYMOVE = $synccopymove;
-  source="${sync[1]}"; echo SOURCE = $source;
-  destination="${sync[2]}"; echo DESTINATION = $destination;
+  source="${sync[1]}"; echo SOURCE = $source; rclone_remote_check $source
+  destination="${sync[2]}"; echo DESTINATION = $destination; rclone_remote_check $destination
   maxtransfer="${sync[3]}"; echo MAX TRANSFER = $maxtransfer;
   rcloneflags=`echo ${sync[@]} | cut -f 5- -d ' '`; echo rclone flags = $rcloneflags;
   sacalc
