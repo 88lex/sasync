@@ -7,7 +7,7 @@
 2. Allows adding rclone flags to each/all pairs in the set.* file. Flags which conflict with default flags in the sasync script will override them.
 3. Allows the user to set sync, copy or move within the set file. This setting can be different for each source-destination pair.
 4. Requires changing your set.* files if you were running a previous version of sasync 
-5. Skips a pair if source and destination are exactly equal in size.
+5. Skips a sync pair if source and destination are exactly equal in size, then moves on to the next sync pair.
 6. Has a light check of set.* source destination pairs. If there are too few the script aborts with an error.
 
 **NOTE:** Recent betas of rclone require a new flag `--drive-server-side-across-configs` in order to do server-side sync/copy. This flag has been
