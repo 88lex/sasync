@@ -1,5 +1,5 @@
 # **sasync**
-**Usage:  ./sasync set.tv**
+**Usage:  ./sasync set.tv**    
 **Note:** Before running sasync double check that line 2 in the script points to the correct location of your json files.
 
 **This script uses rclone with service accounts to sync, copy or move files between rclone remotes.**
