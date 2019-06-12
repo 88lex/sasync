@@ -1,8 +1,7 @@
 # **sasync**
 **Usage:  `./sasync set.tv`**    
 **Note1:** Before running sasync double check that line 2 in the script `JSON_FOLDER=/opt/sa` points to the correct location of your json files.    
-**Note2:** If you want logs run `./sasync set.tv | tee -a sasync.log` or if you want a timestamped log then run
-`./sasync set.tv | tee sasync$(date +%y%m%d%h%m).log`
+**Note2:** To generate logs run `./sasync set.tv | tee -a sasync.log` or for timestamped log run `./sasync set.tv | tee sasync$(date +%y%m%d%h%m).log`
 
 **This script uses rclone with service accounts to sync, copy or move files between rclone remotes.**
 
