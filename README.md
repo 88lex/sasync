@@ -1,6 +1,6 @@
 # **sasync**
 **Usage:  `./sasync set.tv`**    
-**Note1:** Before running sasync double check that line 2 in the script points to the correct location of your json files.    
+**Note1:** Before running sasync double check that line 2 in the script `JSON_FOLDER=/opt/sa` points to the correct location of your json files.    
 **Note2:** If you want logs run `./sasync set.tv | tee -a sasync.log` or `./sasync set.tv | tee -a sasync$(date +%y%m%d%h%m).log`
 if you want a timestamped log file . Remove the `-a` if you want to overwrite rather than append.
 
