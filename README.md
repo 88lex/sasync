@@ -37,12 +37,12 @@ copy            td_tv_4k:  my_tv_4k:     350G          --dry-run --no-traverse
 
 The script will ignore lines that begin with a hash '#'
 
-Script syntax would be "./sasync set.tv" which runs rclone sync for each source-dest pair, in a loop for number of SAs.
+Script syntax would be `./sasync set.tv` which runs rclone sync for each source-dest pair, in a loop for number of SAs.
 
 Each sync set can have from 1 to an unlimited number of sync pairs. Or if you prefer to create smaller/separate sets like tv, movies, 4k, ebooks/audiobooks, etc. then you can create individual set.* files for each subset.
 
-If you have multiple sets then you can run them in sequence with "./sasync set.tv set.movies set.books"
-Or you can run them in parallel with "./sasync set.tv & ./sasync set.movies"
+If you have multiple sets then you can run them in sequence with `./sasync set.tv set.movies set.books`
+Or you can run them in parallel with `./sasync set.tv & ./sasync set.movies`
 
 Resource usage for this script is very light as the copy/move actions are all executed server side. That said, the script can be modified to use the --disable move,copy flag if you prefer, in which case I/O and CPU usage would rise.
 
