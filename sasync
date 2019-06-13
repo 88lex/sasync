@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
+
 JSON_FOLDER=/opt/sa                         # Location of folder with service account .json files. No trailing slash
-EXCLUDES=/opt/sasync/exclude.txt            # Location of exclude.txt file with list of file types to exclude
+JSON_COUNT_FILE=/opt/sasync/json.count     # Location of json.count file. If you have multiple json groups, keep separate json.count files/locations
 MIN_JSON=1; MAX_JSON=1200                   # Set MIN and MAX json file numbers assuming file format is 1.json, 2.json
+EXCLUDES=/opt/sasync/exclude.txt            # Location of exclude.txt file with list of file types to exclude
 
 rclone_remote_check () {
   rclone lsd $1 > /dev/null 2>&1;  if [ $? != 0 ];  then  echo;echo THE REMOTE $1 FAILED. PLEASE CHECK set.* file and rclone.conf;echo;  exit;  fi
@@ -31,10 +33,10 @@ set_rclone_flags () {
 }
 
 get_json_count () {
-  read COUNT < /opt/sasync/json.count
+  read COUNT < $JSON_COUNT_FILE
   if [[ "$COUNT" -gt "$MAX_JSON" ]];
   then let COUNT=$MIN_JSON; fi
-  echo $(($COUNT+1)) > /opt/sasync/json.count
+  echo $(($COUNT+1)) > $JSON_COUNT_FILE
 }
 
 run_rclone_with_flags () {
