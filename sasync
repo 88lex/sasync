@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 JSON_FOLDER=/opt/sa                         # Location of folder with service account .json files. No trailing slash
+COUNTER=/opt/sasync/json.count              # Location of json.count file.
 EXCLUDES=/opt/sasync/exclude.txt            # Location of exclude.txt file with list of file types to exclude
 MIN_JSON=1; MAX_JSON=1200                   # Set MIN and MAX json file numbers assuming file format is 1.json, 2.json
 
@@ -31,10 +32,10 @@ set_rclone_flags () {
 }
 
 get_json_count () {
-  read COUNT < /opt/sasync/json.count
+  read COUNT < $COUNTER
   if [[ "$COUNT" -gt "$MAX_JSON" ]];
   then let COUNT=$MIN_JSON; fi
-  echo $(($COUNT+1)) > /opt/sasync/json.count
+  echo $(($COUNT+1)) > $COUNTER
 }
 
 run_rclone_with_flags () {
