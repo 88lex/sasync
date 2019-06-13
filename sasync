@@ -14,10 +14,10 @@ sacalc () {
   echo;echo CHECKING SIZE of $source and $destination... BE PATIENT, LARGE REMOTES TAKE MINUTES;echo;
   let sourcesize=`rclone size $source --json | cut -d ":" -f3 | cut -d "}" -f1`+1
   let destsize=`rclone size $destination --json | cut -d ":" -f3 | cut -d "}" -f1`+1
-  let srcdestdiff=$(( $sourcesize<=$destsize?1:$sourcesize - $destsize ))
+  let srcdestdiff=$(( $sourcesize<=$destsize?0:$sourcesize - $destsize ))
   let maxtransfer00=$( echo $maxtransfer | cut -d "G" -f1 | echo -e "$(cat -)000000000" )
   let SAs=$(( $srcdestdiff / ( $maxtransfer00 + 1 ) + 1 ))
-  echo SOURCE $source size is $(( $sourcesize / 1000000000 ))Gb
+  echo SOURCE $source size is $(( $sourcesize / 1000000000 ))GB
   echo DESTINATION $destination size is $(( $destsize / 1000000000 ))GB
   echo DIFFERENCE of $(( $srcdestdiff / 1000000000 ))GB requires $SAs SAs with maxtransfer of $maxtransfer
 }
@@ -41,7 +41,7 @@ get_json_count () {
 }
 
 run_rclone_with_flags () {
-  if [ "$sourcesize" == "$destsize" ]; then
+  if [ "$srcdestdiff" == 0 ]; then
     echo Size of source $sourcesize equals size of destination $destsize. Skipping to next source-destination pair.; sleep 2s
   else
     get_json_count
