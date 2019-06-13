@@ -2,9 +2,10 @@
 # `#!/usr/bin/env bash` allows difft bash locations. e.g w MacOS. Use #!/bin/bash if needed
 SYNCCOPY=sync                               # Default action is rclone sync. -c flag to change to rclone copy
 JSON_FOLDER=/opt/sa                         # Location of folder with service account .json files. No trailing slash
-EXCLUDES=/opt/sasync/exclude.txt            # Location of file types to exclude from copy/sync
+JSON_COUNT_FILE=/opt/sasync/json.count      # Location of json.count file. If you have multiple json groups, keep separate json.count files/locations
 MIN_JSON=1; MAX_JSON=100                    # Set MIN and MAX json file numbers assuming file format is 1.json, 2.json
 # NOTE: YOU NEED TO CHANGE `MAX_JSON` TO EQUAL THE NUMBER OF JSON FILES YOU ACTUALLY HAVE IN YOUR JSON_FOLDER
+EXCLUDES=/opt/sasync/exclude.txt            # Location of file types to exclude from copy/sync
 
 # For each source-destination pair set_rclone_flags reads the rclone flags from the set.* file
 set_rclone_flags () {
@@ -20,10 +21,10 @@ set_rclone_flags () {
 
 # Read the current json to be used from the json.count file, then increment by +1 for the next call
 get_json_count () {
-  read COUNT < json.count                   # Pull current json number from json.count file
+  read COUNT < $JSON_COUNT_FILE                   # Pull current json number from json.count file
   if [[ "$COUNT" -gt "$MAX_JSON"  ]];
   then let COUNT=$MIN_JSON; fi
-  echo $(($COUNT+1)) > json.count           # Increment +1 or reset to MIN if at MAX
+  echo $(($COUNT+1)) > $JSON_COUNT_FILE           # Increment +1 or reset to MIN if at MAX
 }
 
 # For a source-destination pair and an SA run rclone sync (or copy with sasync -c flag)
