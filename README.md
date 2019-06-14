@@ -2,7 +2,7 @@
 **Usage:  `./sasync set.tv`**    
 **Note1:** Before running sasync double check that line 2 in the script `JSON_FOLDER=/opt/sa` points to the correct location of your json files.    
 **Note2:** Recent betas of rclone require a new flag `--drive-server-side-across-configs` in order to do server-side sync/copy. This flag has been
-added to this version of sasync as a default. If you are running an older version of rclone or wish to not execute server-side copies simply
+added to sasync as a default. If you are running an older version of rclone or wish to not execute server-side copies simply
 delete the flag from sasync.  
 **Note3:** To generate logs run `./sasync set.tv | tee -a sasync.log` or for timestamped log run `./sasync set.tv | tee sasync$(date +%Y%m%d-%H%M).log`
 
