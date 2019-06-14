@@ -1,7 +1,10 @@
 # **sasync**
 **Usage:  `./sasync set.tv`**    
 **Note1:** Before running sasync double check that line 2 in the script `JSON_FOLDER=/opt/sa` points to the correct location of your json files.    
-**Note2:** To generate logs run `./sasync set.tv | tee -a sasync.log` or for timestamped log run `./sasync set.tv | tee sasync$(date +%Y%m%d-%H%M).log`
+**Note2:** Recent betas of rclone require a new flag `--drive-server-side-across-configs` in order to do server-side sync/copy. This flag has been
+added to this version of sasync as a default. If you are running an older version of rclone or wish to not execute server-side copies simply
+delete the flag from sasync.  
+**Note3:** To generate logs run `./sasync set.tv | tee -a sasync.log` or for timestamped log run `./sasync set.tv | tee sasync$(date +%Y%m%d-%H%M).log`
 
 **This script uses rclone with service accounts to sync, copy or move files between rclone remotes.**
 
@@ -17,10 +20,6 @@ Typically this is a typo or remote auth issue.
 Requires changing your set.* files if you were running a previous version of sasync 
 6. **Skips identical source-dest pairs**: Skips a sync pair if source and destination are exactly equal in size, then moves on to the next sync pair.
 7. **Very basic set file format check**: If there are too few items in any set.* line then the script aborts with an error.
-
-**NOTE:** Recent betas of rclone require a new flag `--drive-server-side-across-configs` in order to do server-side sync/copy. This flag has been
-added to this version of sasync as a default. If you are running an older version of rclone or wish to not execute server-side copies simply
-delete the flag from sasync.
 
 **There are several files in the repo at the moment.**
 1. sasync is the main script that pulls sync sets from 'set' files and runs rclone sync/copy/move.
