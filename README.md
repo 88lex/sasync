@@ -6,7 +6,8 @@ added to sasync as a default. If you are running an older version of rclone or w
 delete the flag from sasync.  
 **Note3:** To generate logs run `./sasync set.tv | tee -a sasync.log` or for timestamped log run `./sasync set.tv | tee sasync$(date +%Y%m%d-%H%M).log`
 
-**This script uses rclone with service accounts to sync, copy or move files between rclone remotes.**
+**This script uses rclone with service accounts to sync, copy or move files between rclone remotes.**  
+**Further information and tools can be found  at https://github.com/88lex/sa-guide**
 
 **The new version of sasync:**
 
