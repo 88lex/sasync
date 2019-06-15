@@ -8,3 +8,4 @@
 *.M4V
 *.divx
 *.DIVX
+mounted.bin
