@@ -33,6 +33,7 @@ set_rclone_flags () {
   # SAs=1; let srcdestdiff=1    # If you want to set number of SAs manually then hash out sacalc and unhash this line
 }
 
+# Read the current json to be used from the json.count file, then increment by +1 for the next call
 get_json_count () {
   read COUNT < $JSON_COUNT_FILE
   if [[ "$COUNT" -gt "$MAX_JSON" ]];
@@ -40,6 +41,8 @@ get_json_count () {
   echo $(($COUNT+1)) > $JSON_COUNT_FILE
 }
 
+# For a source-destination pair and an SA run rclone sync (or copy with sasync -c flag)
+# Feel free to play with the rclone flags to optimize. --fast-list can be problematic. The script works without it, more slowly.
 run_rclone_with_flags () {
   if [ "$srcdestdiff" == 0 ]; then
     echo Size of source $sourcesize equals size of destination $destsize. Skipping to next source-destination pair.; sleep 2s
@@ -58,6 +61,8 @@ run_rclone_with_flags () {
   fi
 }
 
+# clean_tds is an optional function with 3 features. Use hash # to omit any line. For source or destination it can:
+# 1. dedupe identical files  2. remove empty directories  3. permanently empty trash <= be sure you really want to do this.
 clean_tds () {
   echo; echo STARTING DEDUPE of identical files from $destination; echo
   rclone dedupe skip $destination -v --drive-use-trash=false --no-traverse --transfers=40
@@ -70,13 +75,14 @@ clean_tds () {
   #echo; echo PERMANENTLY DELETING TRASH from source; rclone delete $source -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40
 }
 
+# Run rclone for each source-dest in the set file and repeat for specified # of SAs.
 process_all_sets_and_SAs () {
   for set in $(seq 0 $(( $number_of_sync_sets-1 ))); do
     set_rclone_flags
     for SA in $(seq 1 $SAs); do
       run_rclone_with_flags
     done
-    clean_tds
+    clean_tds                                               # Hash out this line if you want to entirely skip clean_tds
   done
 }
 

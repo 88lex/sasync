@@ -37,7 +37,13 @@ sync            td_tv:     my_tv:        350G          --dry-run
 copy            td_tv_4k:  my_tv_4k:     350G          --dry-run --no-traverse
 </pre>
 
-The script will ignore lines that begin with a hash '#'
+Run the script with this syntax "./sasync set.tv" to cycle rclone sync for each source-destination pair and each block of SAs in your set.* file.
+
+Each sync set can have an unlimited number of sync pairs.
+
+If you prefer to create smaller/separate sets then you can create set.* files for each subset. e.g. set.tv, set.movies, set.books etc.
+
+If you have multiple sets then you can run them in sequence with "./sasync set.tv set.movies set.books" or in parallel with "./sasync set.tv & ./sasync set.movies &" .
 
 Script syntax would be `./sasync set.tv` which runs rclone sync for each source-dest pair, in a loop for number of SAs.
 
@@ -48,6 +54,7 @@ Or you can run them in parallel with `./sasync set.tv & ./sasync set.movies`
 
 Resource usage for this script is very light as the copy/move actions are all executed server side. That said, the script can be modified to use the --disable move,copy flag if you prefer, in which case I/O and CPU usage would rise.
 
-There is a clean_tds option in the script to dedupe and remove empty directores from source or destination. If you don't need that feature simply insert a hash '#' before the clean_tds command.
+There is a clean_tds option in the script to dedupe and remove empty directores from source or destination and to delete trash. 
+If you don't need that feature simply insert a hash '#' before the clean_tds command or in front of individual lines in the function.
 
 This script runs on any system with bash >4.x (before which the readarray command did not exist). The current version of bash is 5.x. On MacOS you will need to install a newer version of bash, which is easy enough.
