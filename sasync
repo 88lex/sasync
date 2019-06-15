@@ -2,8 +2,8 @@
 . ./sasync.config
 
 rclone_remote_check () {
-  rclone lsd $1 > /dev/null 2>&1;  if [ $? != 0 ];  then  echo;echo THE REMOTE $1 FAILED. PLEASE CHECK set.* file and rclone.conf;echo;  exit;  fi
-}
+  rclone lsd $1 > /dev/null 2>&1
+  if [ $? != 0 ]; then echo;echo THE REMOTE $1 FAILED. PLEASE CHECK set.* file and rclone.conf;echo; exit; fi; }
 
 sacalc () {
   echo;echo CHECKING SIZE of $source and $destination... BE PATIENT, LARGE REMOTES TAKE MINUTES;echo;
@@ -14,51 +14,32 @@ sacalc () {
   let SAs=$(( $srcdestdiff / ( $maxtransfer00 + 1 ) + 1 ))
   echo SOURCE $source size is $(( $sourcesize / 1000000000 ))GB
   echo DESTINATION $destination size is $(( $destsize / 1000000000 ))GB
-  echo DIFFERENCE of $(( $srcdestdiff / 1000000000 ))GB requires $SAs SAs with maxtransfer of $maxtransfer
-}
+  echo DIFFERENCE of $(( $srcdestdiff / 1000000000 ))GB requires $SAs SAs with maxtransfer of $maxtransfer; }
 
 get_json_count () {
-  read COUNT < $JSON_COUNT_FILE
-  if [[ "$COUNT" -gt "$MAX_JSON" ]];
-  then let COUNT=$MIN_JSON; fi
-  echo $(($COUNT+1)) > $JSON_COUNT_FILE
-}
+  read COUNT < $JSON_COUNT_FILE; if [[ "$COUNT" -gt "$MAX_JSON" ]]; then let COUNT=$MIN_JSON; fi
+  echo $(($COUNT+1)) > $JSON_COUNT_FILE; }
 
 run_rclone_with_flags () {
-  if [ "$srcdestdiff" == 0 ]; then
-    echo Size of source $sourcesize equals size of destination $destsize. Skipping to next source-destination pair.; sleep 2s
-  else
+  if [ "$srcdestdiff" == 0 ]
+  then echo Size of source $sourcesize == destination $destsize.; echo SKIPPING TO NEXT SOURCE-DESTINATION PAIR.;else
     get_json_count
-    echo; echo Starting $synccopymove of $source to $destination w $COUNT/$MAX_JSON.json from $set_files; echo
+    echo; echo Starting $synccopymove of $source to $destination w $COUNT/$MAX_JSON.json from $input_files; echo
     timeout 30m\
-    rclone $synccopymove $source $destination\
-    --drive-server-side-across-configs\
-    --max-transfer $maxtransfer\
-    --fast-list --size-only -vP --stats 5s\
-    --tpslimit 4 --tpslimit-burst 20 --max-backlog 1000000\
-    --exclude-from $EXCLUDES --stats-file-name-length 0 $rclone_flags\
-    --drive-service-account-file $JSON_FOLDER/$COUNT.json
-    echo;echo FINISHED $synccopymove from $source to $destination wJSON $COUNT.json;echo
-  fi
-}
+    rclone $synccopymove $source $destination --drive-server-side-across-configs --max-transfer $maxtransfer\
+    --fast-list --size-only -vP --stats 5s --tpslimit 4 --tpslimit-burst 20 --max-backlog 1000000\
+    --exclude-from $EXCLUDES --stats-file-name-length 0 $rclone_flags --drive-service-account-file $JSON_FOLDER/$COUNT.json
+    echo;echo FINISHED $synccopymove from $source to $destination wJSON $COUNT.json;echo; fi; }
 
 process_sets_and_SAs () {
-  read
-  while IFS=" " read -r synccopymove source destination maxtransfer rclone_flags; do
+  read; while IFS=" " read -r synccopymove source destination maxtransfer rclone_flags; do
     case "$synccopymove" in \#*) continue ;; esac
     rclone_remote_check $source; rclone_remote_check $destination
     sacalc
-    for SA in $(seq 1 $SAs); do
-      run_rclone_with_flags
-    done
-    . ./clean_tds
-  done
-}
+    for SA in $(seq 1 $SAs); do run_rclone_with_flags; done
+    . $SASYNC_FOLDER/clean_tds
+  done; }
 
-main () {
-  for set_files in $*; do
-    process_sets_and_SAs < $set_files
-  done
-}
+main () { for input_files in $SETS_FOLDER/$*; do process_sets_and_SAs < $input_files; done }
 
 main $@
