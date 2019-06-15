@@ -1,4 +1,5 @@
-# set.movies
-# 1source       2destination       3transfers  4checkers  5chunksize     6SAs     7maxtransfer
-td_movies:      my_movies:         4           20         16M            1        600G
-td_movies_4k:   my_movies_4k:      2           20         16M            1        500G
+# set.movies.sample
+# Note: rclone_flags are optional and will override any existing or conflicting flags
+#synccopymove 1source        2destination   3maxtransfer  4rclone_flags
+sync          td_movies:     my_movies:     350G          --dry-run
+copy          td_movies_4k:  my_movies_4k:  350G          --no-traverse --dry-run
