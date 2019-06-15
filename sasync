@@ -36,7 +36,7 @@ run_rclone_with_flags () {
     --max-transfer $maxtransfer\
     --fast-list --size-only -vP --stats 5s\
     --tpslimit 4 --tpslimit-burst 20 --max-backlog 1000000\
-    --exclude-from $EXCLUDES --stats-file-name-length 0 $rcloneflags\
+    --exclude-from $EXCLUDES --stats-file-name-length 0 $rclone_flags\
     --drive-service-account-file $JSON_FOLDER/$COUNT.json
     echo;echo FINISHED $synccopymove from $source to $destination wJSON $COUNT.json;echo
   fi
