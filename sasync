@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
-
-JSON_FOLDER=/opt/sa                         # Location of folder with service account .json files. No trailing slash
-JSON_COUNT_FILE=/opt/sasync/json.count     # Location of json.count file. If you have multiple json groups, keep separate json.count files/locations
-MIN_JSON=1; MAX_JSON=1200                   # Set MIN and MAX json file numbers assuming file format is 1.json, 2.json
-# NOTE: YOU NEED TO CHANGE `MAX_JSON` TO EQUAL THE NUMBER OF JSON FILES YOU ACTUALLY HAVE IN YOUR JSON_FOLDER
-EXCLUDES=/opt/sasync/exclude.txt            # Location of exclude.txt file with list of file types to exclude
+. ./sasync.config
 
 rclone_remote_check () {
   rclone lsd $1 > /dev/null 2>&1;  if [ $? != 0 ];  then  echo;echo THE REMOTE $1 FAILED. PLEASE CHECK set.* file and rclone.conf;echo;  exit;  fi
@@ -12,8 +7,8 @@ rclone_remote_check () {
 
 sacalc () {
   echo;echo CHECKING SIZE of $source and $destination... BE PATIENT, LARGE REMOTES TAKE MINUTES;echo;
-  let sourcesize=`rclone size $source --json | cut -d ":" -f3 | cut -d "}" -f1`+1
-  let destsize=`rclone size $destination --json | cut -d ":" -f3 | cut -d "}" -f1`+1
+  let sourcesize=`rclone size $source --json | cut -d ":" -f3 | cut -d "}" -f1`
+  let destsize=`rclone size $destination --json | cut -d ":" -f3 | cut -d "}" -f1`
   let srcdestdiff=$(( $sourcesize<$destsize?1:$sourcesize - $destsize ))
   let maxtransfer00=$( echo $maxtransfer | cut -d "G" -f1 | echo -e "$(cat -)000000000" )
   let SAs=$(( $srcdestdiff / ( $maxtransfer00 + 1 ) + 1 ))
@@ -21,19 +16,7 @@ sacalc () {
   echo DESTINATION $destination size is $(( $destsize / 1000000000 ))GB
   echo DIFFERENCE of $(( $srcdestdiff / 1000000000 ))GB requires $SAs SAs with maxtransfer of $maxtransfer
 }
-set_rclone_flags () {
-  sync=(`echo ${syncsets[$set]}`); echo Line $(( $set + 1 )) of your set is:; echo ${syncsets[$set]};
-  if [ ${#sync[@]} -lt 4 ]; then echo Check your "set" file ERRORS; exit; fi
-  synccopymove="${sync[0]}"; echo;echo SYNCCOPYMOVE = $synccopymove;
-  source="${sync[1]}"; echo SOURCE = $source; rclone_remote_check $source
-  destination="${sync[2]}"; echo DESTINATION = $destination; rclone_remote_check $destination
-  maxtransfer="${sync[3]}"; echo MAX TRANSFER = $maxtransfer;
-  rcloneflags=`echo ${sync[@]} | cut -f 5- -d ' '`; echo rclone flags = $rcloneflags;
-  sacalc
-  # SAs=1; let srcdestdiff=1    # If you want to set number of SAs manually then hash out sacalc and unhash this line
-}
 
-# Read the current json to be used from the json.count file, then increment by +1 for the next call
 get_json_count () {
   read COUNT < $JSON_COUNT_FILE
   if [[ "$COUNT" -gt "$MAX_JSON" ]];
@@ -41,15 +24,13 @@ get_json_count () {
   echo $(($COUNT+1)) > $JSON_COUNT_FILE
 }
 
-# For a source-destination pair and an SA run rclone sync (or copy with sasync -c flag)
-# Feel free to play with the rclone flags to optimize. --fast-list can be problematic. The script works without it, more slowly.
 run_rclone_with_flags () {
   if [ "$srcdestdiff" == 0 ]; then
     echo Size of source $sourcesize equals size of destination $destsize. Skipping to next source-destination pair.; sleep 2s
   else
     get_json_count
     echo; echo Starting $synccopymove of $source to $destination w $COUNT/$MAX_JSON.json from $input_files; echo
-    #timeout 30m\
+    timeout 30m\
     rclone $synccopymove $source $destination\
     --drive-server-side-across-configs\
     --max-transfer $maxtransfer\
@@ -61,36 +42,22 @@ run_rclone_with_flags () {
   fi
 }
 
-# clean_tds is an optional function with 3 features. Use hash # to omit any line. For source or destination it can:
-# 1. dedupe identical files  2. remove empty directories  3. permanently empty trash <= be sure you really want to do this.
-clean_tds () {
-  echo; echo STARTING DEDUPE of identical files from $destination; echo
-  rclone dedupe skip $destination -v --drive-use-trash=false --no-traverse --transfers=40
-  echo; echo REMOVING EMPTY DIRECTORIES from $destination; echo
-  rclone rmdirs $destination -v --drive-use-trash=false --fast-list --transfers=40
-  #echo; echo PERMANENTLY DELETING TRASH from $destination; echo
-  #rclone delete $destination -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40
-  #echo; echo STARTING DEDUPE of identical files from $source; rclone dedupe skip $source -v --drive-use-trash=false --no-traverse --transfers=40
-  #echo; echo REMOVING EMPTY DIRECTORIES from source; rclone rmdirs $source -v --drive-use-trash=false --fast-list --transfers=40
-  #echo; echo PERMANENTLY DELETING TRASH from source; rclone delete $source -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40
-}
-
-# Run rclone for each source-dest in the set file and repeat for specified # of SAs.
-process_all_sets_and_SAs () {
-  for set in $(seq 0 $(( $number_of_sync_sets-1 ))); do
-    set_rclone_flags
+process_sets_and_SAs () {
+  read
+  while IFS=" " read -r synccopymove source destination maxtransfer rclone_flags; do
+    case "$synccopymove" in \#*) continue ;; esac
+    rclone_remote_check $source; rclone_remote_check $destination
+    sacalc
     for SA in $(seq 1 $SAs); do
       run_rclone_with_flags
     done
-    clean_tds                                               # Hash out this line if you want to entirely skip clean_tds
+    . ./clean_tds
   done
 }
 
 main () {
   for input_files in $*; do
-      readarray syncsets < <( sed '/^#/d' $input_files )
-      number_of_sync_sets=$(( ${#syncsets[@]} )); echo Processing $number_of_sync_sets sync sets;echo;
-      process_all_sets_and_SAs
+    process_sets_and_SAs < $input_files
   done
 }
 
