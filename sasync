@@ -29,7 +29,7 @@ run_rclone_with_flags () {
     echo Size of source $sourcesize equals size of destination $destsize. Skipping to next source-destination pair.; sleep 2s
   else
     get_json_count
-    echo; echo Starting $synccopymove of $source to $destination w $COUNT/$MAX_JSON.json from $input_files; echo
+    echo; echo Starting $synccopymove of $source to $destination w $COUNT/$MAX_JSON.json from $set_files; echo
     timeout 30m\
     rclone $synccopymove $source $destination\
     --drive-server-side-across-configs\
@@ -56,8 +56,8 @@ process_sets_and_SAs () {
 }
 
 main () {
-  for input_files in $*; do
-    process_sets_and_SAs < $input_files
+  for set_files in $*; do
+    process_sets_and_SAs < $set_files
   done
 }
 
