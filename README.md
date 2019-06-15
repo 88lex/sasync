@@ -1,6 +1,6 @@
 # **sasync**
 
-**Installation**: You can copy or download th`install-sasync` (written by Max, tx!) script to which will download the repo files, apply ownership and set USER and GROUP    
+**Installation**: You can copy or download the `install-sasync` script (written by Max, tx!) which will download the repo files, apply ownership and set USER and GROUP    
 **Usage:  `./sasync set.tv`**   
 
 **Note1:** Before running sasync double check that line 2 in the script `JSON_FOLDER=/opt/sa` points to the correct location of your json files.    
