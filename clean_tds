@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-This script dedupes identical files, removes empty directories and permanently deletes trash in your remotes
+#This script dedupes identical files, removes empty directories and permanently deletes trash in your remotes
 
 echo; echo STARTING DEDUPE of identical files from $destination
 rclone dedupe skip $destination -v --drive-use-trash=false --no-traverse --transfers=40
