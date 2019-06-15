@@ -1,45 +1,40 @@
-# sasync : one-way rclone sync/copy between TDs using multiple service accounts
+# **sasync**
+**Usage:  `./sasync set.tv`**    
+**Note1:** Before running sasync double check that line 2 in the script `JSON_FOLDER=/opt/sa` points to the correct location of your json files.    
+**Note2:** Recent betas of rclone require a new flag `--drive-server-side-across-configs` in order to do server-side sync/copy. This flag has been
+added to sasync as a default. If you are running an older version of rclone or wish to not execute server-side copies simply
+delete the flag from sasync.  
+**Note3:** To generate logs run `./sasync set.tv | tee -a sasync.log` or for timestamped log run `./sasync set.tv | tee sasync$(date +%Y%m%d-%H%M).log`
 
-USAGE: ./sasync set.tv set.movies
+**This script uses rclone with service accounts to sync, copy or move files between rclone remotes.**  
+**Further information and tools can be found  at https://github.com/88lex/sa-guide**
 
-NOTE: sasync won't run properly if it cannot find your set files, json files, json.count or exclude.txt. Always double check
-that you are pointing sasync to the correct file locations. If in doubt use absolute locations throughout e.g. `/opt/sasync/set.tv` `opt/myjsons`
+**The new version of sasync:**
 
-NOTE: Two older, simple versions of sasync are included in the repo (sasync-simple1, sasync-simple2). 
-The first works with a single source/destination pair. The second works with multiple, embedded source/destination pairs 
-rather than using external files to specific sync sets, a counter and excluded file types.
-*******************************
-This script uses rclone with google service accounts to do server-side one-way copy or sync between rclone remotes using sync 'sets'.
-It works between Team Drives as-is. It is possible to get it working with My Drive but takes a bit of manual config (see below, and Google to learn).
+1. **Auto calc how many SAs required**: Calculates the size of the SOURCE and DESTINATION for each pair in the set.* file, then estimates the number 
+of SAs required based on the --max-transfer setting. If you wish to set the number of SAs manually, put a # before sacalc and unhash the `SAs=` line.
+2. **Flexible unlimited rclone flags**: Allows adding multiple rclone flags to each/all pairs in the set.* file. Flags which conflict with 
+default flags in the sasync script will override the defaults. Note that you can still add/change flags in the script if you want them to apply to all set.
+4. **rClone config check**: Checks if each SOURCE and DESTINATION in your set.* file are accessible. If not then sasync exits to let you fix it.
+Typically this is a typo or remote auth issue.
+5. **New format for set files**: Allows the user to sync, copy or move for any SOURCE DESTINATION pair (first column of set.* file). 
+Requires changing your set.* files if you were running a previous version of sasync 
+6. **Skips identical source-dest pairs**: Skips a sync pair if source and destination are exactly equal in size, then moves on to the next sync pair.
+7. **Very basic set file format check**: If there are too few items in any set.* line then the script aborts with an error.
 
-If you only use a few service accounts then this may be overkill. But if you have many SAs or many TDs it can help automate rclone syncs/backups.
-The script is written in bash to allow it to function in most OSes without installing dependencies. Feel free to adapt it to other languages.
+**There are several files in the repo at the moment.**
+1. sasync is the main script that pulls sync sets from 'set' files and runs rclone sync/copy/move.
+2. json.count is an external counter for the json set. This allows running multiple instances of sasync that pull in sequence from the jsons without wasting or duplicating usage.
+3. Two sample set.* files with rclone source, destination and max-transfer size.
+4. An exclude.txt file with file patterns to exclude from rclone copy/sync. At the moment these are files that sometimes hang rclone service side copying, so we skip them. Typically it is only a handful of files. Until this gets fixed you will need to do an occasional 'sweep' sync/copy using the --disable move,copy flag which copies without hanging.
 
-Before using this script it is important that you understand how to use service accounts with rclone. There are plenty of 
-threads in the rclone forum as well as discord channels to learn about SAs (i.e. Don't ask me). 
-See  https://rclone.org/drive/#service-account-support 
 
-In most cases if you are having problems the culprit will be your permissions. Permissions for Team Drive copy/sync are pretty straighforward:
-EACH SA MUST HAVE READ/WRITE PERMISSION FOR EACH SOURCE/DESTINATION ACCOUNT. You can do this individually or with a Group.
-
-This script will work with My Drive but can be a bit more tricky. You need --drive-shared-with-me and/or --drive-impersonate, as SA accounts
-have their own (empty) My Drive but SAs cannot add shared folders to My Drive as you do with a normal account.
-
-There are several files in the repo. Before running, check that the files exist on your local machine and that the script points to each file
-in its correct location.
-
-1. sasync is the main script that pulls sync sets from 'set' files and runs rclone sync (or copy with the -c flag).
-2. json.count is an external counter file for the json set. The easiest setup is to number your jsons 1.json, 2.json etc.
-3. set.* files specify rclone source, destination, transfers, checkers, chunks, number of service accounts and max-transfer size.
-4. exclude.txt specifies file patterns to exclude. Some files hang rclone server-side copying. If that happens then add those file types to exclude.txt .
-5. sacopy runs sasync with the -c script. Sometimes it's easier to use sacopy for clarity (copy vs sync batches).
-
-Each set.* file specifies which sync pairs you would like to run along with rclone flags for that sync pair. The set file format is:
+The set.* files specify which sync pairs you would like to run along with rclone flags for that sync pair. The format would be as follows:
 <pre>
 # set.tv
-# 1source    2destination   3transfers  4checkers   5chunksize     6SAs     7maxtransfer
-td_tv:       my_tv:         4           20          16M            5        600G
-td_tv_4k:    my_tv_4k:      2           20          16M            2        500G
+#0synccopymove  1source    2destination  3maxtransfer  4rcloneflags
+sync            td_tv:     my_tv:        350G          --dry-run
+copy            td_tv_4k:  my_tv_4k:     350G          --dry-run --no-traverse
 </pre>
 
 Run the script with this syntax "./sasync set.tv" to cycle rclone sync for each source-destination pair and each block of SAs in your set.* file.
@@ -50,21 +45,14 @@ If you prefer to create smaller/separate sets then you can create set.* files fo
 
 If you have multiple sets then you can run them in sequence with "./sasync set.tv set.movies set.books" or in parallel with "./sasync set.tv & ./sasync set.movies &" .
 
-WARNING: At the moment there is an issue with rclone and server side copies/syncs when you hit the hard limit of 750G uploads per day. 
-If there are files in the transfer 'buffer' and you hit the hard limit then rclone can hang indefinitely. There are a few ways to mitigate this problem.
-1. Use a hard timeout. This is embedded in the sasync script but can be hashed out # if you want to omit it
-2. Use conservative --max-transfer settings so that the number of --transfers times typical library file size will never hit the hard upload limit. 
-e.g. If 4k file sizes are typically 40-80GB and you are doing 4 simultaneous transfers then set --max-transfer to < (750 - (4 x 80)) , say 400GB.
-3. Add --disable move,copy to the rclone script. This will slow down your transfers as they are downloaded then uploaded rather than server side. 
-But rclone will finish non-server-side transfers that are have been started rather than hanging.
+Script syntax would be `./sasync set.tv` which runs rclone sync for each source-dest pair, in a loop for number of SAs.
 
+Each sync set can have from 1 to an unlimited number of sync pairs. Or if you prefer to create smaller/separate sets like tv, movies, 4k, ebooks/audiobooks, etc. then you can create individual set.* files for each subset.
 
-Resource usage for this script is very light as the copy/move actions are all executed server side. 
-The script can be modified to use the --disable move,copy flag if you prefer, in which case I/O and CPU usage will rise. chunk size in the set files to speed up copying.
-If you do use --disable move,copy you may want to increase allocated resources when running the script.
+If you have multiple sets then you can run them in sequence with `./sasync set.tv set.movies set.books`
+Or you can run them in parallel with `./sasync set.tv & ./sasync set.movies`
 
-NOTE: --fast-list increases RAM usage. You can delete the fast list flag and the script will run fine, but scans will take a bit longer. 
-You can also try using --no-traverse rather than --fast-list.
+Resource usage for this script is very light as the copy/move actions are all executed server side. That said, the script can be modified to use the --disable move,copy flag if you prefer, in which case I/O and CPU usage would rise.
 
 There is a clean_tds option in the script to dedupe and remove empty directores from source or destination and to delete trash. 
 If you don't need that feature simply insert a hash '#' before the clean_tds command or in front of individual lines in the function.
