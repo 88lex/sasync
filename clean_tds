@@ -5,8 +5,8 @@ echo; echo STARTING DEDUPE of identical files from $destination
 rclone dedupe skip $destination -v --drive-use-trash=false --no-traverse --transfers=40
 echo; echo REMOVING EMPTY DIRECTORIES from $destination
 rclone rmdirs $destination -v --drive-use-trash=false --fast-list --transfers=40
-#echo; echo PERMANENTLY DELETING TRASH from $destination; echo
-#rclone delete $destination -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40
+echo; echo PERMANENTLY DELETING TRASH from $destination; echo
+rclone delete $destination -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40
 
 # NOTE The next few commands dedupe files, remove empty directories and permanently delete trash in your source remote. If sure then unhash these lines.
 #echo; echo STARTING DEDUPE of identical files from $source; rclone dedupe skip $source -v --drive-use-trash=false --no-traverse --transfers=40
