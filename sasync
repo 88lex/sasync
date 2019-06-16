@@ -6,7 +6,7 @@ rclone_remote_check () {
   [ $? = 0 ] || { echo;echo THE REMOTE $1 FAILED. PLEASE CHECK set.* file and rclone.conf;echo; exit;} }
 
 get_json_count () {
-  read COUNT < $JSON_COUNT_FILE; if [[ "$COUNT" -gt "$MAX_JSON" ]]; then let COUNT=$MIN_JSON; fi
+  read COUNT < $JSON_COUNT_FILE; [[ "$COUNT" -le "$MAX_JSON" ]] || let COUNT=$MIN_JSON
   echo $(($COUNT+1)) > $JSON_COUNT_FILE; }
 
 run_rclone_with_flags () {
