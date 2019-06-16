@@ -29,7 +29,7 @@ Requires changing your set.* files if you were running a previous version of sas
 7. **Very basic set file format check**: If there are too few items in any set.* line then the script aborts with an error.
 
 **There are several files in the repo at the moment.**
-1. [OPTIONAL] **`install-sasync`** installs and sets permissions for sasync. Written by Max (Thank you!)
+1. [OPTIONAL] **`install-sasync`** installs and sets permissions for sasync.
 2. **`sasync`** is the main script that pulls sync sets from 'set' files and runs rclone sync/copy/move.
 3. **`sasync.conf`** contains major variables and rclone global flags.
 4. **`sacalc`** estimates the number of service accounts required to sync/copy the gap between source and destination.
