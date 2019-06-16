@@ -14,7 +14,7 @@ run_rclone_with_flags () {
   then echo Size of SOURCE $source $sourcesize == size of DESTINATION $destination $destsize.
     echo SKIPPING TO NEXT SOURCE-DESTINATION PAIR.;else
     get_json_count
-    echo; echo Starting $synccopymove of $source to $destination w $COUNT/$MAX_JSON.json from $input_files; echo
+    echo; echo Starting $synccopymove of $source to $destination w $COUNT/$MAX_JSON.json from $(basename $input_files); echo
     echo Global flags are $GLOBAL_FLAGS;echo Flags from set files are $set_flags; sleep 2s
     timeout $TIMEOUT \
     rclone $synccopymove $source $destination $GLOBAL_FLAGS $set_flags --drive-service-account-file=$JSON_FOLDER/$COUNT.json
