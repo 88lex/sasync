@@ -11,7 +11,7 @@ get_json_count () {
 
 run_rclone_with_flags () {
   if [ "$srcdestdiff" == 0 ]
-  then echo Size of SOURCE $source $sourcesize == DESTINATION $destination $destsize.
+  then echo Size of SOURCE $source $sourcesize == size of DESTINATION $destination $destsize.
     echo SKIPPING TO NEXT SOURCE-DESTINATION PAIR.;else
     get_json_count
     echo; echo Starting $synccopymove of $source to $destination w $COUNT/$MAX_JSON.json from $input_files; echo
