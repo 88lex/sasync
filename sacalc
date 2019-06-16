@@ -7,4 +7,4 @@
   let SAs=$(( $srcdestdiff / ( $maxtransfer00 + 1 ) + 1 ))
   echo SOURCE $source size is $(( $sourcesize / 1000000000 ))GB
   echo DESTINATION $destination size is $(( $destsize / 1000000000 ))GB
-  echo DIFFERENCE of $(( $srcdestdiff / 1000000000 ))GB requires $SAs SAs with maxtransfer of $maxtransfer
+  echo DIFFERENCE of $(( $srcdestdiff / 1000000000 ))GB requires $SAs SAs with MAXTRANSFER of $maxtransfer
