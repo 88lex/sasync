@@ -19,7 +19,7 @@ run_rclone_with_flags () {
     echo GLOBAL FLAGS = $GLOBAL_FLAGS;echo;echo SET FILE FLAGS = $set_flags
     timeout $TIMEOUT \
     rclone $synccopymove $source $destination $GLOBAL_FLAGS $set_flags --drive-service-account-file=$JSON_FOLDER/$COUNT.json
-    echo;echo FINISHED $synccopymove from $source to $destination wJSON $COUNT.json;echo; 
+    echo;echo FINISHED $synccopymove from $source to $destination wJSON $COUNT.json;echo
   fi; }
 
 process_sets_and_SAs () {
