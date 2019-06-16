@@ -3,7 +3,7 @@
 
 rclone_remote_check () {
   rclone lsd $1 > /dev/null 2>&1
-  if [ $? != 0 ]; then echo;echo THE REMOTE $1 FAILED. PLEASE CHECK set.* file and rclone.conf;echo; exit; fi; }
+  [ $? = 0 ] || { echo;echo THE REMOTE $1 FAILED. PLEASE CHECK set.* file and rclone.conf;echo; exit;} }
 
 get_json_count () {
   read COUNT < $JSON_COUNT_FILE; if [[ "$COUNT" -gt "$MAX_JSON" ]]; then let COUNT=$MIN_JSON; fi
