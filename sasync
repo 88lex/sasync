@@ -11,7 +11,8 @@ get_json_count () {
 
 run_rclone_with_flags () {
   if [ "$srcdestdiff" == 0 ]
-  then echo Size of source $sourcesize == destination $destsize.; echo SKIPPING TO NEXT SOURCE-DESTINATION PAIR.;else
+  then echo Size of SOURCE $source $sourcesize == DESTINATION $destination $destsize.
+    echo SKIPPING TO NEXT SOURCE-DESTINATION PAIR.;else
     get_json_count
     echo; echo Starting $synccopymove of $source to $destination w $COUNT/$MAX_JSON.json from $input_files; echo
     echo Global flags are $GLOBAL_FLAGS;echo Flags from set files are $set_flags; sleep 2s
