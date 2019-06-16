@@ -19,7 +19,7 @@ of SAs required based on the --max-transfer setting. If you wish to set the numb
 Moved the sacalc function to an external file.
 2. **Flexible unlimited rclone flags in the set files**: Allows adding multiple rclone flags to each/all pairs in the set.* file. Flags which conflict with 
 default flags in the sasync script will override the defaults. Note that you can still add/change flags in the script if you want them to apply to all set.
-3. **Moved all variables and flags to a new config file - sasync.conf** Set global variables within the sasync.conf file including addding/changing
+3. **Moved all variables and flags to a new config file - sasync.conf**.  Set global variables within the sasync.conf file including addding/changing
 as many global rclone flags as you like.
 4. **rClone config check**: Checks if each SOURCE and DESTINATION in your set.* file are accessible. If not then sasync exits to let you fix it.
 Typically this is a typo or remote auth issue.
