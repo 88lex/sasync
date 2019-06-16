@@ -3,7 +3,7 @@
 
 rclone_remote_check () {
   rclone lsd $1 > /dev/null 2>&1
-  [ $? = 0 ] || { echo;echo THE REMOTE $1 FAILED. PLEASE CHECK set.* file and rclone.conf;echo; exit;} }
+  [ $? = 0 ] || { echo;echo THE REMOTE $1 in $(basename $input_files) FAILED. CHECK set file and rclone.conf;echo; exit;} }
 
 get_json_count () {
   read COUNT < $JSON_COUNT_FILE; [[ "$COUNT" -le "$MAX_JSON" ]] || let COUNT=$MIN_JSON
