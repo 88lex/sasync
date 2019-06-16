@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-. ./sasync.config
+. ./sasync.conf
 
 rclone_remote_check () {
   rclone lsd $1 > /dev/null 2>&1
@@ -25,19 +25,18 @@ run_rclone_with_flags () {
   then echo Size of source $sourcesize == destination $destsize.; echo SKIPPING TO NEXT SOURCE-DESTINATION PAIR.;else
     get_json_count
     echo; echo Starting $synccopymove of $source to $destination w $COUNT/$MAX_JSON.json from $input_files; echo
-    timeout 30m\
-    rclone $synccopymove $source $destination --drive-server-side-across-configs --max-transfer $maxtransfer\
-    --fast-list --size-only -vP --stats 5s --tpslimit 4 --tpslimit-burst 20 --max-backlog 1000000\
-    --exclude-from $EXCLUDES --stats-file-name-length 0 $rclone_flags --drive-service-account-file $JSON_FOLDER/$COUNT.json
+    echo Global flags are $GLOBAL_FLAGS;echo Flags from set files are $set_flags; sleep 2s
+    timeout $TIMEOUT \
+    rclone $synccopymove $source $destination $GLOBAL_FLAGS $set_flags --drive-service-account-file=$JSON_FOLDER/$COUNT.json
     echo;echo FINISHED $synccopymove from $source to $destination wJSON $COUNT.json;echo; fi; }
 
 process_sets_and_SAs () {
-  read; while IFS=" " read -r synccopymove source destination maxtransfer rclone_flags; do
+  read; while IFS=" " read -r synccopymove source destination maxtransfer set_flags; do
     case "$synccopymove" in \#*) continue ;; esac
     rclone_remote_check $source; rclone_remote_check $destination
     sacalc
     for SA in $(seq 1 $SAs); do run_rclone_with_flags; done
-    . $SASYNC_FOLDER/clean_tds
+    if [ $CLEAN_TDS = "yes" ]; then . $SASYNC_FOLDER/clean_tds; exit; fi;
   done; }
 
 main () { for input_files in $SETS_FOLDER/$*; do process_sets_and_SAs < $input_files; done }
