@@ -26,7 +26,7 @@ process_sets_and_SAs () {
     rclone_remote_check $source; rclone_remote_check $destination
     . ./sacalc
     for SA in $(seq 1 $SAs); do run_rclone_with_flags; done
-    . $SASYNC_FOLDER/clean_tds
+    [ "$srcdestdiff" == 0 ] || . $SASYNC_FOLDER/clean_tds
   done; }
 
 main () { for input_files in $SETS_FOLDER/$*; do process_sets_and_SAs < $input_files; done }
