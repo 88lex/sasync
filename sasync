@@ -25,7 +25,7 @@ run_rclone_with_flags () {
 process_sets_and_SAs () {
   read; while IFS=" " read -r synccopymove source destination maxtransfer set_flags; do
     case "$synccopymove" in \#*) continue ;; esac
-    rclone_remote_check $source; rclone_remote_check $destination
+    rclone_remote_check $source; rclone mkdir $destination; rclone_remote_check $destination
     . ./sacalc
     for SA in $(seq 1 $SAs); do run_rclone_with_flags; done
     [ "$srcdestdiff" == 0 ] || . $SASYNC_FOLDER/clean_tds
