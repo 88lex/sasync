@@ -32,14 +32,13 @@ Requires changing your set.* files if you were running a previous version of sas
 8. **Very basic set file format check**: If there are too few items in any set.* line then the script aborts with an error.
 
 **There are several files in the repo at the moment.**
-1. [OPTIONAL] **`install-sasync`** installs and sets permissions for sasync.
-2. **`sasync`** is the main script that pulls sync sets from 'set' files and runs rclone sync/copy/move.
-3. **`sasync.conf`** contains major variables and rclone global flags.
-4. **`sacalc`** estimates the number of service accounts required to sync/copy the gap between source and destination.
-5. **`clean_tds`** deletes exact dupes, removes empty directories and permanently deletes trash. By default for DESTINATION only, but can be set to clean SOURCE as well.
-6. **`json.count`** is an external counter for the json set. This allows running multiple instances of sasync that pull in sequence from the jsons without wasting or duplicating usage.
-7. Two sample set files with rclone source, destination and max-transfer size. **`set.tv.sample`** and **`set.movies.sample`**
-8. **`exclude.txt`** contains file patterns to exclude from sasync. At the moment these are files that sometimes hang rclone service side copying, so we skip them. 
+1. **`sasync`** is the main script that pulls sync sets from 'set' files and runs rclone sync/copy/move.
+2. **`sasync.conf`** contains major variables and rclone global flags.
+3. **`sacalc`** estimates the number of service accounts required to sync/copy the gap between source and destination.
+4. **`clean_tds`** deletes exact dupes, removes empty directories and permanently deletes trash. By default for DESTINATION only, but can be set to clean SOURCE as well.
+5. **`json.count`** is an external counter for the json set. This allows running multiple instances of sasync that pull in sequence from the jsons without wasting or duplicating usage.
+6. Two sample set files with rclone source, destination and max-transfer size. **`set.tv.sample`** and **`set.movies.sample`**
+7. **`exclude.txt`** contains file patterns to exclude from sasync. At the moment these are files that sometimes hang rclone service side copying, so we skip them. 
 Typically it is only a handful of files. Until this gets fixed you will need to do an occasional 'sweep' sync/copy using the --disable move,copy flag which copies without hanging.
 
 
