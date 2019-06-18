@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-. ./sasync.conf
+if [ -f ./sasync.conf ]; 
+then source ./sasync.conf; else echo ERROR: sasync.conf file is missing or needs to be renamed from sasync.conf.default;exit;fi
+source ./sasync.conf
 
 rclone_remote_check () {
   rclone lsd $1 > /dev/null 2>&1
@@ -31,6 +33,6 @@ process_sets_and_SAs () {
     [ "$srcdestdiff" == 0 ] || . $SASYNC_FOLDER/clean_tds
   done; }
 
-main () { for input_files in $SETS_FOLDER/$*; do process_sets_and_SAs < $input_files; done }
+main () { echo STARTING SASYNC;for input_files in $SETS_FOLDER/$*; do process_sets_and_SAs < $input_files; done }
 
 main $@
