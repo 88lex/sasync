@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
-if [ -f ./sasync.conf ]; 
-then source ./sasync.conf; else echo ERROR: sasync.conf file is missing or needs to be renamed from sasync.conf.default;exit;fi
 source ./sasync.conf
 
 rclone_remote_check () {
   rclone lsd $1 > /dev/null 2>&1
-  [ $? = 0 ] || { echo;echo THE REMOTE $1 in $(basename $input_files) FAILED. CHECK set file and rclone.conf;echo; exit;} }
+  [ $? = 0 ] || { echo;echo THE REMOTE $1 in $(basename $input_files) FAILED. CHECK set file and rclone.conf;echo; exit; } }
 
 get_json_count () {
   read COUNT < $JSON_COUNT_FILE; [[ "$COUNT" -le "$MAX_JSON" ]] || let COUNT=$MIN_JSON
@@ -35,4 +33,4 @@ process_sets_and_SAs () {
 
 main () { echo STARTING SASYNC;for input_files in $SETS_FOLDER/$*; do process_sets_and_SAs < $input_files; done }
 
-main $@
+main $@ > >(tee stdout.log) 2> >(tee stderr.log >&2)
