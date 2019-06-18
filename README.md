@@ -14,7 +14,7 @@ delete the flag from sasync.
 **This script uses rclone with service accounts to sync, copy or move files between rclone remotes.**  
 **Further information and tools can be found  at https://github.com/88lex/sa-guide**
 
-**The new version of sasync:**
+**The new version of sasync includes the following changes:**
 
 1. The config file is now **`sasync.conf.default`** in order to not overwrite your existing `sasync.config`. Check `sasync.conf.default` for new flags that you may need.
 2. **Auto calc how many SAs required**: Calculates the size of the SOURCE and DESTINATION for each pair in the set.* file, then estimates the number 
