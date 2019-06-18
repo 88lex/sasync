@@ -1,7 +1,9 @@
 # **sasync**
 
-**Installation**: You can copy or download the `install-sasync` script (written by Max, tx!) which will download the repo files, apply ownership and set USER and GROUP    
-**Usage:  `./sasync set.tv`**  The default location for set files is a subfolder called `sa-sets`    
+**IMPORTANT**: If this is your first time running sasync then rename `sasync.conf.default` to `sasync.conf`. If you are updating sasync then check for new 
+flags and add/edit as needed into your existing `sasync.conf`.   
+
+**Usage**:  `./sasync set.tv`  The default location for set files is a subfolder called `sa-sets`    
 
 **Note1:** Check the sasync.conf file to ensure default file/folder locations are correct.
 **Note2:** Recent betas of rclone require a new flag `--drive-server-side-across-configs` in order to do server-side sync/copy. This flag has been
@@ -14,19 +16,20 @@ delete the flag from sasync.
 
 **The new version of sasync:**
 
-1. **Auto calc how many SAs required**: Calculates the size of the SOURCE and DESTINATION for each pair in the set.* file, then estimates the number 
+1. The config file is now **`sasync.conf.default`** in order to not overwrite your existing `sasync.config`. Check `sasync.conf.default` for new flags that you may need.
+2. **Auto calc how many SAs required**: Calculates the size of the SOURCE and DESTINATION for each pair in the set.* file, then estimates the number 
 of SAs required based on the --max-transfer setting. If you wish to set the number of SAs manually, put a # before sacalc and unhash the `SAs=` line. 
 Moved the sacalc function to an external file.
-2. **Flexible unlimited rclone flags in the set files**: Allows adding multiple rclone flags to each/all pairs in the set.* file. Flags which conflict with 
+3. **Flexible unlimited rclone flags in the set files**: Allows adding multiple rclone flags to each/all pairs in the set.* file. Flags which conflict with 
 default flags in the sasync script will override the defaults. Note that you can still add/change flags in the script if you want them to apply to all set.
-3. **MOVED ALL VARIABLES AND FLAGS TO A NEW CONFIG FILE - `sasync.conf`**:   Set global variables within the sasync.conf file including addding/changing
+4. **MOVED ALL VARIABLES AND FLAGS TO A NEW CONFIG FILE - `sasync.conf`**:   Set global variables within the sasync.conf file including addding/changing
 as many global rclone flags as you like.
-4. **rClone config check**: Checks if each SOURCE and DESTINATION in your set.* file are accessible. If not then sasync exits to let you fix it.
+5. **rClone config check**: Checks if each SOURCE and DESTINATION in your set.* file are accessible. If not then sasync exits to let you fix it.
 Typically this is a typo or remote auth issue.
-5. **NEW FORMAT AND LOCATION (`sa-sets`) FOR SET FILES**: Allows the user to sync, copy or move for any SOURCE DESTINATION pair (first column of set.* file). 
+6. **NEW FORMAT AND LOCATION (`sa-sets`) FOR SET FILES**: Allows the user to sync, copy or move for any SOURCE DESTINATION pair (first column of set.* file). 
 Requires changing your set.* files if you were running a previous version of sasync 
-6. **Skips identical source-dest pairs**: Skips a sync pair if source and destination are exactly equal in size, then moves on to the next sync pair.
-7. **Very basic set file format check**: If there are too few items in any set.* line then the script aborts with an error.
+7. **Skips identical source-dest pairs**: Skips a sync pair if source and destination are exactly equal in size, then moves on to the next sync pair.
+8. **Very basic set file format check**: If there are too few items in any set.* line then the script aborts with an error.
 
 **There are several files in the repo at the moment.**
 1. [OPTIONAL] **`install-sasync`** installs and sets permissions for sasync.
