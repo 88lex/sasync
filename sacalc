@@ -1,10 +1,19 @@
 # sacalc
-  echo;echo CHECKING SIZE of $source and $destination... BE PATIENT, LARGE REMOTES TAKE MINUTES;echo;
+  echo;echo CHECKING SIZE of $source and $destination... BE PATIENT, LARGE REMOTES TAKE MINUTES;echo
+
+rclone_remote_check () {
+  rclone lsd $1 > /dev/null 2>&1
+  [ $? = 0 ] || { echo;echo THE REMOTE $1 in $(basename $input_files) FAILED. CHECK set file and rclone.conf;echo; exit; } }
+
+  rclone_remote_check $source
+  rclone_remote_check $destination
+
   let sourcesize=`rclone size $source --json | cut -d ":" -f3 | cut -d "}" -f1`
   let destsize=`rclone size $destination --json | cut -d ":" -f3 | cut -d "}" -f1`
   let srcdestdiff=$(( $sourcesize<$destsize?1:$sourcesize - $destsize ))
   let maxtransfer00=$( echo $maxtransfer | cut -d "G" -f1 | echo -e "$(cat -)000000000" )
   let SAs=$(( $srcdestdiff / ( $maxtransfer00 + 1 ) + 1 ))
-  echo SOURCE $source size is $(( $sourcesize / 1000000000 ))GB
-  echo DESTINATION $destination size is $(( $destsize / 1000000000 ))GB
-  echo DIFFERENCE of $(( $srcdestdiff / 1000000000 ))GB requires $SAs SAs with MAXTRANSFER of $maxtransfer
+
+  echo "SOURCE $source size is $(( $sourcesize / 1000000000 )) GB"
+  echo "DESTINATION $destination size is $(( $destsize / 1000000000 )) GB"
+  echo "DIFFERENCE of $(( $srcdestdiff / 1000000000 )) GB requires $SAs SAs with MAXTRANSFER of $maxtransfer"
