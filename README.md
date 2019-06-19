@@ -25,7 +25,8 @@ Moved the sacalc function to an external file.
 3. **Flexible unlimited rclone flags in the set files**: Allows adding multiple rclone flags to each/all pairs in the set.* file. Flags which conflict with 
 default flags in the sasync script will override the defaults. Note that you can still add/change flags in the script if you want them to apply to all set.
 4. **rClone config check**: Checks if each SOURCE and DESTINATION in your set.* file are accessible. If not then sasync exits to let you fix it.
-Typically this is a typo or remote auth issue.
+Typically this is a typo or remote auth issue. 
+**NOTE: sasync does not create missing folders, as rclone could accidentally create and copy to a local folder = DANGEROUS.**
 5. **Set files are in a sub folder called `sa-sets`**: The new format requires changing your set.* files if you were running an older version of sasync 
 6. **Skips identical source-dest pairs**: Skips a sync pair if source and destination are exactly equal in size, then moves on to the next sync pair.
 
