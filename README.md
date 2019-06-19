@@ -5,7 +5,7 @@ Further information and tools can be found  at https://github.com/88lex/sa-guide
 **IMPORTANT**: If this is your first time running sasync then rename `sasync.conf.default` to `sasync.conf`. If you are updating sasync then check for new 
 flags and add/edit as needed into your existing `sasync.conf`.   
 
-**Usage**:  `./sasync set.tv`  The default location for set files is a subfolder called `sa-sets`    
+**Usage**:  `./sasync set.tv` Enable execution of sasync with `chmod +x sasync` each time you update. The default location for set files is a subfolder called `sa-sets`    
 
 **Note1:** Check the sasync.conf file to ensure default file/folder locations are correct.    
 **Note2:** Recent betas of rclone require a new flag `--drive-server-side-across-configs` in order to do server-side sync/copy. This flag has been
