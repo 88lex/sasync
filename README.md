@@ -13,19 +13,27 @@ added to sasync as a default. If you are running an older version of rclone or w
 
 **This version of sasync includes the following features:**
 
-1. **sasync.conf file**: Set global variables within the sasync.conf file including as many global rclone flags as you like.    
+
+*  **sasync.conf file**:  Set global variables within the sasync.conf file including as many global rclone flags as you like.    
 **NOTE** The config file in the repo is called **`sasync.conf.default`** in order to not overwrite your existing `sasync.config`.
 Check `sasync.conf.default` for new flags that you may need rename to `sasync.conf` if you want to keep the defaults.
-2. **Auto calc the number of SAs required**: Calculates the size of the SOURCE and DESTINATION for each pair in the set.* file, then estimates the number 
+
+*  **Auto calc the number of SAs required**:  Calculates the size of the SOURCE and DESTINATION for each pair in the set.* file, then estimates the number 
 of SAs required based on the --max-transfer setting. If you wish to set the number of SAs manually, put a # before sacalc and unhash the `SAs=` line. 
 Moved the sacalc function to an external file.
-3. **Flexible unlimited rclone flags in the set files**: Allows adding multiple rclone flags to each/all pairs in the set.* file. Flags which conflict with 
+
+*  **Flexible unlimited rclone flags in the set files**:  Allows adding multiple rclone flags to each/all pairs in the set.* file. Flags which conflict with 
 default flags in the sasync script will override the defaults. Note that you can still add/change flags in the script if you want them to apply to all set.
-4. **rClone config check**: Checks if each SOURCE and DESTINATION in your set.* file are accessible. If not then sasync exits to let you fix it.
+
+*  **rClone config check**:  Checks if each SOURCE and DESTINATION in your set.* file are accessible. If not then sasync exits to let you fix it.
 Typically this is a typo or remote auth issue. 
 **NOTE: sasync does not create missing folders, as rclone could accidentally create and copy to a local folder = DANGEROUS.**
-5. **Set files are in a sub folder called `sa-sets`**: The new format requires changing your set.* files if you were running an older version of sasync 
-6. **Skips identical source-dest pairs**: Skips a sync pair if source and destination are exactly equal in size, then moves on to the next sync pair.
+
+*  **Log files**:  sasync creates two log files with each run. `stderr_set.name.log` and `stdout_set.name.log`
+
+*  **Set files are in a sub folder called `sa-sets`**:  The new format requires changing your set.* files if you were running an older version of sasync 
+
+*  **Skips identical source-dest pairs**:  Skips a sync pair if source and destination are exactly equal in size, then moves on to the next sync pair.
 
 **There are several files in the repo at the moment.**
 1. **`sasync`** is the main script that pulls sync sets from 'set' files and runs rclone sync/copy/move.
