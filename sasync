@@ -11,7 +11,7 @@ run_rclone_with_flags () {
     echo; echo Starting "$synccopymove" of "$source" to "$destination" w "$COUNT"/"$MAX_JSON".json from $( basename "$input_files" ); echo
     echo GLOBAL FLAGS = $GLOBAL_FLAGS;echo;echo SET FILE FLAGS = $set_flags;echo
     timeout "$TIMEOUT" \
-echo    rclone "$synccopymove" "$source" "$destination" $GLOBAL_FLAGS $set_flags --drive-service-account-file="$JSON_FOLDER"/"$COUNT".json
+    rclone "$synccopymove" "$source" "$destination" $GLOBAL_FLAGS $set_flags --drive-service-account-file="$JSON_FOLDER"/"$COUNT".json
     echo;echo FINISHED "$synccopymove" from "$source" to "$destination" wJSON "$COUNT".json;echo
   fi; }
 
@@ -20,7 +20,7 @@ process_sets_and_SAs () {
     case "$synccopymove" in \#*) continue ;; esac
     source ./sacalc
     for SA in $(seq 1 "$SAs"); do run_rclone_with_flags; done
-#    [ "$srcdestdiff" == 0 ] || source "$SASYNC_FOLDER"/clean_tds
+    [ "$srcdestdiff" == 0 ] || source "$SASYNC_FOLDER"/clean_tds
   done; }
 
 main () { echo STARTING SASYNC;for input_files in "$SETS_FOLDER"/$*; do process_sets_and_SAs < "$input_files";done }
