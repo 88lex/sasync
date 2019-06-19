@@ -19,7 +19,6 @@ export GLOBAL_FLAGS="
     --max-backlog=2000000
     --stats-file-name-length=0
     --drive-server-side-across-configs=true
-    --max-transfer=350G
     --exclude-from=$EXCLUDES
     "
 #   Please LEAVE SPACES AND QUOTATION MARKS ABOVE to allow rclone to interpret the flags
