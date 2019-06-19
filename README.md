@@ -1,18 +1,15 @@
 **sasync** -- This script uses rclone with service accounts to sync, copy or move files between rclone remotes. 
 Further information and tools can be found  at https://github.com/88lex/sa-guide
 
-
-**IMPORTANT**: If this is your first time running sasync then rename `sasync.conf.default` to `sasync.conf`. If you are updating sasync then check for new 
-flags and add/edit as needed into your existing `sasync.conf`.   
-
 **Usage**:  `./sasync set.tv` Enable execution of sasync with `chmod +x sasync` each time you update. The default location for set files is a subfolder called `sa-sets`    
 
-**Note1:** Check the sasync.conf file to ensure default file/folder locations are correct.    
-**Note2:** Recent betas of rclone require a new flag `--drive-server-side-across-configs` in order to do server-side sync/copy. This flag has been
-added to sasync as a default. If you are running an older version of rclone or wish to not execute server-side copies simply
-delete the flag from sasync.  
-
-
+**IMPORTANT**:   
+==>  If this is your first time running sasync then rename `sasync.conf.default` to `sasync.conf`. If you are updating sasync then check for new 
+flags and add/edit as needed into your existing `sasync.conf`.   
+==>  sasync will NOT create base folders. e.g. If you specify remote:movies in a set, sasync will not create the movies folder, but will create movies/myhomevideo.
+==>  Check in the sasync.conf file to point sasync to where your sasync script, set files and SA jsons are located.    
+==>  Versions of rclone from 1.48 require a new flag `--drive-server-side-across-configs` in order to do server-side sync/copy. This flag has been
+added to sasync as a default. If you are running an older version of rclone or wish to not execute server-side copies simply delete the flag from sasync.  
 
 **The new version of sasync includes the following changes:**
 
@@ -47,21 +44,19 @@ occasional 'sweep' sync/copy using the --disable move,copy flag which copies wit
 The set.* files specify which sync pairs you would like to run along with rclone flags for that sync pair. The format would be as follows:
 <pre>
 # set.tv
-#0synccopymove  1source    2destination  3maxtransfer  4rcloneflags
-sync            td_tv:     my_tv:        350G          --dry-run
-copy            td_tv_4k:  my_tv_4k:     350G          --dry-run --no-traverse
+#0synccopymove  1source         2destination     3maxtransfer  4rcloneflags
+sync            td_video:       my_video:        350G          --dry-run
+copy            td_video_4k:    my_video_4k:     350G          --dry-run --no-traverse
 </pre>
 
-Run the script with this syntax "./sasync set.tv" to cycle rclone sync for each source-destination pair and each block of SAs in your set.* file.
+Script syntax would be `./sasync set.tv` which runs rclone sync for each source-dest pair, in a loop for number of SAs.
 
-Each sync set can have an unlimited number of sync pairs.
-
-If you prefer to create smaller/separate sets then you can create set.* files for each subset. e.g. set.tv, set.movies, set.books etc.
+Each sync set can have an unlimited number of sync pairs. If you prefer to create smaller/separate sets then you can create set.* files
+for each subset. e.g. set.tv, set.movies, set.books etc.
 
 If you have multiple sets then you can run them in sequence with "./sasync set.tv set.movies set.books" or in parallel with
 "./sasync set.tv & ./sasync set.movies &" .
 
-Script syntax would be `./sasync set.tv` which runs rclone sync for each source-dest pair, in a loop for number of SAs.
 
 Resource usage for this script is very light as the copy/move actions are all executed server side. That said, the script can be modified to use the
 --disable move,copy flag if you prefer, in which case I/O and CPU usage would rise.
