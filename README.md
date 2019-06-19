@@ -11,7 +11,7 @@ flags and add/edit as needed into your existing `sasync.conf`.
 ==>  Versions of rclone from 1.48 require a new flag `--drive-server-side-across-configs` in order to do server-side sync/copy. This flag has been
 added to sasync as a default. If you are running an older version of rclone or wish to not execute server-side copies simply delete the flag from sasync.  
 
-**The new version of sasync includes the following changes:**
+**This version of sasync includes the following features:**
 
 1. **sasync.conf file**: Set global variables within the sasync.conf file including as many global rclone flags as you like.    
 **NOTE** The config file in the repo is called **`sasync.conf.default`** in order to not overwrite your existing `sasync.config`.
