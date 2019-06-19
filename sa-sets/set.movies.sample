@@ -1,5 +1,0 @@
-# set.movies.sample
-# Note: rclone_flags are optional and will override any existing or conflicting flags
-#synccopymove 1source        2destination   3maxtransfer  4rclone_flags
-sync          td_movies:     my_movies:     350G          --dry-run
-copy          td_movies_4k:  my_movies_4k:  350G          --no-traverse --dry-run
