@@ -25,4 +25,4 @@ process_sets_and_SAs () {
 
 main () { echo STARTING SASYNC;for input_files in "$SETS_FOLDER"/$*; do process_sets_and_SAs < "$input_files";done }
 
-main $@ > >(tee "stdout_$@.log") 2> >(tee "stderr_$@.log" >&2) && echo;echo ===SASYNC COMPLETED===
+main $@ > >(tee "stdout_$@.log") 2> >(tee "stderr_$@.log" >&2) && echo;echo === SASYNC COMPLETED ===
