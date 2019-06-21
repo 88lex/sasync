@@ -2,7 +2,7 @@
 export SASYNC_FOLDER=/opt/sasync
 export SETS_FOLDER=$SASYNC_FOLDER/sa-sets
 export JSON_FOLDER=/opt/sa                        # Location of folder with service account .json files. No trailing slash
-export JSON_COUNT_FILE=$SASYNC_FOLDER/json.count  # Location of json.count file. Keep separate json.count files if you use >1 group of SAs
+export JSON_COUNT=$SASYNC_FOLDER/json.count  # Location of json.count file. Keep separate json.count files if you use >1 group of SAs
 export MIN_JSON=1
 export MAX_JSON=1200                              # NOTE: YOU NEED TO CHANGE `MAX_JSON` TO THE MAX JSON FILE # IN YOUR JSON_FOLDER
 export EXCLUDES=$SASYNC_FOLDER/exclude.txt        # Location of exclude.txt file with list of file types to exclude
