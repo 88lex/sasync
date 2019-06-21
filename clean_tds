@@ -1,22 +1,22 @@
 #!/usr/bin/env bash
-#This script dedupes identical files, removes empty directories and permanently deletes trash in your remotes
+#This script dedupes identical files and permanently deletes trash in your remotes.
 
 if [ "$CLEAN_DESTINATION" = TRUE ] ; then
-  echo; echo STARTING DEDUPE of identical files from $destination
-  rclone dedupe skip $destination -v --drive-use-trash=false --no-traverse --transfers=40
-  echo; echo PERMANENTLY DELETING TRASH from $destination; echo
-  rclone delete $destination -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40
+  echo; echo STARTING DEDUPE of identical files from $dest
+  rclone dedupe skip $dest -v --drive-use-trash=false --no-traverse --transfers=40
+  echo; echo PERMANENTLY DELETING TRASH from $dest; echo
+  rclone delete $dest -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40
 # Omitting RMDIRS as sometimes removing empty directories can have unintended consequences in set files.
-#  echo; echo REMOVING EMPTY DIRECTORIES from $destination
-#  rclone rmdirs $destination -v --drive-use-trash=false --fast-list --transfers=40
+#  echo; echo REMOVING EMPTY DIRECTORIES from $dest
+#  rclone rmdirs $dest -v --drive-use-trash=false --fast-list --transfers=40
 fi
 
 if [ "$CLEAN_SOURCE" = TRUE ] ; then
-echo; echo STARTING DEDUPE of identical files from $source
-rclone dedupe skip $source -v --drive-use-trash=false --no-traverse --transfers=40
-echo; echo PERMANENTLY DELETING TRASH from source
-rclone delete $source -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40
+echo; echo STARTING DEDUPE of identical files from $src
+rclone dedupe skip $src -v --drive-use-trash=false --no-traverse --transfers=40
+echo; echo PERMANENTLY DELETING TRASH from $src
+rclone delete $src -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40
 # Omitting RMDIRS as sometimes removing empty directories can have unintended consequences in set files.
-# echo; echo REMOVING EMPTY DIRECTORIES from source
-#rclone rmdirs $source -v --drive-use-trash=false --fast-list --transfers=40
+# echo; echo REMOVING EMPTY DIRECTORIES from $src
+#rclone rmdirs $src -v --drive-use-trash=false --fast-list --transfers=40
 fi
