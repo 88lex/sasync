@@ -1,19 +1,25 @@
 # sacalc
-  echo;echo CHECKING SIZE of $source and $destination... BE PATIENT, LARGE REMOTES TAKE MINUTES;echo
+echo == CHECKING SIZE of $src and $dest... BE PATIENT, LARGE REMOTES TAKE MINUTES ==
 
 rclone_remote_check () {
   rclone lsd $1 > /dev/null 2>&1
-  [ $? = 0 ] || { echo;echo THE REMOTE $1 in $(basename $input_files) FAILED. CHECK set file and rclone.conf;echo; exit; } }
+  [ $? = 0 ] || \
+  { echo THE REMOTE $1 in $(basename $input_files) FAILED.\
+  CHECK set file and rclone.conf;echo; exit; } }
 
-  rclone_remote_check $source
-  rclone_remote_check $destination
+rclone_remote_check $src
+rclone_remote_check $dest
 
-  let sourcesize=`rclone size $source --json | cut -d ":" -f3 | cut -d "}" -f1`
-  let destsize=`rclone size $destination --json | cut -d ":" -f3 | cut -d "}" -f1`
-  let srcdestdiff=$(( $sourcesize<$destsize?1:$sourcesize - $destsize ))
-  let maxtransfer00=$( echo $maxtransfer | cut -d "G" -f1 | echo -e "$(cat -)000000000" )
-  let SAs=$(( $srcdestdiff / ( $maxtransfer00 + 1 ) + 1 ))
+let srcsize=`rclone size $src --json | cut -d ":" -f3 | cut -d "}" -f1`
+let srcsizeGB=$(( $srcsize/1024**3 ))
+let destsize=`rclone size $dest --json | cut -d ":" -f3 | cut -d "}" -f1`
+let destsizeGB=$(( $destsize/1024**3 ))
+let srcdestdiff=$(( $srcsize<$destsize?1:$srcsize - $destsize ))
+let srcdestdiffGB=$(( $srcdestdiff/1024**3 ))
+let maxtrans00=$( echo $maxtrans | cut -d "G" -f1 )*1024**3
+let maxtransGB=$( echo $maxtrans | cut -d "G" -f1 )
+let SAs=$(( $srcdestdiffGB / $maxtransGB + 1 ))
 
-  echo "SOURCE $source size is $(( $sourcesize / 1000000000 )) GB"
-  echo "DESTINATION $destination size is $(( $destsize / 1000000000 )) GB"
-  echo "DIFFERENCE of $(( $srcdestdiff / 1000000000 )) GB requires $SAs SAs with MAXTRANSFER of $maxtransfer"
+echo "SOURCE $src size is $srcsizeGB GB"
+echo "DEST $dest size is $destsizeGB GB"
+echo "DIFF of $srcdestdiffGB GB requires $SAs SAs w maxtransfer=$maxtrans"
