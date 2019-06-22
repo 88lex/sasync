@@ -8,7 +8,7 @@ if [ "$CLEAN_DESTINATION" = TRUE ] ; then
   rclone delete $dest -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40
 # Omitting RMDIRS as sometimes removing empty directories can have unintended consequences in set files.
 #  echo; echo REMOVING EMPTY DIRECTORIES from $dest
-#  rclone rmdirs $dest -v --drive-use-trash=false --fast-list --transfers=40
+#  rclone rmdirs $dest -v --drive-use-trash=false --fast-list --transfers=40 --leave-root
 fi
 
 if [ "$CLEAN_SOURCE" = TRUE ] ; then
@@ -18,5 +18,5 @@ echo; echo PERMANENTLY DELETING TRASH from $src
 rclone delete $src -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40
 # Omitting RMDIRS as sometimes removing empty directories can have unintended consequences in set files.
 # echo; echo REMOVING EMPTY DIRECTORIES from $src
-#rclone rmdirs $src -v --drive-use-trash=false --fast-list --transfers=40
+#rclone rmdirs $src -v --drive-use-trash=false --fast-list --transfers=40 --leave-root
 fi
