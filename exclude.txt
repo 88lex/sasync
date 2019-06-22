@@ -1,13 +1,8 @@
 *.m2ts
-*.M2TS
 *.mk3d
-*.MK3D
 *.vob
-*.VOB
 *.m4v
-*.M4V
 *.divx
-*.DIVX
 mounted.bin
 desktop.ini
 .DS_store
