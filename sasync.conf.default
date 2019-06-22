@@ -2,7 +2,7 @@
 export SASYNC_FOLDER=/opt/sasync
 export SETS_FOLDER=$SASYNC_FOLDER/sa-sets
 export JSON_FOLDER=/opt/sa                        # Location of folder with service account .json files. No trailing slash
-export JSON_COUNT=$SASYNC_FOLDER/json.count  # Location of json.count file. Keep separate json.count files if you use >1 group of SAs
+export JSON_COUNT=$SASYNC_FOLDER/json.count       # Location of json.count file. Keep separate json.count files if you use >1 group of SAs
 export MIN_JSON=1
 export MAX_JSON=1200                              # NOTE: YOU NEED TO CHANGE `MAX_JSON` TO THE MAX JSON FILE # IN YOUR JSON_FOLDER
 export EXCLUDES=$SASYNC_FOLDER/exclude.txt        # Location of exclude.txt file with list of file types to exclude
@@ -10,8 +10,8 @@ export TIMEOUT=30m                                # Set timeout in case rclone h
 export CLEAN_DESTINATION=TRUE
 export CLEAN_SOURCE=FALSE
 export GLOBAL_FLAGS="
-    --tpslimit=4
-    --tpslimit-burst=20
+    --tpslimit=5
+    --tpslimit-burst=50
     --fast-list
     -vP
     --size-only
@@ -20,6 +20,9 @@ export GLOBAL_FLAGS="
     --stats-file-name-length=0
     --drive-server-side-across-configs=true
     --exclude-from=$EXCLUDES
+    --ignore-case
+    --drive-chunk-size=128M
+    --use-mmap
     "
 #   Please LEAVE SPACES AND QUOTATION MARKS ABOVE to allow rclone to interpret the flags
 #   Add or remove any flags you like above. These are global rclone flags for rclone in sasync
