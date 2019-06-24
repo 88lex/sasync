@@ -70,5 +70,3 @@ If you have multiple sets then you can run them in sequence with "./sasync set.t
 Resource usage for this script is very light as the copy/move actions are all executed server side. That said, the script can be modified to use the
 --disable move,copy flag if you prefer, in which case I/O and CPU usage would rise.
 
-This script runs on any system with bash >4.x (before which the readarray command did not exist). The current version of bash is 5.x. On MacOS you
-will need to install a newer version of bash, which is easy enough.
