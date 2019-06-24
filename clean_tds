@@ -6,9 +6,8 @@ if [ "$CLEAN_DESTINATION" = TRUE ] ; then
   rclone dedupe skip $dest -v --drive-use-trash=false --no-traverse --transfers=40
   echo; echo PERMANENTLY DELETING TRASH from $dest; echo
   rclone delete $dest -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40
-# Omitting RMDIRS as sometimes removing empty directories can have unintended consequences in set files.
-#  echo; echo REMOVING EMPTY DIRECTORIES from $dest
-#  rclone rmdirs $dest -v --drive-use-trash=false --fast-list --transfers=40 --leave-root
+  echo; echo REMOVING EMPTY DIRECTORIES from $dest
+  rclone rmdirs $dest -v --drive-use-trash=false --fast-list --transfers=40 --leave-root
 fi
 
 if [ "$CLEAN_SOURCE" = TRUE ] ; then
@@ -16,7 +15,6 @@ echo; echo STARTING DEDUPE of identical files from $src
 rclone dedupe skip $src -v --drive-use-trash=false --no-traverse --transfers=40
 echo; echo PERMANENTLY DELETING TRASH from $src
 rclone delete $src -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40
-# Omitting RMDIRS as sometimes removing empty directories can have unintended consequences in set files.
-# echo; echo REMOVING EMPTY DIRECTORIES from $src
-#rclone rmdirs $src -v --drive-use-trash=false --fast-list --transfers=40 --leave-root
+ echo; echo REMOVING EMPTY DIRECTORIES from $src
+rclone rmdirs $src -v --drive-use-trash=false --fast-list --transfers=40 --leave-root
 fi
