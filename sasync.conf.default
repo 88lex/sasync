@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 export SASYNC_FOLDER=/opt/sasync
-export SETS_FOLDER=$SASYNC_FOLDER/sa-sets
+export SETS_FOLDER=$SASYNC_FOLDER/sasets
 export JSON_FOLDER=/opt/sa                        # Location of folder with service account .json files. No trailing slash
 export JSON_COUNT=$SASYNC_FOLDER/json.count       # Location of json.count file. Keep separate json.count files if you use >1 group of SAs
 export MIN_JSON=1
