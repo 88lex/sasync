@@ -16,7 +16,8 @@ added to sasync as a default. If you are running an older version of rclone or w
 
 *  **sasync.conf file**:  Set global variables within the sasync.conf file including as many global rclone flags as you like.    
 **NOTE** The config file in the repo is called **`sasync.conf.default`** in order to not overwrite your existing `sasync.config`.
-Check `sasync.conf.default` for new flags that you may need rename to `sasync.conf` if you want to keep the defaults.
+Check `sasync.conf.default` for new flags that you may need rename to `sasync.conf` if you want to keep the defaults. `sasync.conf` files are backed up
+daily and kept for 14 days (default, adjustable) in a config_backup folder.
 
 *  **Auto calc the number of SAs required**:  Calculates the size of the SOURCE and DESTINATION for each pair in the set.* file, then estimates the number 
 of SAs required based on the --max-transfer setting. If you wish to set the number of SAs manually, put a # before sacalc and unhash the `SAs=` line. 
