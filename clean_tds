@@ -11,10 +11,10 @@ if [ "$CLEAN_DESTINATION" = TRUE ] ; then
 fi
 
 if [ "$CLEAN_SOURCE" = TRUE ] ; then
-echo; echo STARTING DEDUPE of identical files from $src
-rclone dedupe skip $src -v --drive-use-trash=false --no-traverse --transfers=40
-echo; echo PERMANENTLY DELETING TRASH from $src
-rclone delete $src -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40
- echo; echo REMOVING EMPTY DIRECTORIES from $src
-rclone rmdirs $src -v --drive-use-trash=false --fast-list --transfers=40 --leave-root
+  echo; echo STARTING DEDUPE of identical files from $src
+  rclone dedupe skip $src -v --drive-use-trash=false --no-traverse --transfers=40
+  echo; echo PERMANENTLY DELETING TRASH from $src
+  rclone delete $src -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40
+  echo; echo REMOVING EMPTY DIRECTORIES from $src
+  rclone rmdirs $src -v --drive-use-trash=false --fast-list --transfers=40 --leave-root
 fi
