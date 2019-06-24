@@ -5,8 +5,8 @@
 # https://github.com/88lex/sasync
 # Created by Max and a925. Thank you!
 
-USER=seed
-GROUP=seed
+#USER=seed
+#GROUP=seed
 INSTALL_PATH=/opt/sasync
 DEVELOP_BRANCH=FALSE
 
@@ -15,6 +15,7 @@ echo "Making Directories"
 sudo mkdir -p $INSTALL_PATH
 sudo chown -R $USER:$GROUP $INSTALL_PATH
 echo "Downloading sasync"
+sudo apt-get install git
 git clone https://github.com/88lex/sasync.git $INSTALL_PATH
 cd $INSTALL_PATH
 if [ "$DEVELOP_BRANCH" = TRUE ] ; then
