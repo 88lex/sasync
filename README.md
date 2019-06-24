@@ -29,7 +29,7 @@ default flags in the sasync script will override the defaults. Note that you can
 Typically this is a typo or remote auth issue. 
 **NOTE: sasync does not create missing folders, as rclone could accidentally create and copy to a local folder = DANGEROUS.**
 
-*  **Log files**:  sasync creates two log files with each run. `stderr_set.name.log` and `stdout_set.name.log`
+*  **Log files**:  sasync creates two log files with each run. `stderr_set.name.log` and `stdout_set.name.log` and puts them in `logs` folder
 
 *  **Set files are in a sub folder called `sasets`**:  The new format requires changing your set.* files if you were running an older version of sasync 
 
