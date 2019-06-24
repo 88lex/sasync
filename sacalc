@@ -1,15 +1,10 @@
-# sacalc
-echo;echo == CHECKING SIZE of $src and $dest ==;echo BE PATIENT, LARGE REMOTES TAKE TIME
+# sacalc is a function called by sasync. It checks rclone remotes then calculates their size
+# If source and destination are exactly equal is size then it skips to the next pair
 
-rclone_remote_check () {
-  rclone lsd $1 > /dev/null 2>&1
-  [ $? = 0 ] || \
-  { echo;echo REMOTE $1 in $(basename $set_file) FAILED.
-  echo == CHECK set file and rclone.conf ==;echo;exit; } }
+if ! rclone lsd $src &>/dev/null;then echo FAILURE: CHECK $src in $set_file;exit;fi
+if ! rclone lsd $dest &>/dev/null;then echo FAILURE: CHECK $dest in $set_file;exit;fi
 
-rclone_remote_check $src
-rclone_remote_check $dest
-
+echo;echo == CHECKING SIZE of $src and $dest BE PATIENT ==
 let srcsize=`rclone size $src --json | cut -d ":" -f3 | cut -d "}" -f1`
 let srcsizeGB=$(( $srcsize/1024**3 ))
 let destsize=`rclone size $dest --json | cut -d ":" -f3 | cut -d "}" -f1`
@@ -17,8 +12,14 @@ let destsizeGB=$(( $destsize/1024**3 ))
 let srcdestdiff=$(( $srcsize<$destsize?0:$srcsize - $destsize ))
 let srcdestdiffGB=$(( $srcdestdiff/1024**3 ))
 let maxtrans00=$( echo $maxtrans | cut -d "G" -f1 )*1024**3
-let maxtransGB=$( echo $maxtrans | cut -d "G" -f1 )
-let SAs=$(( ($srcdestdiffGB+$maxtransGB-1) / $maxtransGB ))
+let SAs=$(( ($srcdestdiff+$maxtrans00-1) / $maxtrans00 ))
 
-echo SOURCE $src size is $srcsizeGB GB;echo DEST $dest size is $destsizeGB GB
-echo DIFF of $srcdestdiffGB GB requires $SAs SAs w maxtransfer= $maxtrans
+echo $srcsizeGB GB = SIZE of SOURCE $src
+echo $destsizeGB GB = SIZE of DEST $dest
+
+if [ $srcdestdiff == 0 ]; then
+  echo "SOURCE AND DEST ARE THE SAME SIZE ==> SKIPPING TO NEXT SOURCE-DESTINATION PAIR."
+  continue
+fi
+
+echo DIFF of $srcdestdiffGB GB needs $SAs SAs with MAXTRANSFER = $maxtrans
