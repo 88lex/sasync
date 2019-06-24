@@ -1,0 +1,29 @@
+#!/bin/bash
+# This script is intended to be used for initial install or a major/clean upgrade
+# This script installs sasync, applies ownership and sets USER and GROUP
+# Modify below USER, GROUP and INSTALL_PATH values for your own setup
+# https://github.com/88lex/sasync
+# Created by Max and a925. Thank you!
+
+USER=seed
+GROUP=seed
+INSTALL_PATH=/opt/sasync
+DEVELOP_BRANCH=FALSE
+
+# Make Directories
+echo "Making Directories"
+sudo mkdir -p $INSTALL_PATH
+sudo chown -R $USER:$GROUP $INSTALL_PATH
+echo "Downloading sasync"
+git clone https://github.com/88lex/sasync.git $INSTALL_PATH
+cd $INSTALL_PATH
+if [ "$DEVELOP_BRANCH" = TRUE ] ; then
+git checkout develop
+cp $INSTALL_PATH/sasync.conf $INSTALL_PATH/sasync.conf.orig
+cp $INSTALL_PATH/sasync.conf.default $INSTALL_PATH/sasync.conf ; fi
+sudo chmod 775 $INSTALL_PATH/sasync
+sudo chmod 775 $INSTALL_PATH/readsets
+echo "Finished - See https://github.com/88lex/sasync for instructions"
+echo "Don't forget to set paths and json count in the config"
+echo "Check global defaults in the config file"
+exit 0
