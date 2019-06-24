@@ -12,6 +12,7 @@ export CLEAN_SOURCE=FALSE
 export GLOBAL_FLAGS="
     --tpslimit=5
     --tpslimit-burst=50
+    --transfers=20
     --fast-list
     -vP
     --size-only
