@@ -1,7 +1,7 @@
 **sasync** -- This script uses rclone with service accounts to sync, copy or move files between rclone remotes. 
 Further information and tools can be found  at https://github.com/88lex/sa-guide
 
-**Usage**:  `./sasync set.tv` Enable execution of sasync with `chmod +x sasync` each time you update. The default location for set files is a subfolder called `sa-sets`    
+**Usage**:  `./sasync set.tv` Enable execution of sasync with `chmod +x sasync` each time you update. The default location for set files is a subfolder called `sasets`    
 
 **IMPORTANT**:   
 ==>  If this is your first time running sasync then rename `sasync.conf.default` to `sasync.conf`. If you are updating sasync then check for new 
@@ -31,7 +31,7 @@ Typically this is a typo or remote auth issue.
 
 *  **Log files**:  sasync creates two log files with each run. `stderr_set.name.log` and `stdout_set.name.log`
 
-*  **Set files are in a sub folder called `sa-sets`**:  The new format requires changing your set.* files if you were running an older version of sasync 
+*  **Set files are in a sub folder called `sasets`**:  The new format requires changing your set.* files if you were running an older version of sasync 
 
 *  **Skips identical source-dest pairs**:  Skips a sync pair if source and destination are exactly equal in size, then moves on to the next sync pair.
 
