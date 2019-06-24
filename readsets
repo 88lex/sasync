@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# This is a standalone script that will show you how sasync will read your set files
+# Syntax is ./readsets set.videos <= substituting your set file name/location
 echo;echo == CHECKING IF YOUR SETS CAN BE READ CORRECTLY BY SASYNC ==;echo
 source ./sasync.conf
 
