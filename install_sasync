@@ -3,7 +3,7 @@
 # This script installs sasync, applies ownership and sets USER and GROUP
 # Modify below USER, GROUP and INSTALL_PATH values for your own setup
 # https://github.com/88lex/sasync
-# Created by Max and a925. Thank you!
+# Created by Max and a925. Thank you! With a few edits from me
 
 # Have the script install a few apps for you, if you want. git you will need
 #curl https://rclone.org/install.sh | sudo bash -s beta
