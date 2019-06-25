@@ -14,27 +14,27 @@ added to sasync as a default. If you are running an older version of rclone or w
 **This version of sasync includes the following features:**
 
 
-*  **sasync.conf file**:  Set global variables within the sasync.conf file including as many global rclone flags as you like.    
+*  **sasync.conf file**:  Set global variables within the sasync.conf file including as many global rclone flags as you like.   
+The `sasync.conf` file is backed up daily to a `./config_backup` folder and kept for 14 days (default, adjustable).    
 **NOTE** The config file in the repo is called **`sasync.conf.default`** in order to not overwrite your existing `sasync.config`.
-Check `sasync.conf.default` for new flags that you may need rename to `sasync.conf` if you want to keep the defaults. `sasync.conf` files are backed up
-daily and kept for 14 days (default, adjustable) in a config_backup folder.
+Check `sasync.conf.default` for new flags that you may need rename to `sasync.conf` if you want to keep the defaults.   
 
 *  **Auto calc the number of SAs required**:  Calculates the size of the SOURCE and DESTINATION for each pair in the set.* file, then estimates the number 
 of SAs required based on the --max-transfer setting. If you wish to set the number of SAs manually, put a # before sacalc and unhash the `SAs=` line. 
 Moved the sacalc function to an external file.
 
-*  **Flexible unlimited rclone flags in the set files**:  Allows adding multiple rclone flags to each/all pairs in the set.* file. Flags which conflict with 
-default flags in the sasync script will override the defaults. Note that you can still add/change flags in the script if you want them to apply to all set.
+*  **Flexible unlimited rclone flags in the set files**:  Add multiple rclone flags to each/all pairs in the set.* file. Flags in the set file will override
+flags in the config file.
 
-*  **rClone config check**:  Checks if each SOURCE and DESTINATION in your set.* file are accessible. If not then sasync exits to let you fix it.
+*  **rClone config check**:  Checks if each SOURCE and DESTINATION in your set.* file is accessible. If not then sasync exits to let you fix it.
 Typically this is a typo or remote auth issue. 
-**NOTE: sasync does not create missing folders, as rclone could accidentally create and copy to a local folder = DANGEROUS.**
+**NOTE: sasync intentionally does not create missing folders, as rclone could accidentally create and copy to a local folder = DANGEROUS.**
 
-*  **Log files**:  sasync creates two log files with each run. `stderr_set.name.log` and `stdout_set.name.log` and puts them in `logs` folder
+*  **Log files**:  sasync creates two log files with each run. `stderr_set.name.log` and `stdout_set.name.log` and puts them in the `logs` folder
 
 *  **Set files are in a sub folder called `sasets`**:  The new format requires changing your set.* files if you were running an older version of sasync 
 
-*  **Skips identical source-dest pairs**:  Skips a sync pair if source and destination are exactly equal in size, then moves on to the next sync pair.
+*  **Skips same-size source-dest pairs**:  Skips a sync pair if source and destination are exactly equal in size, then moves on to the next sync pair.
 
 **There are several files in the repo at the moment.**
 1. **`sasync`** is the main script that pulls sync sets from 'set' files and runs rclone sync/copy/move.
@@ -48,6 +48,12 @@ sequence from the jsons without wasting or duplicating usage.
 7. **`exclude.txt`** contains file patterns to exclude from sasync. At the moment these are files that sometimes hang rclone 
 service side copying, so we skip them. Typically it is only a handful of files. Until this gets fixed you will need to do an 
 occasional 'sweep' sync/copy using the --disable move,copy flag which copies without hanging.
+8. **`readsets`** is a standalone utility that will show you your cleaned up set file and display how sasync reads it. This can sometimes be helpful
+when doing bug checking of your set files.
+9. **`install_sasync`** will automate some installation tasks for you. It is intended for use during initial install, but can be used with subsequent installs.
+10. The **`sasets`** folder has one sample set in it. This is the location that sasync looks in by default, so a good idea to put your custom sets here.
+You may consider creating your own private repo called `sasets` in github/lab/bucket that contains your personal set files. 
+Then it is quite easy to add your set files to a new machine while installing sasync.
 
 
 The set.* files specify which sync pairs you would like to run along with rclone flags for that sync pair. The format would be as follows:
