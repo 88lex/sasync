@@ -20,7 +20,7 @@ export GLOBAL_FLAGS="
     --stats=5s
     --max-backlog=2000000
     --stats-file-name-length=0
-    --drive-server-side-across-configs=true
+    --drive-server-side-across-accounts=true
     --exclude-from=$EXCLUDES
     --ignore-case
     --drive-chunk-size=128M
