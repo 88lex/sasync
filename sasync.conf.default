@@ -9,6 +9,7 @@ export EXCLUDES=$SASYNC_FOLDER/exclude.txt        # Location of exclude.txt file
 export TIMEOUT=30m                                # Set timeout in case rclone hangs. If no need, set to high value e.g. 2h (2 hours) or 5d (5 days).
 export CLEAN_DESTINATION=TRUE
 export CLEAN_SOURCE=FALSE
+export PRE_CLEAN_TDS=FALSE                        # If you want to clean the TDs before running rclone w SAs then change this to TRUE
 export GLOBAL_FLAGS="
     --tpslimit=5
     --tpslimit-burst=50
