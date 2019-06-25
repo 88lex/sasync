@@ -9,7 +9,7 @@
 #curl https://rclone.org/install.sh | sudo bash -s beta
 #sudo apt-get install zip
 #sudo apt-get install tmux
-#sudo apt-get install git
+sudo apt-get install git
 
 
 # Add USER and GROUP if desired
