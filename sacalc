@@ -4,6 +4,9 @@
 if ! rclone lsd $src &>/dev/null;then echo FAILURE: CHECK $src in $set_file;exit;fi
 if ! rclone lsd $dest &>/dev/null;then echo FAILURE: CHECK $dest in $set_file;exit;fi
 
+# Clean TDs before calc (source and/or destination, as set in your config file)
+if [ $PRE_CLEAN_TDS == "TRUE" ];then source clean_tds;fi
+
 echo;echo == CHECKING SIZE of $src and $dest BE PATIENT ==
 let srcsize=`rclone size $src --json | cut -d ":" -f3 | cut -d "}" -f1`
 let srcsizeGB=$(( $srcsize/1024**3 ))
