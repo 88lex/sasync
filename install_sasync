@@ -28,9 +28,9 @@ echo "Downloading sasync"
 git clone https://github.com/88lex/sasync.git $INSTALL_PATH
 cd $INSTALL_PATH
 if [ "$DEVELOP_BRANCH" = TRUE ] ; then
-git checkout develop
+git checkout develop ; fi
 cp $INSTALL_PATH/sasync.conf $INSTALL_PATH/sasync.conf.orig
-cp $INSTALL_PATH/sasync.conf.default $INSTALL_PATH/sasync.conf ; fi
+cp $INSTALL_PATH/sasync.conf.default $INSTALL_PATH/sasync.conf
 sudo chmod +x $INSTALL_PATH/sasync
 sudo chmod +x $INSTALL_PATH/readsets
 echo "Finished - See https://github.com/88lex/sasync for instructions"
