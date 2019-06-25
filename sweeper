@@ -1,0 +1,18 @@
+#!/bin/bash
+# Sweep up misc files that cannot be copied server-side
+
+>exclude_none.txt
+source ./sasync.conf
+
+echo BEFORE = ;echo $GLOBAL_FLAGS;echo
+export GLOBAL_FLAGS="$GLOBAL_FLAGS
+    --drive-server-side-across-configs=false
+    --exclude-from=exclude-none.txt
+    " >> GLOBAL_FLAGS
+echo AFTER = ;echo $GLOBAL_FLAGS
+
+source sacalc
+for SA in $(seq 1 $SAs); do run_rclone_w_flags; done
+
+rm exclude_none.txt
+source ./sasync.conf
