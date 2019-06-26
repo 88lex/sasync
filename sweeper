@@ -7,4 +7,3 @@ if [ $SWEEP == "TRUE" ]; then
   for SA in $(seq 1 $SAs); do run_rclone_w_flags; done
   source ./sasync.conf
 fi
-exit 0
