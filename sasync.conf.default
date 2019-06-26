@@ -1,17 +1,14 @@
 #!/usr/bin/env bash
 export SASYNC_FOLDER=/opt/sasync
-export SETS_FOLDER=/opt/sasync/sasets
+export SETS_FOLDER=$SASYNC_FOLDER/sa-sets
 export JSON_FOLDER=/opt/sa                        # Location of folder with service account .json files. No trailing slash
-export JSON_COUNT=/opt/sa/json.count              # Location of json.count file. Keep separate json.count files if you use >1 group of SAs
+export JSON_COUNT=$SASYNC_FOLDER/json.count       # Location of json.count file. Keep separate json.count files if you use >1 group of SAs
 export MIN_JSON=1
 export MAX_JSON=1200                              # NOTE: YOU NEED TO CHANGE `MAX_JSON` TO THE MAX JSON FILE # IN YOUR JSON_FOLDER
-export TIMEOUT=30m                                # Set timeout in case rclone hangs. Do not leave blank. If no need, set to high value 5d (5 days).
+export EXCLUDES=$SASYNC_FOLDER/exclude.txt        # Location of exclude.txt file with list of file types to exclude
+export TIMEOUT=30m                                # Set timeout in case rclone hangs. If no need, set to high value e.g. 2h (12 hours) or 5d (5 days).
 export CLEAN_DESTINATION=TRUE
 export CLEAN_SOURCE=FALSE
-export PRE_CLEAN_TDS=FALSE                        # If you want to clean the TDs before running rclone w SAs then change this to TRUE
-export SWEEP=FALSE                                # To copy files that won't copy server-side set SWEEP=TRUE. Otherwise leave as FALSE
-export EXCL="--exclude-from exclude.txt"          # Location of exclude.txt file with list of file types to exclude
-export DMC=""                                     # DMC is for "--disable move,copy". Normally leave blank
 export GLOBAL_FLAGS="
     --tpslimit=5
     --tpslimit-burst=50
@@ -22,17 +19,18 @@ export GLOBAL_FLAGS="
     --stats=5s
     --max-backlog=2000000
     --stats-file-name-length=0
+    --drive-server-side-across-configs=true
+    --exclude-from=$EXCLUDES
     --ignore-case
     --drive-chunk-size=128M
     --use-mmap
-    --drive-server-side-across-configs=true
     "
 #   Please LEAVE SPACES AND QUOTATION MARKS ABOVE to allow rclone to interpret the flags
 #   Add or remove any flags you like above. These are global rclone flags for rclone in sasync
 #   Flags from your set files (if any) will override the global flags if there are any conflicts
 #   Other common rclone flags you may wish to add:
 #   --no-traverse  ;  works with copy or move but not sync
-#   --dry-run      ;  useful for test runs
+#   --dry-run      ;  useful for testing runs
 #   --no-update-modtime  ;  if you have system time mismatches can save runtime. But can produce odd duplicates results with copy
 
 mkdir -p $SASYNC_FOLDER/config_backup
