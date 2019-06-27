@@ -4,7 +4,5 @@
 *.MK3D
 *.vob
 *.VOB
-*.m4v
-*.M4V
 *.divx
 *.DIVX
