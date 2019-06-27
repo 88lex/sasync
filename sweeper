@@ -1,9 +1,12 @@
 #!/bin/bash
+# Sweep up misc files that cannot be copied server-side
 echo;echo == STARTING SWEEP OF NON-SERVER-SIDE FILES ==;echo
+
 if [ $SWEEP == "TRUE" ]; then
-  export EXCL="--exclude-from "$SASYNC_FOLDER/exclude_none.txt
-  export DMC="--disable move,copy"
+  EXCL="--exclude-from exclude_none.txt"
+  DMC="--disable move,copy --max-transfer=1000G"
   source sacalc
   for SA in $(seq 1 $SAs); do run_rclone_w_flags; done
-  source ./sasync.conf
+  EXCL="--exclude-from exclude.txt"
+  DMC=""
 fi
