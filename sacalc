@@ -1,8 +1,11 @@
 # sacalc is a function called by sasync. It checks rclone remotes then calculates their size
 # If source and destination are exactly equal is size then it skips to the next pair
 
-if ! rclone lsd $src &>/dev/null;then echo FAILURE: CHECK $src in $set_file;exit;fi
-if ! rclone lsd $dest &>/dev/null;then echo FAILURE: CHECK $dest in $set_file;exit;fi
+echo;echo == CHECKING if $src and $dest have PERMISSIONS and correct RCLONE CONFIG ==
+if ! rclone lsd $src --drive-service-account-file="$JSON_FOLDER/$MIN_JSON.json" &>/dev/null;then
+  echo FAILURE: CHECK gsuite permissions and rclone config for $src in $set_file;exit;fi
+if ! rclone lsd $dest --drive-service-account-file="$JSON_FOLDER/$MIN_JSON.json" &>/dev/null;then
+  echo FAILURE: CHECK gsuite permissions and rclone config for$dest in $set_file;exit;fi
 
 # Clean TDs before calc (source and/or destination, as set in your config file)
 if [ $PRE_CLEAN_TDS == "TRUE" ];then source clean_tds;fi
