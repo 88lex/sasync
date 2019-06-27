@@ -10,3 +10,5 @@ if [ $SWEEP == "TRUE" ]; then
   EXCL="--exclude-from exclude.txt"
   DMC=""
 fi
+
+echo;echo == FINISHED SWEEP OF NON-SERVER-SIDE FILES ==;echo
