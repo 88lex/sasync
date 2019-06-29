@@ -1,6 +1,6 @@
 #!/bin/bash
 # Sweep up misc files that cannot be copied server-side
-echo;echo == STARTING SWEEP OF NON-SERVER-SIDE FILES ==;echo
+echo ; echo STARTING SWEEP OF NON-SERVER-SIDE FILES ; echo
 
 if [ $SWEEP == "TRUE" ]; then
   EXCL="--exclude-from $SASYNC_FOLDER/exclude_min.txt"
@@ -11,4 +11,4 @@ if [ $SWEEP == "TRUE" ]; then
   DMC=""
 fi
 
-echo;echo == FINISHED SWEEP OF NON-SERVER-SIDE FILES ==;echo
+echo ; echo FINISHED SWEEP OF NON-SERVER-SIDE FILES ; echo
