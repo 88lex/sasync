@@ -6,7 +6,6 @@
 mounted.bin
 desktop.ini
 .DS_store
-Thumbs.db
 thumbs.db
 *.icns
 *.part_*
