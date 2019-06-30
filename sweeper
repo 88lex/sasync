@@ -1,14 +1,13 @@
 #!/bin/bash
 # Sweep up misc files that cannot be copied server-side
-echo ; echo STARTING SWEEP OF NON-SERVER-SIDE FILES ; echo
 
 if [ $SWEEP == "TRUE" ]; then
+  echo ; echo STARTING SWEEP OF NON-SERVER-SIDE FILES ; echo
   EXCL="--exclude-from $SASYNC_FOLDER/exclude_min.txt"
   DMC="--disable move,copy --max-transfer=1000G"
   source sacalc
   for SA in $(seq 1 $SAs); do run_rclone_w_flags; done
   EXCL="--exclude-from $SASYNC_FOLDER/exclude.txt"
   DMC=""
+  echo ; echo FINISHED SWEEP OF NON-SERVER-SIDE FILES ; echo
 fi
-
-echo ; echo FINISHED SWEEP OF NON-SERVER-SIDE FILES ; echo
