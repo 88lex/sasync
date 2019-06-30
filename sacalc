@@ -23,7 +23,7 @@ let SAs=$(( ($srcdestdiff+$maxtrans00-1) / $maxtrans00 ))
 echo $srcsizeGB GB = SIZE of SOURCE $src
 echo $destsizeGB GB = SIZE of DEST $dest
 
-if [ $srcdestdiff == 0 ]; then
+if [ $srcsize == $destsize ]; then
   echo "SOURCE AND DEST ARE THE SAME SIZE.  SKIPPING TO NEXT SOURCE-DESTINATION PAIR."
   continue
 fi
