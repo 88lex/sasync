@@ -14,7 +14,7 @@ process_sets () {
   for set_file in $@; do
     echo Set file=$SETS_FOLDER/$set_file
     grep -v '^$\|^\s*\#' $SETS_FOLDER/$set_file>sync_sets;cat sync_sets
-    while IFS=$' \t\n' read -r sync src dest maxtrans set_flags; do
+    while IFS=$' \t\r\n' read -r sync src dest maxtrans set_flags; do
       source sacalc
       for SA in $(seq 1 $SAs); do run_rclone_w_flags; done
       source sweeper
