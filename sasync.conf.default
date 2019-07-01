@@ -9,7 +9,7 @@ TIMEOUT=20m                                # Set timeout in case rclone hangs. I
 CLEAN_DESTINATION=TRUE
 CLEAN_SOURCE=FALSE
 PRE_CLEAN_TDS=FALSE                        # If you want to clean the TDs before running rclone w SAs then change this to TRUE
-SWEEP=TRUE                                 # To copy files that won't copy server-side set SWEEP=TRUE. Otherwise leave as FALSE
+SWEEP=FALSE                                # To copy files that won't copy server-side set SWEEP=TRUE. Otherwise leave as FALSE
 EXCL="--exclude-from "$SASYNC_FOLDER/exclude.txt    # Location of exclude.txt file with list of file types to exclude
 DMC=""
 GLOBAL_FLAGS="
