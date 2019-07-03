@@ -25,7 +25,7 @@ echo $destsizeGB GB = SIZE of DEST $dest
 
 if [ $srcsize == $destsize ]; then
   echo "SOURCE AND DEST ARE THE SAME SIZE.  SKIPPING TO NEXT SOURCE-DESTINATION PAIR."
-  continue
+  source sasync.conf;continue
 fi
 
 echo DIFF of $srcdestdiffGB GB needs $SAs SAs with MAXTRANSFER = $maxtrans
