@@ -6,6 +6,6 @@ if [ ${SWEEP,,} = true ]; then
   local DMC="--disable move,copy --max-transfer=1000G"
   local TIMEOUT=$TIMEOUT_SWEEP
   source sacalc
-  for SA in {1..$SAs}; do run_rclone_w_flags; done
+  for SA in $(seq $SAs); do run_rclone_w_flags; done
   echo;echo FINISHED SWEEP OF NON-SERVER-SIDE FILES;echo
 fi
