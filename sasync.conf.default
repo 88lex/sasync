@@ -10,7 +10,7 @@ TIMEOUT_SWEEP=90m                          # Allow longer timeout for sweeper. D
 CLEAN_DEST=TRUE
 CLEAN_SRC=FALSE
 PRE_CLEAN_TDS=FALSE                        # If you want to clean the TDs before running rclone w SAs then change this to TRUE
-SWEEP=TRUE                                 # To copy files that won't copy server-side set SWEEP=TRUE. Otherwise leave as FALSE
+SWEEP=FALSE                                # To copy files that won't copy server-side set SWEEP=TRUE. Otherwise leave as FALSE
 FILTER="--filter-from="$SASYNC_DIR/filter
 DMC=""
 GLOBAL_FLAGS="
