@@ -1,13 +1,11 @@
-#!/bin/bash
 # Sweep up misc files that cannot be copied server-side
-echo ; echo STARTING SWEEP OF NON-SERVER-SIDE FILES ; echo
 
 if [ ${SWEEP,,} = true ]; then
+  echo ; echo STARTING SWEEP OF NON-SERVER-SIDE FILES ; echo
   local FILTER="--filter-from="$SASYNC_DIR/filter.sweep
   local DMC="--disable move,copy --max-transfer=1000G"
   local TIMEOUT=$TIMEOUT_SWEEP
   source sacalc
   for SA in {1..$SAs}; do run_rclone_w_flags; done
+  echo;echo FINISHED SWEEP OF NON-SERVER-SIDE FILES;echo
 fi
-
-echo;echo FINISHED SWEEP OF NON-SERVER-SIDE FILES ;echo
