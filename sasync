@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-#set -x
-echo ; echo STARTING SASYNC v1.0 ; echo
+echo ; echo STARTING SASYNC v1.1 ; echo
 source sasync.conf
 run_rclone_w_flags () {
   COUNT=$(<$JSON_COUNT);echo $(( $COUNT>=$MAX_JSON?$MIN_JSON:$COUNT+1 ))>$JSON_COUNT
