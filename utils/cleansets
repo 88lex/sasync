@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# This is a standalone script to clean your set files of tabs and windows characters
+# Syntax is ./cleansets set.videos <= substituting your set file name/location
+
+echo;echo STARTING CLEANSETS ;echo
+
+process_sets () {
+  for set_file in $@; do
+    echo Set file=$set_file
+    column -t $set_file > tmp
+    mv tmp $set_file
+    cat $set_file
+  done
+}
+
+process_sets $@
+echo;echo CLEANSETS COMPLETED;echo

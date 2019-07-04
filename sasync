@@ -1,27 +1,26 @@
 #!/usr/bin/env bash
+#set -x
 echo ; echo STARTING SASYNC v1.0 ; echo
 source sasync.conf
 run_rclone_w_flags () {
-  COUNT=$(<$JSON_COUNT);if [ $COUNT -gt $MAX_JSON ];then COUNT=$MIN_JSON;fi;
-  echo $((COUNT+1))>$JSON_COUNT
-  echo BEGIN $sync of $src to $dest w $COUNT/$MAX_JSON.json from $set_file ; echo
-  echo GLOBAL FLAGS = "$GLOBAL_FLAGS";echo SET FILE FLAGS = $set_flags ; echo
-  timeout $TIMEOUT rclone $sync $src $dest --max-transfer=$maxtrans $EXCL $GLOBAL_FLAGS\
-  --drive-service-account-file="$JSON_FOLDER/$COUNT.json" $set_flags $DMC
-  echo ; echo FINISHED $sync from $src to $dest wJSON $COUNT.json ; echo
+  COUNT=$(<$JSON_COUNT);echo $(( $COUNT>=$MAX_JSON?$MIN_JSON:$COUNT+1 ))>$JSON_COUNT
+  echo BEGIN $sync of $src to $dest w $COUNT/$MAX_JSON.json from $set_file
+  echo GLOBAL FLAGS = "$GLOBAL_FLAGS";echo SET FILE FLAGS = $set_flags
+  echo FILTER = $FILTER  DMC = $DMC  TIMEOUT = $TIMEOUT
+  timeout $TIMEOUT rclone $sync $src $dest --max-transfer=$maxtrans $GLOBAL_FLAGS\
+  --drive-service-account-file="$JSON_DIR/$COUNT.json" $set_flags $DMC $FILTER
+  echo;echo FINISHED $sync from $src to $dest wJSON $COUNT.json;echo
 }
 process_sets () {
-  for set_file in $@; do
-    echo Set file=$SETS_FOLDER/$set_file
-    grep -v '^$\|^\s*\#' $SETS_FOLDER/$set_file>sync_sets;cat sync_sets
-    while IFS=$' \t\r\n' read -r sync src dest maxtrans set_flags; do
+  for set_file in $@; do echo Set file is $set_file
+    column -t $SET_DIR/$set_file|tee /dev/tty|sed '/^\s*#.*$/d'|\
+    while IFS=' ' read -r sync src dest maxtrans set_flags;do
       source sacalc
-      for SA in $(seq 1 $SAs); do run_rclone_w_flags; done
+      for SA in {1..$SAs};do run_rclone_w_flags;done
       source sweeper
       source clean_tds
-    done < sync_sets
+    done
   done
 }
 process_sets $@ > >(tee "logs/stdout_$@.log") 2> >(tee "logs/stderr_$@.log" >&2)
-echo ; echo SASYNC COMPLETED ; echo 
-
+echo ; echo SASYNC COMPLETED and EXITING ; echo

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# This is a standalone script that will show you how sasync will read your set files
+# Syntax is ./readsets set.videos <= substituting your set file name/location
+echo;echo CHECKING IF YOUR SETS CAN BE READ CORRECTLY BY SASYNC;echo
+
+# if your sets are in another directory, change SET_DIR
+SET_DIR=/opt/sasync/sasets
+
+process_sets () {
+  for set_file in $@; do echo;echo Set file is $SET_DIR/$set_file
+    column -t $SET_DIR/$set_file|tee /dev/tty|sed '/^\s*#.*$/d'|\
+    while IFS=' ' read -r sync src dest maxtrans set_flags;do
+    echo READ: $sync $src $dest $maxtrans $set_flags
+    done
+  done
+}
+process_sets $@
+echo;echo READ SETS COMPLETED;echo

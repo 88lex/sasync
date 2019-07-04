@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #This script dedupes identical files and permanently deletes trash in your remotes.
 
-if [ "$CLEAN_DESTINATION" = TRUE ] ; then
+if [ ${CLEAN_DEST,,} = true ]; then
   echo; echo STARTING DEDUPE of identical files from $dest
   rclone dedupe skip $dest -v --drive-use-trash=false --no-traverse --transfers=40
   echo; echo PERMANENTLY DELETING TRASH from $dest; echo
@@ -10,7 +10,7 @@ if [ "$CLEAN_DESTINATION" = TRUE ] ; then
   rclone rmdirs $dest -v --drive-use-trash=false --fast-list --transfers=40 --leave-root
 fi
 
-if [ "$CLEAN_SOURCE" = TRUE ] ; then
+if [ ${CLEAN_SRC,,} = true ]; then
   echo; echo STARTING DEDUPE of identical files from $src
   rclone dedupe skip $src -v --drive-use-trash=false --no-traverse --transfers=40
   echo; echo PERMANENTLY DELETING TRASH from $src
