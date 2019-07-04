@@ -1,23 +1,20 @@
 #!/bin/bash
 # This script is intended to be used for initial install or a major/clean upgrade
-# This script installs sasync, applies ownership and sets USER and GROUP
+# Installs sasync and applies ownership
 # Modify below USER, GROUP and INSTALL_PATH values for your own setup
 # https://github.com/88lex/sasync
-# Created by Max and a925. Thank you! With a few edits from me
+# Created by Max and a925. Thank you! With a few edits from 88
 
-# Have the script install a few apps for you, if you want. git you will need
+# Have the script install a few apps for you. You will need git
 #curl https://rclone.org/install.sh | sudo bash -s beta
 #sudo apt-get install zip
 #sudo apt-get install tmux
 sudo apt-get install git
 
-
-# Add USER and GROUP if desired
 #USER=seed
 #GROUP=seed
 INSTALL_PATH=/opt/sasync
-
-Change FALSE to TRUE if you want develop branch
+# Change FALSE to TRUE if you want develop branch
 DEVELOP_BRANCH=FALSE
 
 # Make Directories
@@ -32,8 +29,7 @@ git checkout develop ; fi
 cp $INSTALL_PATH/sasync.conf $INSTALL_PATH/sasync.conf.orig
 cp $INSTALL_PATH/sasync.conf.default $INSTALL_PATH/sasync.conf
 sudo chmod +x $INSTALL_PATH/sasync
-sudo chmod +x $INSTALL_PATH/readsets
 echo "Finished - See https://github.com/88lex/sasync for instructions"
-echo "Don't forget to set paths and json count in the config"
+echo "Don't forget to set paths in the config"
 echo "Check global defaults in the config file"
 exit 0

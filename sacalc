@@ -1,16 +1,16 @@
-# sacalc is a function called by sasync. It checks rclone remotes then calculates their size
-# If source and destination are exactly equal is size then it skips to the next pair
+#!/usr/bin/env bash
+# sacalc checks rclone remotes then calculates their size
+# If source and destination are exactly equal in size then it skips to the next pair
 
-echo ; echo CHECKING if $src and $dest have PERMISSIONS and correct RCLONE CONFIG 
-if ! rclone lsd $src --drive-service-account-file="$JSON_FOLDER/$MIN_JSON.json" &>/dev/null;then
-  echo FAILURE: CHECK gsuite permissions and rclone config for $src in $set_file ; exit ; fi 
-if ! rclone lsd $dest --drive-service-account-file="$JSON_FOLDER/$MIN_JSON.json" &>/dev/null ; then
-  echo FAILURE: CHECK gsuite permissions and rclone config for$dest in $set_file ; exit ; fi
+echo;echo CHECKING PERMISSIONS and RCLONE CONFIGS of $src and $dest
+if ! rclone lsd $src --drive-service-account-file="$JSON_DIR/$MIN_JSON.json" &>/dev/null;then
+  echo FAILURE: CHECK gsuite permissions and rclone config for $src in $set_file;exit;fi
+if ! rclone lsd $dest --drive-service-account-file="$JSON_DIR/$MIN_JSON.json" &>/dev/null;then
+  echo FAILURE: CHECK gsuite permissions and rclone config for$dest in $set_file;exit;fi
 
-# Clean TDs before calc (source and/or destination, as set in your config file)
-if [ $PRE_CLEAN_TDS == "TRUE" ];then source clean_tds ; fi
+if [ ${PRE_CLEAN_TDS,,} = true ];then source clean_tds;fi
 
-echo ; echo CHECKING SIZE of $src and $dest BE PATIENT 
+echo;echo CHECKING SIZE of $src and $dest BE PATIENT
 let srcsize=`rclone size $src --json | cut -d ":" -f3 | cut -d "}" -f1`
 let srcsizeGB=$(( $srcsize/1024**3 ))
 let destsize=`rclone size $dest --json | cut -d ":" -f3 | cut -d "}" -f1`
@@ -18,14 +18,10 @@ let destsizeGB=$(( $destsize/1024**3 ))
 let srcdestdiff=$(( $srcsize<$destsize?1:$srcsize - $destsize ))
 let srcdestdiffGB=$(( $srcdestdiff/1024**3 ))
 let maxtrans00=$( echo $maxtrans | cut -d "G" -f1 )*1024**3
-let SAs=$(( ($srcdestdiff+$maxtrans00-1) / $maxtrans00 ))
+let SAs=$(( ($srcdestdiff+$maxtrans00) / $maxtrans00 ))
 
-echo $srcsizeGB GB = SIZE of SOURCE $src
-echo $destsizeGB GB = SIZE of DEST $dest
-
+echo $srcsizeGB GB = $srcsize bytes = SIZE of SOURCE $src
+echo $destsizeGB GB = $destsize bytes = SIZE of DEST $dest
 if [ $srcsize == $destsize ]; then
-  echo "SOURCE AND DEST ARE THE SAME SIZE.  SKIPPING TO NEXT SOURCE-DESTINATION PAIR."
-  source sasync.conf;continue
-fi
-
-echo DIFF of $srcdestdiffGB GB needs $SAs SAs with MAXTRANSFER = $maxtrans
+  echo "SOURCE size = DEST size. SKIPPING TO NEXT SOURCE-DESTINATION PAIR.";continue;fi
+echo USING $SAs SAs w diff of $srcdestdiffGB GB = $srcdestdiff bytes and MAXTRANSFER = $maxtrans;echo
