@@ -6,9 +6,10 @@ Further information and tools can be found  at https://github.com/88lex/sa-guide
 
 **Usage**:  `./sasync set.video` Enable execution of sasync with `chmod +x sasync` each time you update. The default location for set files is a subfolder called `sasets`    
 
-**NEW**: Changed `--exclude-from` flag and file to `--filter-from` in sasync.conf. Allows more flexibility in excluding/including file and folder types.    
-**NEW**: Added a filter.sweep file with fewer exclusions for the sweeper run. You can change this to `+ *.filetype` if you want only certain files in sweeper.
-**NEW**: (May not be needed w just released rclone versions!) Added `sweeper` which will pick up files that cannot copy server-side. Turn on (TRUE) or off (FALSE) in sasync.conf
+**NEW**: Changed `--exclude-from` to `--filter-from` in sasync.conf. Allows more flexibility in excluding/including file and folder types to match your use-case. 
+There is a very good description with examples in the rclone wiki https://rclone.org/filtering/#filter-from-read-filtering-patterns-from-a-file    
+**NEW**: Added a filter.sweep file with fewer exclusions for the sweeper run. You can change this to `+ *.filetype` if you want only certain files in sweeper.    
+**NEW**: (May not be needed w just released rclone versions!) Added `sweeper` which will pick up files that cannot copy server-side. Turn on (TRUE) or off (FALSE) in sasync.conf    
 
 **IMPORTANT**:   
 ==>  If this is your first time running sasync then rename `sasync.conf.default` to `sasync.conf`. If you are updating sasync then check for new 
