@@ -8,15 +8,15 @@ Further information and tools can be found  at https://github.com/88lex/sa-guide
 
 **NEW**: Changed `--exclude-from` to `--filter-from` in sasync.conf. Allows more flexibility in excluding/including file and folder types to match your use-case. 
 There is a very good description with examples in the rclone wiki https://rclone.org/filtering/#filter-from-read-filtering-patterns-from-a-file    
-**NEW**: Added a filter.sweep file with fewer exclusions for the sweeper run. You can change this to `+ *.filetype` if you want only certain files in sweeper.    
 **NEW**: (May not be needed w just released rclone versions!) Added `sweeper` which will pick up files that cannot copy server-side. Turn on (TRUE) or off (FALSE) in sasync.conf    
+**NEW**: Added a filter.sweep file with fewer exclusions for the sweeper run. You can change this to `+ *.filetype` if you want only certain files in sweeper.    
 
 **IMPORTANT**:   
 ==>  If this is your first time running sasync then rename `sasync.conf.default` to `sasync.conf`. If you are updating sasync then check for new 
 flags and add/edit as needed into your existing `sasync.conf`.   
-==>  You need to create your own `sasets` folder and point sasync.conf to that folder. The default is `/opt/sasync/sasets`    
-==>  sasync will NOT create base folders. e.g. If you specify remote:movies in a set, sasync will not create the `movies` folder in `remote:`.    
-==>  Check in the sasync.conf file to point sasync to where your sasync script, set files and SA jsons are located.    
+==>  Check each line in the sasync.conf file, especially the directory (`DIR`) locations. sasync will not run correctly if it cannot find sets, jsons or filters .    
+==>  The default set file folder is `/opt/sasync/sasets`. If you want to put set files in another folder be sure to change sasync.conf SET_DIR    
+==>  sasync will NOT create base folders. e.g. If you specify `remote:movies` in a set file, sasync will not create the `movies` folder in `remote:`.    
 ==>  Versions of rclone from 1.48 require a new flag `--drive-server-side-across-configs` in order to do server-side sync/copy. This flag has been
 added to sasync as a default. If you are running an older version of rclone or wish to not execute server-side copies simply delete the flag from sasync.conf.  
 
@@ -25,7 +25,7 @@ added to sasync as a default. If you are running an older version of rclone or w
 *  **sasync.conf file**:  Set global variables within the sasync.conf file including as many global rclone flags as you like.   
 The `sasync.conf` file is backed up daily to a `./config_backup` folder and kept for 14 days (default, adjustable).    
 **NOTE** The config file in the repo is called **`sasync.conf.default`** so you do not not overwrite an existing `sasync.config`.
-You can copy via `cp sasync.conf.default sasync.conf` or edit your `sasync.conf` to add any new flags in the default file.     
+You can copy via `cp sasync.conf.default sasync.conf`. If you keep your existing `sasync.conf` check carefully not to omit new flags.     
 
 *  **Auto calc the number of SAs required**:  Calculates the size of the SOURCE and DESTINATION for each pair in the set.* file, then estimates the number 
 of SAs required based on the --max-transfer setting. 
@@ -39,9 +39,13 @@ Typically this is a typo or remote auth issue.
 
 *  **Log files**:  sasync creates two log files with each run. `stderr_set.name.log` and `stdout_set.name.log` and puts them in the `logs` folder
 
-*  **Set files are in a sub folder called `sasets`**:  The new format requires changing your set.* files if you were running an older version of sasync 
+*  **Set files go by default in a sub folder called `sasets`**:  The new format requires changing the content of your set.* files if you were
+*  running an older version of sasync 
 
 *  **Skips same-size source-dest pairs**:  Skips a sync pair if source and destination are exactly equal in size, then moves on to the next sync pair.
+
+*  You may consider creating your own private repo called `sasets` in github/lab/bucket that contains your personal set files. 
+Set files are easy to edit in github/gitlab and can be easily added to / updated to any machines running sasync.
 
 **There are several files in the repo at the moment.**
 1. **`sasync`** is the main script that pulls sync sets from 'set' files and runs rclone sync/copy/move.
@@ -57,10 +61,7 @@ service side copying, so we skip them. Typically it is only a handful of files.
 8. **`utils` folder** contains a few misc scripts. `readsets` will check if your set.* files are readable by sasync. `cleansets` will 
 replace tabs and unreadable characters in your set.* files. Syntax is `./cleansets set.video`.
 9. **`install_sasync`** will automate some installation tasks for you. It is intended for use during initial install, but can be used with subsequent installs.
-10. The **`sasets`** folder has one sample set in it. This is the location that sasync looks in by default, so a good idea to put your custom sets here.
-You may consider creating your own private repo called `sasets` in github/lab/bucket that contains your personal set files. 
-Then it is quite easy to add your set files to a new machine while installing sasync.
-
+10. The **`utils`** folder has one sample set in it for reference. Be sure to put your actual set files in the `sasets` folder.
 
 The set.* files specify which sync pairs you would like to run along with rclone flags for that sync pair. The format would be as follows:
 <pre>
