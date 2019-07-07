@@ -30,6 +30,8 @@ You can copy via `cp sasync.conf.default sasync.conf`. If you keep your existing
 *  **Auto calc the number of SAs required**:  Calculates the size of the SOURCE and DESTINATION for each pair in the set.* file, then estimates the number 
 of SAs required based on the --max-transfer setting. 
 
+*  The default **filter** file excludes some system files. Open and customize it to suit your own needs.
+
 *  **Flexible unlimited rclone flags in the set files**:  Add multiple rclone flags to each/all pairs in the set.* file. Flags in the set file will override
 flags in the config file.
 
@@ -40,7 +42,7 @@ Typically this is a typo or remote auth issue.
 *  **Log files**:  sasync creates two log files with each run. `stderr_set.name.log` and `stdout_set.name.log` and puts them in the `logs` folder
 
 *  **Set files go by default in a sub folder called `sasets`**:  The new format requires changing the content of your set.* files if you were
-*  running an older version of sasync 
+running an older version of sasync 
 
 *  **Skips same-size source-dest pairs**:  Skips a sync pair if source and destination are exactly equal in size, then moves on to the next sync pair.
 
@@ -56,8 +58,8 @@ but can be set to clean SOURCE as well.
 5. **`json.count`** is an external counter for the json set. This allows running multiple instances of sasync that pull in 
 sequence from the jsons without wasting or duplicating usage.
 6. Two sample set files with rclone source, destination and max-transfer size. **`set.tv.sample`** and **`set.movies.sample`**
-7. **`filter and filter.sweep`** contain file patterns to include or exclude from sasync. At the moment these are files that sometimes hang rclone 
-service side copying, so we skip them. Typically it is only a handful of files.    
+7. **`filter and filter.sweep`** contain file patterns to include or exclude from sasync. You may customize the filters in many ways to suit your
+own needs / use case.
 8. **`utils` folder** contains a few misc scripts. `readsets` will check if your set.* files are readable by sasync. `cleansets` will 
 replace tabs and unreadable characters in your set.* files. Syntax is `./cleansets set.video`.
 9. **`install_sasync`** will automate some installation tasks for you. It is intended for use during initial install, but can be used with subsequent installs.
