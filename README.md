@@ -1,3 +1,6 @@
+FOR THIS VERSION YOU MAY WANT TO DO A CLEAN INSTALL. THE 4-COLUMN SET FILES WILL STILL WORK, BUT IT IS WORTHWHILE TO COPY THE NEW SASYNC.CONF
+FILE AND EDIT THE SETTINGS TO YOUR PREFERENCE.
+
 **sasync** -- This script uses rclone with service accounts to sync, copy or move files between rclone remotes. 
 Further information and tools can be found  at https://github.com/88lex/sa-guide
 
