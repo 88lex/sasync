@@ -64,7 +64,7 @@ The set.* files specify which sync pairs you would like to run along with rclone
 #0synccopymove  1source         2destination     3maxtransfer  4rcloneflags
 sync            td_video:       my_video:        350G          --dry-run
 copy            td_video_4k:    my_video_4k:     350G          --dry-run --no-traverse
-#end of file
+#end-of-file
 </pre>
 
 Script syntax would be `./sasync set.video` which runs rclone sync for each source-dest pair, in a loop for number of SAs.
