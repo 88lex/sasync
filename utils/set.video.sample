@@ -3,3 +3,4 @@
 #synccopymove 1source        2destination   3maxtransfer  4rclone_flags
 sync          td_video:      my_video:      350G          --dry-run
 copy          td_video_4k:   my_video_4k:   350G          --no-traverse --dry-run
+#end-of-file
