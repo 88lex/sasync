@@ -1,5 +1,6 @@
-FOR THIS VERSION YOU MAY WANT TO DO A CLEAN INSTALL. THE 4-COLUMN SET FILES WILL STILL WORK, BUT IT IS WORTHWHILE TO COPY THE NEW SASYNC.CONF
-FILE AND EDIT THE SETTINGS TO YOUR PREFERENCE.
+WHEN YOU UPGRADE TO THIS VERSION YOU SHOULD DO A CLEAN INSTALL AND CAREFULLY CHECK YOUR CONFIG FILE.    
+EXCLUDE files have been replace by FILTER files. Be sure to transfer your `exclude` list to your new `filter` file.
+
 
 **sasync** -- This script uses rclone with service accounts to sync, copy or move files between rclone remotes. 
 Further information and tools can be found  at https://github.com/88lex/sa-guide
@@ -12,11 +13,11 @@ There is a very good description with examples in the rclone wiki https://rclone
 **NEW**: Added a filter.sweep file with fewer exclusions for the sweeper run. You can change this to `+ *.filetype` if you want only certain files in sweeper.    
 
 **IMPORTANT**:   
-==>  If this is your first time running sasync then rename `sasync.conf.default` to `sasync.conf`. If you are updating sasync then check for new 
-flags and add/edit as needed into your existing `sasync.conf`.   
+==>  If this is your first time running sasync then copy `sasync.conf.default` to `sasync.conf`. If you are updating sasync then double check
+`sasync.conf.default` to see if there are any new settings.   
 ==>  Check each line in the sasync.conf file, especially the directory (`DIR`) locations. sasync will not run correctly if it cannot find sets, jsons or filters .    
 ==>  The default set file folder is `/opt/sasync/sasets`. If you want to put set files in another folder be sure to change sasync.conf SET_DIR    
-==>  sasync will NOT create base folders. e.g. If you specify `remote:movies` in a set file, sasync will not create the `movies` folder in `remote:`.    
+==>  sasync will NOT create base folders. e.g. If you specify `remote:movies` in a set file, you must create the `movies` folder in `remote:` before syncing.    
 ==>  Versions of rclone from 1.48 require a new flag `--drive-server-side-across-configs` in order to do server-side sync/copy. This flag has been
 added to sasync as a default. If you are running an older version of rclone or wish to not execute server-side copies simply delete the flag from sasync.conf.  
 
@@ -42,7 +43,7 @@ Typically this is a typo or remote auth issue.
 *  **Log files**:  sasync creates two log files with each run. `stderr_set.name.log` and `stdout_set.name.log` and puts them in the `logs` folder
 
 *  **Set files go by default in a sub folder called `sasets`**:  The new format requires changing the content of your set.* files if you were
-running an older version of sasync 
+running an older version of sasync.  The new set file has 5 columns vs 7 in older versions.
 
 *  **Skips same-size source-dest pairs**:  Skips a sync pair if source and destination are exactly equal in size, then moves on to the next sync pair.
 
@@ -63,7 +64,7 @@ own needs / use case.
 8. **`utils` folder** contains a few misc scripts. `readsets` will check if your set.* files are readable by sasync. `cleansets` will 
 replace tabs and unreadable characters in your set.* files. Syntax is `./cleansets set.video`.
 9. **`install_sasync`** will automate some installation tasks for you. It is intended for use during initial install, but can be used with subsequent installs.
-10. The **`utils`** folder has one sample set in it for reference. Be sure to put your actual set files in the `sasets` folder.
+10. Put your actual set files in the `sasets` folder. If you put them in a different folder be sure to change the SET_DIR in sasync.conf
 
 The set.* files specify which sync pairs you would like to run along with rclone flags for that sync pair. The format would be as follows:
 <pre>
