@@ -25,7 +25,7 @@ GLOBAL_FLAGS="
     --stats-file-name-length=0
     --ignore-case
     --drive-chunk-size=128M
-    --drive-use-trash=false
+    --drive-use-trash=true
     --drive-server-side-across-configs=true
     "
 #   Please LEAVE SPACES AND QUOTATION MARKS ABOVE to allow rclone to interpret the flags
