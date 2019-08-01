@@ -1,3 +1,5 @@
+- *.m2ts
+- *.mk3d
 - mounted.bin
 - desktop.ini
 - .DS_store
