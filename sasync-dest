@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+echo ; echo STARTING SASYNC v1.1 ; echo
+source sasync.conf
+run_rclone_w_flags () {
+  COUNT=$(<$JSON_COUNT);echo $(( $COUNT>=$MAX_JSON?$MIN_JSON:$COUNT+1 ))>$JSON_COUNT
+  echo BEGIN $sync of $src to $dest w $COUNT/$MAX_JSON.json from $set_file
+  echo GLOBAL FLAGS = "$GLOBAL_FLAGS";echo SET FILE FLAGS = $set_flags
+  echo FILTER = $FILTER  DMC = $DMC  TIMEOUT = $TIMEOUT
+  rclone config update $dest service_account_file "$JSON_DIR/$COUNT.json"
+  timeout $TIMEOUT rclone $sync $src $dest --max-transfer=$maxtrans $GLOBAL_FLAGS\
+  $set_flags $DMC $FILTER
+  echo;echo FINISHED $sync from $src to $dest wJSON $COUNT.json;echo
+}
+process_sets () {
+  for set_file in $@; do echo Set file is $set_file
+    column -t $SET_DIR/$set_file|tee /dev/tty|sed '/^\s*#.*$/d'|\
+    while IFS=' ' read -r sync src dest maxtrans set_flags;do
+      source sacalc
+      for SA in $(seq $SAs);do run_rclone_w_flags;done
+      source sweeper
+      source clean_tds
+    done
+  done
+}
+process_sets $@ > >(tee "logs/stdout_$@.log") 2> >(tee "logs/stderr_$@.log" >&2)
+echo ; echo SASYNC COMPLETED and EXITING ; echo
