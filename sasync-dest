@@ -15,7 +15,7 @@ process_sets () {
   for set_file in $@; do echo Set file is $set_file
     column -t $SET_DIR/$set_file|tee /dev/tty|sed '/^\s*#.*$/d'|\
     while IFS=' ' read -r sync src dest maxtrans set_flags;do
-      source sacalc
+      source sacalc-dest
       let SAs=$(( $srcdestdiffGB<10000?$SAs:$SAs*10000/$srcdestdiffGB ))
       for SA in $(seq $SAs);do run_rclone_w_flags;done
       source sweeper
