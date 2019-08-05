@@ -7,5 +7,6 @@ if [ ${SWEEP,,} = true ]; then
   local TIMEOUT=$TIMEOUT_SWEEP
   source sacalc
   for SA in $(seq $SAs); do run_rclone_w_flags; done
+  source sasync.conf
   echo;echo FINISHED SWEEP OF NON-SERVER-SIDE FILES;echo
 fi
