@@ -2,11 +2,12 @@
 
 if [ ${SWEEP,,} = true ]; then
   echo ; echo STARTING SWEEP OF NON-SERVER-SIDE FILES ; echo
-  local FILTER="--filter-from="$SASYNC_DIR/filter.sweep
-  local DMC="--disable move,copy --max-transfer=1000G"
+  FILTER="--filter-from="$SASYNC_DIR/filter.sweep
+  DMC="--disable move,copy --max-transfer=1000G"
   local TIMEOUT=$TIMEOUT_SWEEP
   source sacalc
   for SA in $(seq $SAs); do run_rclone_w_flags; done
-  source sasync.conf
+  FILTER="--filter-from="$SASYNC_DIR/filter
+  DMC=""
   echo;echo FINISHED SWEEP OF NON-SERVER-SIDE FILES;echo
 fi
