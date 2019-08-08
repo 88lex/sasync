@@ -1,5 +1,9 @@
 - *.m2ts
 - *.mk3d
+- *.vob
+- *.m4v
+- *.divx
+- *.r*
 - mounted.bin
 - desktop.ini
 - .DS_store
