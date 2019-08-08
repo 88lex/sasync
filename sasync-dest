@@ -6,7 +6,7 @@ run_rclone_w_flags () {
   echo BEGIN $sync of $src to $dest w $COUNT/$MAX_JSON.json from $set_file
   echo GLOBAL FLAGS = "$GLOBAL_FLAGS";echo SET FILE FLAGS = $set_flags
   echo FILTER = $FILTER  DMC = $DMC  TIMEOUT = $TIMEOUT
-  rclone config update $dest service_account_file "$JSON_DIR/$COUNT.json"
+  rclone config update ${dest::-1} service_account_file "$JSON_DIR/$COUNT.json"
   timeout $TIMEOUT rclone $sync $src $dest --max-transfer=$maxtrans $GLOBAL_FLAGS\
   $set_flags $DMC $FILTER --disable move,copy --drive-server-side-across-configs=false
   echo;echo FINISHED $sync from $src to $dest wJSON $COUNT.json;echo
