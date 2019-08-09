@@ -4,6 +4,7 @@
 - *.m4v
 - *.divx
 - *.r*
+- *.tp
 - mounted.bin
 - desktop.ini
 - .DS_store
