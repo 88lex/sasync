@@ -22,7 +22,7 @@ GLOBAL_FLAGS="
     --size-only
     --stats=5s
     --max-backlog=2000000
-    --stats-file-name-length=0
+    --stats-file-name-length=128
     --ignore-case
     --drive-chunk-size=128M
     --drive-use-trash=false
