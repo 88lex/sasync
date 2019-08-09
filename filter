@@ -3,7 +3,6 @@
 - *.vob
 - *.m4v
 - *.divx
-- *.r*
 - *.tp
 - mounted.bin
 - desktop.ini
