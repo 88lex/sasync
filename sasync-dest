@@ -18,7 +18,7 @@ process_sets () {
       source sacalc-dest
       let SAs=$(( $srcdestdiffGB<10000?$SAs:$SAs*10000/$srcdestdiffGB ))
       for SA in $(seq $SAs);do run_rclone_w_flags;done
-      source sweeper
+#      source sweeper
       source clean_tds
     done
   done
