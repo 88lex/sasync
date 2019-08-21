@@ -10,6 +10,7 @@
 #sudo apt-get install zip
 #sudo apt-get install tmux
 sudo apt-get install git
+sudo apt-get install util-linux
 
 #USER=seed
 #GROUP=seed
