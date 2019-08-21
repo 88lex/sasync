@@ -7,10 +7,11 @@
 
 # Have the script install a few apps for you. You will need git
 #curl https://rclone.org/install.sh | sudo bash -s beta
-#sudo apt-get install zip
-#sudo apt-get install tmux
-sudo apt-get install git
+sudo apt-get install zip
+sudo apt-get install tmux
 sudo apt-get install util-linux
+sudo apt-get install git
+
 
 #USER=seed
 #GROUP=seed
