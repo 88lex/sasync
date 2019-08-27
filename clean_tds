@@ -3,18 +3,18 @@
 
 if [ ${CLEAN_DEST,,} = true ]; then
   echo; echo STARTING DEDUPE of identical files from $dest
-  rclone dedupe skip $dest -v --drive-use-trash=false --fast-list --transfers=20
+  rclone dedupe skip $dest -v --drive-use-trash=false --fast-list --transfers=40 --drive-service-account-file="$JSON_DIR/$MIN_JSON.json"
   echo; echo PERMANENTLY DELETING TRASH from $dest; echo
-  rclone delete $dest -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=20
+  rclone delete $dest -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40 --drive-service-account-file="$JSON_DIR/$MIN_JSON.json"
   echo; echo REMOVING EMPTY DIRECTORIES from $dest
-  rclone rmdirs $dest -v --drive-use-trash=false --fast-list --transfers=20 --leave-root
+  rclone rmdirs $dest -v --drive-use-trash=false --fast-list --transfers=40 --leave-root --drive-service-account-file="$JSON_DIR/$MIN_JSON.json"
 fi
 
 if [ ${CLEAN_SRC,,} = true ]; then
   echo; echo STARTING DEDUPE of identical files from $src
-  rclone dedupe skip $src -v --drive-use-trash=false --fast-list --transfers=20
+  rclone dedupe skip $src -v --drive-use-trash=false --fast-list --transfers=40 --drive-service-account-file="$JSON_DIR/$MIN_JSON.json"
   echo; echo PERMANENTLY DELETING TRASH from $src
-  rclone delete $src -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=20
+  rclone delete $src -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40 --drive-service-account-file="$JSON_DIR/$MIN_JSON.json"
   echo; echo REMOVING EMPTY DIRECTORIES from $src
-  rclone rmdirs $src -v --drive-use-trash=false --fast-list --transfers=20 --leave-root
+  rclone rmdirs $src -v --drive-use-trash=false --fast-list --transfers=40 --leave-root --drive-service-account-file="$JSON_DIR/$MIN_JSON.json"
 fi
