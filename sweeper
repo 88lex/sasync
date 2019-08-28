@@ -3,9 +3,9 @@
 if [ ${SWEEP,,} = true ]; then
   echo ; echo STARTING SWEEP OF NON-SERVER-SIDE FILES ; echo
   FILTER="--filter-from="$SASYNC_DIR/filter.sweep
-  DMC="--disable move,copy --max-transfer=1000G"
   local TIMEOUT=$TIMEOUT_SWEEP
   source sacalc
+  DMC="--disable move,copy --max-transfer=2000G"
   for SA in $(seq $SAs); do run_rclone_w_flags; done
   FILTER="--filter-from="$SASYNC_DIR/filter
   DMC=""
