@@ -7,8 +7,8 @@ run_rclone_w_flags () {
   echo GLOBAL FLAGS = "$GLOBAL_FLAGS";echo SET FILE FLAGS = $set_flags
   echo FILTER = $FILTER  DMC = $DMC  TIMEOUT = $TIMEOUT
   rclone config update ${dest%:*} service_account_file "$JSON_DIR/$COUNT.json"
-  timeout $TIMEOUT rclone $sync $src $dest --max-transfer=$maxtrans $GLOBAL_FLAGS\
-  $set_flags $DMC $FILTER --disable move,copy --drive-server-side-across-configs=false
+  timeout $TIMEOUT rclone $sync $src $dest $GLOBAL_FLAGS\
+  $set_flags $DMC $FILTER --max-transfer="" --disable move,copy --drive-server-side-across-configs=false
   echo;echo FINISHED $sync from $src to $dest wJSON $COUNT.json;echo
 }
 process_sets () {
@@ -18,7 +18,6 @@ process_sets () {
       source sacalc-dest
       let SAs=$(( $srcdestdiffGB<10000?$SAs:$SAs*10000/$srcdestdiffGB ))
       for SA in $(seq $SAs);do run_rclone_w_flags;done
-#      source sweeper
       source clean_tds
     done
   done
