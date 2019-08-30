@@ -28,7 +28,7 @@ fi
 if rclone lsd $src --drive-service-account-file="$JSON_DIR/$MIN_JSON.json" &>/dev/null ||\
   rclone lsd $src --drive-shared-with-me --drive-service-account-file="$JSON_DIR/$MIN_JSON.json" &>/dev/null
   then SRC_SAS="true";echo "SUCCESS-SA: SOURCE $src works correctly with SAs."
-  else SRC_SAS="false";set_flags="$set_flags $DMC";FILTER=$FILTER".sweep"
+  else SRC_SAS="false";set_flags="$set_flags $DMC";FILTER=$FILTER_DMC
     echo "NO-SA: SOURCE $src does not work with SAs. Check if source has outbound quotas."
 fi
 
