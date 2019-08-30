@@ -1,25 +1,32 @@
 #!/usr/bin/env bash
-echo ; echo STARTING SASYNC v1.1 ; echo
+echo -e "STARTING SASYNC v2.0\n"
+set_file=$1;echo "Set file = $set_file";shift;flags=$@
 source sasync.conf
-run_rclone_w_flags () {
+
+rotate_sas () {
   COUNT=$(<$JSON_COUNT);echo $(( $COUNT>=$MAX_JSON?$MIN_JSON:$COUNT+1 ))>$JSON_COUNT
-  echo BEGIN $sync of $src to $dest w $COUNT/$MAX_JSON.json from $set_file
-  echo GLOBAL FLAGS = "$GLOBAL_FLAGS";echo SET FILE FLAGS = $set_flags
-  echo FILTER = $FILTER  DMC = $DMC  TIMEOUT = $TIMEOUT
-  timeout $TIMEOUT rclone $sync $src $dest --max-transfer=$maxtrans $GLOBAL_FLAGS\
-  --drive-service-account-file="$JSON_DIR/$COUNT.json" $set_flags $DMC $FILTER
-  echo;echo FINISHED $sync from $src to $dest wJSON $COUNT.json;echo
+  echo -e "BEGIN $sync of $src to $dest w $COUNT/$MAX_JSON.json from $set_file\n"
+  echo -e "GLOBAL FLAGS=$G_FLAGS\nSET FLAGS=$set_flags\nFILTER=$FILTER\nTIMEOUT=$TIMEOUT\n"
+  SRC1="${src^^}" ; SRC1="${SRC1%:*}";DEST1="${dest^^}" ; DEST1="${DEST1%:*}"
+  if [ $SRC_SAS == "true" ];then export "RCLONE_CONFIG_"$SRC1"_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$COUNT.json;fi
+  export "RCLONE_CONFIG_"$DEST1"_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$COUNT.json
 }
-process_sets () {
-  for set_file in $@; do echo Set file is $set_file
-    column -t $SET_DIR/$set_file|tee /dev/tty|sed '/^\s*#.*$/d'|\
-    while IFS=' ' read -r sync src dest maxtrans set_flags;do
-      source sacalc
-      for SA in $(seq $SAs);do run_rclone_w_flags;done
-      source sweeper
-      source clean_tds
-    done
-  done
+run_rclone_w_flags () {
+  rotate_sas
+  $TIMEOUT rclone $sync $src $dest $maxtrans $G_FLAGS $set_flags $FILTER
+  echo EXIT CODE = $?;exitcode=$?;sleep 15s
+  echo -e "FINISHED $sync from $src to $dest wJSON $COUNT.json\n"
 }
-process_sets $@ > >(tee "logs/stdout_$@.log") 2> >(tee "logs/stderr_$@.log" >&2)
-echo ; echo SASYNC COMPLETED and EXITING ; echo
+process_pairs () {
+  column -t $SET_DIR/$set_file|tee /dev/tty|sed '/^\s*#.*$/d'|\
+  while IFS=' ' read -r sync src dest maxtrans set_flags;do exitcode=8
+    set_flags="$set_flags $flags";maxtrans="--max-transfer=$maxtrans"
+    source rc_check
+    while [[ $exitcode != 0 ]];do run_rclone_w_flags;done
+    #source sacalc
+    #for SA in $(seq $SAs);do run_rclone_w_flags;done
+    source clean_tds
+  done > >(tee "logs/stdout_$set_file.log") 2> >(tee "logs/stderr_$set_file.log" >&2)
+}
+process_pairs $@
+echo -e "\nSASYNC COMPLETED and EXITING\n"
