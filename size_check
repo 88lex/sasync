@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# size_check calculates source and destination size
+# If source and destination are exactly equal in size then it skips to the next pair
+
+echo;echo CHECKING SIZE of $src and $dest BE PATIENT
+let srcsize=`rclone size $src --json | cut -d ":" -f3 | cut -d "}" -f1`
+let srcsizeGB=$(( $srcsize/1024**3 ))
+let destsize=`rclone size $dest --json | cut -d ":" -f3 | cut -d "}" -f1`
+let destsizeGB=$(( $destsize/1024**3 ))
+let srcdestdiff=$(( $srcsize<$destsize?1:$srcsize - $destsize ))
+let srcdestdiffGB=$(( $srcdestdiff/1024**3 ))
+let maxtrans00=$( echo $maxtrans | cut -d "G" -f1 )*1024**3
+let SAs=$(( ($srcdestdiff+$maxtrans00) / $maxtrans00 ))
+
+echo $srcsizeGB GB = $srcsize bytes = SIZE of SOURCE $src
+echo $destsizeGB GB = $destsize bytes = SIZE of DEST $dest
+
+echo sasync will use about $SAs SAs w diff of $srcdestdiffGB GB = $srcdestdiff\
+bytes and MAXTRANSFER = $maxtrans;echo
