@@ -33,7 +33,7 @@ if rclone lsd $src --drive-service-account-file="$JSON_DIR/$MIN_JSON.json" &>/de
 fi
 
 $SKIP_IF_EQUAL && if rclone check $src $dest --one-way --fast-list &> >(grep '0 differences')
-  then echo "$src and $dest already synced, moving to next pair"; continue;fi
+  then echo "SKIPPING: $src and $dest already synced, moving to next pair"; continue;fi
 
 if [[ $G_FLAGS$set_flags == *"disable"* ]];then TIMEOUT=$TIMEOUT_DMC;set_flags="$set_flags $DMC";fi
 
