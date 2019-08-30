@@ -3,10 +3,16 @@ I have not edited the README below to reflect the changes. Will do shortly
 
 You must use the new config file for the new script to work.    
 
-Main changes are:    
-SACALC is no longer used. rclone is run on a loop for each pair in a set file until finished (using exit codes).    
-SWEEPER is gone.    
+THE MAIN CHANGES ARE:    
+sasync now allows rclone flag pass through. `sasync set1 --flag1 --flag2 --flag3`  
+   [[ To enable flag pass through multi-sets in the command line were removed (`sasync set1 set2` no longer works). ]]    
+    
+SACALC is removed. rclone is run on a loop for each pair in a set file until finished (using exit codes).    
+
+SWEEPER is removed. filter.sweep is replaced by filter.dmc    
+
 SASYNC-DEST is gone.    
+
 I'm using a script to check if source and destination are TDs, MDs, shared folders or local. This then determines if SAs are used
 for the source and adjusts flags accordingly.    
 If `--disable move,copy` is used then `--max-transfer` is set to 1TB , which allows a graceful exit of rclone and also uses the full quota
