@@ -4,7 +4,7 @@ SET_DIR=$SASYNC_DIR/sasets                 # Location of sasync set.* files
 JSON_DIR=/opt/sa                           # Location of DIR with service account .json files. No trailing slash
 JSON_COUNT=$SASYNC_DIR/json.count          # Location of json.count file
 MIN_JSON=1
-MAX_JSON=4500                              # CHANGE `MAX_JSON` TO THE MAX JSON FILE # IN JSON_DIR
+MAX_JSON=1200                              # CHANGE `MAX_JSON` TO THE MAX JSON FILE # IN JSON_DIR
 SKIP_IF_EQUAL=false                        # Runs rclone check command, skips to next pair if true. Can take time to calc. Def=false
 TIMEOUT="timeout 30m"                      # Timeout bypasses rclone hangs. Set to 2h (2 hours) or 1d (1 day) if not needed
 TIMEOUT_DMC="timeout 120m"                 # Allow longer timeout for --disable move,copy which is slower than server-side
