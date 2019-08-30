@@ -21,6 +21,7 @@ process_pairs () {
   column -t $SET_DIR/$set_file|tee /dev/tty|sed '/^\s*#.*$/d'|\
   while IFS=' ' read -r sync src dest maxtrans set_flags;do exitcode=8
     set_flags="$set_flags $flags";maxtrans="--max-transfer=$maxtrans"
+    source sasync.conf
     source rc_check
     while [[ $exitcode != 0 ]];do run_rclone_w_flags;done
     #source sacalc
