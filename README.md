@@ -1,5 +1,7 @@
 NEW VERSION OF SASYNC, 2.0
-I have not edited the README below to reflect the changes. Will do shortly.
+I have not edited the README below to reflect the changes. Will do shortly    
+
+You must use the new config file for the new script to work.    
 
 Main changes are:    
 SACALC is no longer used. rclone is run on a loop for each pair in a set file until finished (using exit codes).    
