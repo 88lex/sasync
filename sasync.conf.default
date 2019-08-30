@@ -6,13 +6,14 @@ JSON_COUNT=$SASYNC_DIR/json.count          # Location of json.count file
 MIN_JSON=1
 MAX_JSON=4500                              # CHANGE `MAX_JSON` TO THE MAX JSON FILE # IN JSON_DIR
 SKIP_IF_EQUAL=false                        # Runs rclone check command, skips to next pair if true. Can take time to calc. Def=false
-DMC=" --disable copy --max-transfer=1T"    # Disable server side, uses high max transfer to allow graceful exit
 TIMEOUT="timeout 30m"                      # Timeout bypasses rclone hangs. Set to 2h (2 hours) or 1d (1 day) if not needed
 TIMEOUT_DMC="timeout 120m"                 # Allow longer timeout for --disable move,copy which is slower than server-side
 CLEAN_DEST=false
 CLEAN_SRC=false
 PRE_CLEAN_TDS=false                        # If you want to clean the TDs before running rclone w SAs then change this to TRUE
 FILTER=" --filter-from=$SASYNC_DIR/filter"
+FILTER_DMC=" --filter-from=$SASYNC_DIR/filter.dmc"     # This is a filter used with upload/download runs. Can include filetypes that may hang w SS
+DMC=" --disable copy --max-transfer=1T $FILTER_DMC"    # Disable server side, uses high max transfer to allow graceful exit
 G_FLAGS="
     --tpslimit=5
     --tpslimit-burst=40
