@@ -1,3 +1,25 @@
+NEW VERSION OF SASYNC, 2.0
+I have not edited the README below to reflect the changes. Will do shortly.
+
+Main changes are:    
+SACALC is no longer used. rclone is run on a loop for each pair in a set file until finished (using exit codes).    
+SWEEPER is gone.    
+SASYNC-DEST is gone.    
+I'm using a script to check if source and destination are TDs, MDs, shared folders or local. This then determines if SAs are used
+for the source and adjusts flags accordingly.    
+If `--disable move,copy` is used then `--max-transfer` is set to 1TB , which allows a graceful exit of rclone and also uses the full quota
+for an SA (750GB).    
+
+There are a few other changes but these are the big ones.    
+
+This is a develop version. Needs to be stress tested. Comments/input welcome. Readme will be updated ... soon.
+
+*******************************************
+*******************************************
+OLD README BELOW
+*******************************************
+*******************************************
+
 WHEN YOU UPGRADE TO THIS VERSION YOU SHOULD DO A CLEAN INSTALL AND CAREFULLY CHECK YOUR CONFIG FILE.    
 EXCLUDE files have been replace by FILTER files. Be sure to transfer your `exclude` list to your new `filter` file.
 
