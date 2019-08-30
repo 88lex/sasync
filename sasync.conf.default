@@ -30,7 +30,6 @@ G_FLAGS="
 #   Add or remove flags as needed. Flags in set files (if any) will override global flags
 
 [ ! -f $SASYNC_DIR/json.count ] && echo $MIN_JSON >$SASYNC_DIR/json.count
-mkdir -p $SASYNC_DIR/config_backup
+mkdir -p $SASYNC_DIR/config_backup $SASYNC_DIR/logs
 cp $SASYNC_DIR/sasync.conf $SASYNC_DIR/config_backup/sasync.conf_$(date +%y%m%d)
 find $SASYNC_DIR/config_backup/sasync.conf* -type f -mtime +14 -exec rm {} \;
-#
