@@ -37,6 +37,6 @@ if [ ${PRE_CLEAN_TDS,,} = true ];then source clean_tds;fi
 $SKIP_IF_EQUAL && if rclone check $src $dest --one-way --fast-list &> >(grep '0 differences')
   then echo "SKIPPING: $src and $dest already synced, moving to next pair"; continue;fi
 
-if [[ $G_FLAGS$set_flags == *"disable"* ]];then TIMEOUT=$TIMEOUT_DMC;set_flags="$set_flags $DMC";fi
+if [[ $G_FLAGS$set_flags == *"disable"* ]];then TIMEOUT=$TIMEOUT_DMC;set_flags="$set_flags $DMC";FILTER=$FILTER_DMC;fi
 
 echo -e "RCLONE REMOTE CHECK COMPLETED"
