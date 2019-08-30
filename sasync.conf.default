@@ -13,7 +13,7 @@ CLEAN_SRC=false
 PRE_CLEAN_TDS=false                        # If you want to clean the TDs before running rclone w SAs then change this to TRUE
 FILTER=" --filter-from=$SASYNC_DIR/filter"
 FILTER_DMC=" --filter-from=$SASYNC_DIR/filter.dmc"     # This is a filter used with upload/download runs. Can include filetypes that may hang w SS
-DMC=" --disable copy --max-transfer=1T $FILTER_DMC"    # Disable server side, uses high max transfer to allow graceful exit
+DMC=" --disable copy --max-transfer=1T"    # Disable server side, uses high max transfer to allow graceful exit
 G_FLAGS="
     --tpslimit=5
     --tpslimit-burst=40
