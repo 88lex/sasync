@@ -15,17 +15,18 @@ FILTER=" --filter-from=$SASYNC_DIR/filter"
 FILTER_DMC=" --filter-from=$SASYNC_DIR/filter.dmc"     # This is a filter used with upload/download runs. Can include filetypes that may hang w SS
 DMC=" --disable copy --max-transfer=1T"    # Disable server side, uses high max transfer to allow graceful exit
 G_FLAGS="
-    --tpslimit=5
-    --tpslimit-burst=40
-    --fast-list
-    --transfers=10
-    -vP
-    --stats=5s
-    --max-backlog=2000000
-    --ignore-case
-    --drive-chunk-size=128M
-    --drive-use-trash=false
-    --drive-server-side-across-configs=true
+  --tpslimit=5
+  --tpslimit-burst=40
+  --fast-list
+  --transfers=10
+  -vP
+  --stats=5s
+  --max-backlog=2000000
+  --ignore-case
+  --no-update-modtime
+  --drive-chunk-size=128M
+  --drive-use-trash=false
+  --drive-server-side-across-configs=true
     "
 #   Please LEAVE SPACES AND QUOTATION MARKS ABOVE to allow rclone to interpret the flags
 #   Add or remove flags as needed. Flags in set files (if any) will override global flags
