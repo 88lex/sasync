@@ -34,6 +34,9 @@ fi
 
 if [ ${PRE_CLEAN_TDS,,} = true ];then source clean_tds;fi
 
+$CHECK_SIZE && source size_check && if [ $srcsize == $destsize ]; then
+  echo "SOURCE size = DEST size. SKIPPING TO NEXT SOURCE-DESTINATION PAIR.";continue;fi
+
 $SKIP_IF_EQUAL && if rclone check $src $dest --one-way --fast-list &> >(grep '0 differences')
   then echo "SKIPPING: $src and $dest already synced, moving to next pair"; continue;fi
 
