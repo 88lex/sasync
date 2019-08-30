@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # test all pairs in a set file
-echo -e "CHECKING RCLONE REMOTES for $src and $dest\n"
+echo -e "\nCHECKING RCLONE REMOTES for $src and $dest\n"
 
 DEST1="${dest%:*}"
 if [ "$(rclone config show $DEST1 | grep team_drive | wc -m)" -gt 15 ]
