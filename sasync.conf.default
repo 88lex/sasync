@@ -7,8 +7,8 @@ MIN_JSON=1
 MAX_JSON=1200                              # CHANGE `MAX_JSON` TO THE MAX JSON FILE # IN JSON_DIR
 SKIP_IF_EQUAL=false                        # Runs rclone check command, skips to next pair if true. Can take time to calc. Def=false
 CHECK_SIZE=false                           # Runs check size and estimates SAs which would be used with set maxtransfer size
-TIMEOUT=""                                 # Default blank. syntax is`TIMEOUT=timeout 20m` Timeout can bypass rclone hangs. 
-TIMEOUT_DMC=""                             # Same as TIMEOUT, but you can set longer timeout if `--disable copy` is set 
+TIMEOUT=""                                 # Syntax is`TIMEOUT=timeout 20m`. Default value is blank "" . Timeout can bypass rclone hangs. 
+TIMEOUT_DMC=""                             # Same as TIMEOUT, but you can set longer timeout if `--disable copy` is being used
 CLEAN_DEST=false
 CLEAN_SRC=false
 PRE_CLEAN_TDS=false                        # If you want to clean the TDs before running rclone w SAs then change this to TRUE
