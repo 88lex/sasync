@@ -1,7 +1,7 @@
 NEW VERSION OF SASYNC, 2.0
 I have not edited the README below to reflect the changes. Will do shortly    
 
-You must use the new config file for the new script to work.    
+You must use the new config file for the new script to work. Run `cp sasync.conf.default sasync.conf` and edit new config as needed.    
 
 THE MAIN CHANGES ARE:    
 sasync now allows rclone flag pass through. `sasync set1 --flag1 --flag2 --flag3`  
@@ -11,9 +11,9 @@ SACALC is removed. rclone is run on a loop for each pair in a set file until fin
 
 SWEEPER is removed. filter.sweep is replaced by filter.dmc    
 
-SASYNC-DEST is gone.    
+SASYNC-DEST is gone as `sasync` should now handle destination-only SA copies correctly.     
 
-I'm using a script to check if source and destination are TDs, MDs, shared folders or local. This then determines if SAs are used
+`rc_check` checks if the source and destination are TDs, MDs, shared folders or local. This then determines if SAs are used
 for the source and adjusts flags accordingly.    
 If `--disable move,copy` is used then `--max-transfer` is set to 1TB , which allows a graceful exit of rclone and also uses the full quota
 for an SA (750GB).    
@@ -21,6 +21,11 @@ for an SA (750GB).
 There are a few other changes but these are the big ones.    
 
 This is a develop version. Needs to be stress tested. Comments/input welcome. Readme will be updated ... soon.
+
+USAGE NOTES:    
+
+SASYNC is only useful if the destination is shared with service accounts and has write permissions.
+SASYNC will copy from TD to TD, from MD to TD and from local drives to a TD.
 
 *******************************************
 *******************************************
