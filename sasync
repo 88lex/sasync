@@ -13,7 +13,7 @@ rotate_sas () {
 }
 run_rclone_w_flags () {
   rotate_sas
-  rclone $sync $src $dest $maxtrans $G_FLAGS $set_flags $FILTER
+  $TIMEOUT rclone $sync $src $dest $maxtrans $G_FLAGS $set_flags $FILTER
   exitcode=$?;echo EXIT CODE = $exitcode
   echo -e "FINISHED $sync from $src to $dest wJSON $COUNT.json\n"
 }
