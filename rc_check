@@ -32,9 +32,9 @@ if rclone lsd $src --drive-service-account-file="$JSON_DIR/$MIN_JSON.json" &>/de
     echo "NO-SA: SOURCE $src does not work with SAs. Check if source has outbound quotas."
 fi
 
-if [ ${PRE_CLEAN_TDS,,} = true ];then source clean_tds;fi
+${PRE_CLEAN_TDS,,} && source clean_tds
 
-$CHECK_SIZE && source size_check && if [ $srcsize == $destsize ]; then
+${CHECK_SIZE,,} && source size_check && if [ $srcsize == $destsize ]; then
   echo "SOURCE size = DEST size. SKIPPING TO NEXT SOURCE-DESTINATION PAIR.";continue;fi
 
 $SKIP_IF_EQUAL && if rclone check $src $dest --one-way --fast-list &> >(grep '0 differences')
