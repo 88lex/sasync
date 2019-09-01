@@ -8,8 +8,8 @@ rotate_sas () {
   echo -e "BEGIN $sync of $src to $dest w $COUNT/$MAX_JSON.json from $set_file\n"
   echo -e "GLOBAL FLAGS=$G_FLAGS\nSET FLAGS=$set_flags\nFILTER=$FILTER\nTIMEOUT=$TIMEOUT\n"
   SRC1="${src^^}" ; SRC1="${SRC1%:*}";DEST1="${dest^^}" ; DEST1="${DEST1%:*}"
-  if [ $SRC_SAS == "true" ];then export "RCLONE_CONFIG_"$SRC1"_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$COUNT.json;fi
-  export "RCLONE_CONFIG_"$DEST1"_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$COUNT.json
+  if [ $SRC_SAS == "true" ];then export "RCLONE_CONFIG_""${SRC1//-/_}""_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$COUNT.json;fi
+  export "RCLONE_CONFIG_""${DEST1//-/_}""_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$COUNT.json
 }
 run_rclone_w_flags () {
   rotate_sas
@@ -23,7 +23,7 @@ process_pairs () {
     set_flags="$set_flags $flags";maxtrans="--max-transfer=$maxtrans"
     source sasync.conf
     source rc_check
-    while [ "$exitcode" -ne "0" ];do $TIMEOUT run_rclone_w_flags;done
+    while [ "$exitcode" -ne "0" ];do run_rclone_w_flags;done
     #source sacalc
     #for SA in $(seq $SAs);do run_rclone_w_flags;done
     source clean_tds
