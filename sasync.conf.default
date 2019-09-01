@@ -9,7 +9,7 @@ SKIP_IF_EQUAL=false                        # Runs rclone check command, skips to
 CHECK_SIZE=false                           # Runs check size and estimates SAs which would be used with set maxtransfer size
 TIMEOUT=""                                 # Syntax is`TIMEOUT=timeout 20m`. Default value is blank "" . Timeout can bypass rclone hangs. 
 TIMEOUT_DMC=""                             # Same as TIMEOUT, but you can set longer timeout if `--disable copy` is being used
-CLEAN_DEST=false
+CLEAN_DEST=false                           # If you are worried about dupes from --fast-list then set this to 'true'. Will delete dupes
 CLEAN_SRC=false
 PRE_CLEAN_TDS=false                        # If you want to clean the TDs before running rclone w SAs then change this to TRUE
 FILTER=" --filter-from=$SASYNC_DIR/filter"
@@ -18,7 +18,7 @@ DMC=" --disable copy --max-transfer=10T"   # Disable server side, uses high max 
 G_FLAGS="
   --tpslimit=5                             # These are set for safety. I omit both tpslimit and -burst and have no problems
   --tpslimit-burst=40
-  --fast-list
+  --fast-list                              # --fast-list can create some dupes in destination. omit if you like, but rclone is much slower
   --transfers=10
   -vP
   --stats=5s
