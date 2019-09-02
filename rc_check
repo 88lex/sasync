@@ -16,7 +16,7 @@ fi
 SRC1="${src%:*}";SRC_SAS="false"
 if [ "$(rclone config show $SRC1 | grep team_drive | wc -m)" -gt 15 ];
   then echo "SUCCESS-TD: SOURCE $SRC1 is a Team Drive"
-  else echo "NO-TD: SOURCE $SRC1 is NOT a Team Drive"
+  else echo "NOT-A-TD: SOURCE $SRC1 is NOT a Team Drive"
   SRC1="${src^^}" ; SRC1="${SRC1%:*}"
   export "RCLONE_CONFIG_""${SRC1//-/_}""_SHARED_WITH_ME=true"
 fi
