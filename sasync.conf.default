@@ -6,7 +6,7 @@ JSON_COUNT=$SASYNC_DIR/json.count          # Location of json.count file
 MIN_JSON=1
 MAX_JSON=1200                              # CHANGE `MAX_JSON` TO THE MAX JSON FILE # IN JSON_DIR
 SKIP_IF_EQUAL=false                        # Runs rclone check command, skips to next pair if true. Can take time to calc. Def=false
-CHECK_SIZE=false                           # Runs size_check and estimates SAs which would be used with set maxtransfer size
+CALC_SIZE=false                           # Runs size_calc and estimates SAs which would be used with set maxtransfer size
 TIMEOUT=""                                 # Syntax is`TIMEOUT=timeout 20m`. Default value is blank "" . Timeout can bypass rclone hangs. 
 TIMEOUT_DMC=""                             # Same as TIMEOUT, but you can set longer timeout if `--disable copy` is being used
 CLEAN_DEST=false                           # If you are worried about dupes from --fast-list then set this to 'true'. Will delete dupes
