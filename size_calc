@@ -2,7 +2,7 @@
 # size_check calculates source and destination size
 # If source and destination are exactly equal in size then it skips to the next pair
 
-echo;echo CALCULATING SIZE of $src and $dest BE PATIENT
+echo;echo CHECKING SIZE of $src and $dest BE PATIENT
 let srcsize=`rclone size $src --json | cut -d ":" -f3 | cut -d "}" -f1`
 let srcsizeGB=$(( $srcsize/1024**3 ))
 let destsize=`rclone size $dest --json | cut -d ":" -f3 | cut -d "}" -f1`
@@ -12,5 +12,9 @@ let srcdestdiffGB=$(( $srcdestdiff/1024**3 ))
 
 echo $srcsizeGB GB = $srcsize bytes = SIZE of SOURCE $src
 echo $destsizeGB GB = $destsize bytes = SIZE of DEST $dest
-echo -e "DIFF is $srcdestdiffGB GB = $srcdestdiff bytes\n"
+echo -e "DIFF is $srcdestdiffGB GB = $srcdestdiff bytes"
+
+if [[ $G_FLAGS$set_flags == *"disable"* ]];then MAXT=750;else MAXT=${maxtrans//[^0-9.]/};fi
+SAs=$(( 1+$srcdestdiffGB/$MAXT ))
+echo -e "Estimated number of SAs is $SAs with Max Transfer = $MAXT\n"
 
