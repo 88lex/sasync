@@ -12,4 +12,5 @@ let srcdestdiffGB=$(( $srcdestdiff/1024**3 ))
 
 echo $srcsizeGB GB = $srcsize bytes = SIZE of SOURCE $src
 echo $destsizeGB GB = $destsize bytes = SIZE of DEST $dest
+echo -e "DIFF is $srcdestdiffGB GB = $srcdestdiff bytes\n"
 
