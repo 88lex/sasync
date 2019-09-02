@@ -7,7 +7,7 @@ MIN_JSON=1
 MAX_JSON=1200                          # CHANGE `MAX_JSON` TO THE MAX JSON FILE # IN JSON_DIR
 AUTO_SAS=true                          # Default=true=Let rclone run loops until done
 SKIP_IF_EQUAL=false                    # Runs rclone check command, skips to next pair if true. Can take time to calc. Def=false
-CHECK_SIZE=false                       # Runs check size and estimates SAs which would be used with set maxtransfer size
+CALC_SIZE=false                        # Calculates size of source and destination then estimates SAs required
 TIMEOUT=""                             # Timeout bypasses rclone hangs. Set to 2h (2 hours) or 1d (1 day) if not needed
 TIMEOUT_DMC=""                         # Allow longer timeout for --disable move,copy which is slower than server-side
 CLEAN_DEST=false                       # Set to true if you want to dedupe and clean trash
