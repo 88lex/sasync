@@ -8,12 +8,12 @@ rotate_sas () {
   echo -e "BEGIN $sync of $src to $dest w $COUNT/$MAX_JSON.json from $set_file\n"
   echo -e "GLOBAL FLAGS=$G_FLAGS\nSET FLAGS=$set_flags\nFILTER=$FILTER\nTIMEOUT=$TIMEOUT\n"
   SRC1="${src^^}" ; SRC1="${SRC1%:*}";DEST1="${dest^^}" ; DEST1="${DEST1%:*}"
-  if [ $SRC_SAS == "true" ];then export "RCLONE_CONFIG_""${SRC1//-/_}""_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$COUNT.json;fi
+  $SRC_SAS && export "RCLONE_CONFIG_""${SRC1//-/_}""_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$COUNT.json
   export "RCLONE_CONFIG_""${DEST1//-/_}""_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$COUNT.json
 }
 run_rclone_w_flags () {
   rotate_sas
-  $TIMEOUT rclone $sync $src $dest $maxtrans $G_FLAGS $set_flags $FILTER
+  rclone $sync $src $dest $maxtrans $G_FLAGS $set_flags $FILTER
   exitcode=$?;echo EXIT CODE = $exitcode
   echo -e "FINISHED $sync from $src to $dest wJSON $COUNT.json\n"
 }
@@ -23,9 +23,11 @@ process_pairs () {
     set_flags="$set_flags $flags";maxtrans="--max-transfer=$maxtrans"
     source sasync.conf
     source rc_check
-    while [ "$exitcode" -ne "0" ];do run_rclone_w_flags;done
-    #source sacalc
-    #for SA in $(seq $SAs);do run_rclone_w_flags;done
+    if ${AUTO_SAS,,} || ! ${CHECK_SIZE,,};then
+      echo -e "AUTO SAS is $AUTO_SAS and CHECK SIZE is $CHECK_SIZE. RCLONE will cycle until done.\n"
+      while [ "$exitcode" -ne "0" ];do run_rclone_w_flags;done
+    else echo -e "Auto SAS is $AUTO_SAS. RCLONE will cycle through $SAs SAs.\n"
+      for SA in $(seq $SAs);do run_rclone_w_flags;done;fi
     source clean_tds
   done > >(tee "logs/stdout_$set_file.log") 2> >(tee "logs/stderr_$set_file.log" >&2)
 }
