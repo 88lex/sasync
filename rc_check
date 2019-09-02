@@ -34,7 +34,7 @@ fi
 
 ${PRE_CLEAN_TDS,,} && source clean_tds
 
-${CALC_SIZE,,} && source size_calcf && if [ $srcsize == $destsize ]; then
+${CALC_SIZE,,} && source size_calc && if [ $srcsize == $destsize ]; then
   echo "SOURCE size = DEST size. SKIPPING TO NEXT SOURCE-DESTINATION PAIR.";continue;fi
 
 ${SKIP_IF_EQUAL,,} && if rclone check $src $dest --one-way --fast-list &> >(grep '0 differences')
