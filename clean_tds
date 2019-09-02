@@ -10,9 +10,6 @@ if [ ${CLEAN_DEST,,} = true ]; then
   rclone rmdirs $dest -v --drive-use-trash=false --fast-list --transfers=40 --leave-root --drive-service-account-file="$JSON_DIR/$MIN_JSON.json"
 fi
 
-# ADD code to include drive service account file=MIN_JSON if SRC_SAS=true, else DSAF=""
-#if SRC_SAS="true";then DSAF="--drive-service-account-file=$JSON_DIR/$MIN_JSON.json"
-
 if [ ${CLEAN_SRC,,} = true ]; then
   echo -e "STARTING DEDUPE of identical files from $src\n"
   rclone dedupe skip $src -v --drive-use-trash=false --fast-list --transfers=40 --drive-service-account-file="$JSON_DIR/$MIN_JSON.json"
