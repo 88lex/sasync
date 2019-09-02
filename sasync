@@ -23,8 +23,8 @@ process_pairs () {
     set_flags="$set_flags $flags";maxtrans="--max-transfer=$maxtrans"
     source sasync.conf
     source rc_check
-    if ${AUTO_SAS,,} || ! ${CHECK_SIZE,,};then
-      echo -e "AUTO SAS is $AUTO_SAS and CHECK SIZE is $CHECK_SIZE. RCLONE will cycle until done.\n"
+    if ${AUTO_SAS,,} || ! ${CALC_SIZE,,};then
+      echo -e "AUTO SAS is $AUTO_SAS and CALC SIZE is $CALC_SIZE. RCLONE will cycle until done.\n"
       while [ "$exitcode" -ne "0" ];do run_rclone_w_flags;done
     else echo -e "Auto SAS is $AUTO_SAS. RCLONE will cycle through $SAs SAs.\n"
       for SA in $(seq $SAs);do run_rclone_w_flags;done;fi
