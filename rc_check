@@ -28,8 +28,6 @@ if rclone lsd $src --drive-service-account-file="$JSON_DIR/$TEST1.json" &>/dev/n
   elif rclone lsd $src --drive-shared-with-me --drive-service-account-file="$JSON_DIR/$TEST1.json" &>/dev/null
   then SRC_SAS="true";echo "SUCCESS-SA: SOURCE $src works correctly with SAs."
   SRC1="${src^^}" ; SRC1="${SRC1%:*}"
-  echo export "RCLONE_CONFIG_""${SRC1//-/_}""_SHARED_WITH_ME=true"
-  echo export "RCLONE_CONFIG_""${SRC1//-/_}""_SERVICE_ACCOUNT_FILE="$JSON_DIR/$TEST1.json;sleep 5s
   export "RCLONE_CONFIG_""${SRC1//-/_}""_SHARED_WITH_ME=true"
   export "RCLONE_CONFIG_""${SRC1//-/_}""_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$TEST1.json
   else SRC_SAS="false";set_flags="$set_flags $DMC";FILTER=$FILTER_DMC
