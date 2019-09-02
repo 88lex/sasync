@@ -16,9 +16,9 @@ FILTER=" --filter-from=$SASYNC_DIR/filter"
 FILTER_DMC=" --filter-from=$SASYNC_DIR/filter.dmc"     # This is a filter used with upload/download runs. Can include filetypes that may hang w SS
 DMC=" --disable copy --max-transfer=10T"   # Disable server side, uses high max transfer to allow graceful exit
 G_FLAGS="
-  --tpslimit=5                             # These are set for safety. I omit both tpslimit and -burst and have no problems
+  --tpslimit=5
   --tpslimit-burst=40
-  --fast-list                              # --fast-list can create some dupes in destination. omit if you like, but rclone is much slower
+  --fast-list
   --transfers=10
   -vP
   --stats=5s
@@ -29,8 +29,10 @@ G_FLAGS="
   --drive-use-trash=false
   --drive-server-side-across-configs=true
     "
-#   Please LEAVE SPACES AND QUOTATION MARKS ABOVE to allow rclone to interpret the flags
-#   Add or remove flags as needed. Flags in set files (if any) will override global flags
+# Please LEAVE SPACES AND QUOTATION MARKS ABOVE to allow rclone to interpret the flags
+# Add or remove flags as needed. Flags in set files (if any) will override global flags
+# --tpslimit and -burst are set for safety. I omit both tpslimit and -burst and have no problems
+# --fast-list can create some dupes in destination. omit if you like, but rclone is much slower
 
 [ ! -f $SASYNC_DIR/json.count ] && echo $MIN_JSON >$SASYNC_DIR/json.count
 mkdir -p $SASYNC_DIR/config_backup $SASYNC_DIR/logs
