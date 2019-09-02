@@ -2,13 +2,13 @@
 # test all pairs in a set file
 echo -e "\nCHECKING RCLONE REMOTES for $src and $dest\n"
 
-DEST1="${dest%:*}"
+DEST1="${dest%:*}";TEST1=$(<$JSON_COUNT)
 if [ "$(rclone config show $DEST1 | grep team_drive | wc -m)" -gt 15 ]
   then echo "SUCCESS-TD: DESTINATION $DEST1 is a Team Drive"
   else echo "FATAL ERROR-TD: DESTINATION $DEST1 is NOT a Team Drive";exit
 fi
 
-if rclone lsd $dest --drive-service-account-file="$JSON_DIR/$MIN_JSON.json" &>/dev/null
+if rclone lsd $dest --drive-service-account-file="$JSON_DIR/$TEST1.json" &>/dev/null
   then echo "SUCCESS-SA: DESTINATION $dest works correctly with SAs."
   else echo "FAILURE-SA: CHECK $dest config and SA permissions in $set_file";exit
 fi
@@ -17,27 +17,31 @@ SRC1="${src%:*}";SRC_SAS="false"
 if [ "$(rclone config show $SRC1 | grep team_drive | wc -m)" -gt 15 ];
   then echo "SUCCESS-TD: SOURCE $SRC1 is a Team Drive"
   else echo "NOT-A-TD: SOURCE $SRC1 is NOT a Team Drive"
-  SRC1="${src^^}" ; SRC1="${SRC1%:*}"
-  export "RCLONE_CONFIG_""${SRC1//-/_}""_SHARED_WITH_ME=true"
 fi
 
 if ! rclone lsd $src &>/dev/null
   then echo "FAILURE-CONFIG: CHECK gsuite permissions and rclone config for $src in $set_file";exit
 fi
 
-if rclone lsd $src --drive-service-account-file="$JSON_DIR/$MIN_JSON.json" &>/dev/null ||\
-  rclone lsd $src --drive-shared-with-me --drive-service-account-file="$JSON_DIR/$MIN_JSON.json" &>/dev/null
+if rclone lsd $src --drive-service-account-file="$JSON_DIR/$TEST1.json" &>/dev/null
   then SRC_SAS="true";echo "SUCCESS-SA: SOURCE $src works correctly with SAs."
+  elif rclone lsd $src --drive-shared-with-me --drive-service-account-file="$JSON_DIR/$TEST1.json" &>/dev/null
+  then SRC_SAS="true";echo "SUCCESS-SA: SOURCE $src works correctly with SAs."
+  SRC1="${src^^}" ; SRC1="${SRC1%:*}"
+  echo export "RCLONE_CONFIG_""${SRC1//-/_}""_SHARED_WITH_ME=true"
+  echo export "RCLONE_CONFIG_""${SRC1//-/_}""_SERVICE_ACCOUNT_FILE="$JSON_DIR/$TEST1.json;sleep 5s
+  export "RCLONE_CONFIG_""${SRC1//-/_}""_SHARED_WITH_ME=true"
+  export "RCLONE_CONFIG_""${SRC1//-/_}""_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$TEST1.json
   else SRC_SAS="false";set_flags="$set_flags $DMC";FILTER=$FILTER_DMC
     echo "NO-SA: SOURCE $src does not work with SAs. Check if source has outbound quotas."
 fi
 
 ${PRE_CLEAN_TDS,,} && source clean_tds
 
-SAs=0;${CALC_SIZE,,} && source size_calc && if [ $srcsize == $destsize ]; then
+SAs=0;$CALC_SIZE && source size_calc && if [ $srcsize == $destsize ]; then
   echo "SOURCE size = DEST size. SKIPPING TO NEXT SOURCE-DESTINATION PAIR.";continue;fi
 
-${SKIP_IF_EQUAL,,} && if rclone check $src $dest --one-way --fast-list &> >(grep '0 differences')
+$SKIP_IF_EQUAL && if rclone check $src $dest --one-way --fast-list &> >(grep '0 differences')
   then echo "SKIPPING: $src and $dest already synced, moving to next pair"; continue;fi
 
 if [[ $G_FLAGS$set_flags == *"disable"* ]];then TIMEOUT=$TIMEOUT_DMC;set_flags="$set_flags $DMC";FILTER=$FILTER_DMC;fi
