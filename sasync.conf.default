@@ -30,8 +30,10 @@ G_FLAGS="
   --drive-use-trash=false
   --drive-server-side-across-configs=true
     "
-#   Please LEAVE SPACES AND QUOTATION MARKS ABOVE to allow rclone to interpret the flags
-#   Add or remove flags as needed. Flags in set files (if any) will override global flags
+# Please LEAVE SPACES AND QUOTATION MARKS ABOVE to allow rclone to interpret the flags
+# Add or remove flags as needed. Flags in set files (if any) will override global flags
+# --tpslimit and -burst are set for safety. I omit both tpslimit and -burst and have no problems
+# --fast-list can create some dupes in destination. omit if you like, but rclone is much slower
 
 [ ! -f $SASYNC_DIR/json.count ] && echo $MIN_JSON >$SASYNC_DIR/json.count
 mkdir -p $SASYNC_DIR/config_backup $SASYNC_DIR/logs
