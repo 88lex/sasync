@@ -1,10 +1,10 @@
 - mounted.bin
 - desktop.ini
-- .DS_store
+- *.DS_store
 - Thumbs.db
 - thumbs.db
 - *.icns
 - *.part_*
 - *.gsl
 - *._gs
-- _gsdata_
+- *_gsdata_
