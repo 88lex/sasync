@@ -2,7 +2,7 @@
 JSON_DIR=/opt/sa                       # Location of DIR with service account .json files. No trailing slash
 JSON_COUNT=$SASYNC_DIR/json.count      # Location of json.count file
 MIN_JSON=1
-MAX_JSON=4500                          # CHANGE `MAX_JSON` TO THE MAX JSON FILE # IN JSON_DIR
+MAX_JSON=1200                          # CHANGE `MAX_JSON` TO THE MAX JSON FILE # IN JSON_DIR
 CALC_SIZE=true                         # Runs check size and estimates SAs which would be used with set maxtransfer size
 FILE_COMPARE=false                     # Runs rclone check command which compares files. Skips to next pair if true. Def=false
 TIMEOUT=""                             # Timeout bypasses rclone hangs. Set to 2h (2 hours) or 1d (1 day) if not needed
