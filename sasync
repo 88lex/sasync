@@ -1,33 +1,22 @@
 #!/usr/bin/env bash
-echo -e "STARTING SASYNC v2.0\n"
-set_file=$1;echo "Set file = $set_file";shift;flags=$@
-source sasync.conf
+echo -e "STARTING SASYNC v2.0\n";set_file=$1;shift;flags=$@
+source sasync.init
 
-rotate_sas () {
+run_rclone_w_flags () {
   COUNT=$(<$JSON_COUNT);echo $(( $COUNT>=$MAX_JSON?$MIN_JSON:$COUNT+1 ))>$JSON_COUNT
   echo -e "BEGIN $sync of $src to $dest w $COUNT/$MAX_JSON.json from $set_file\n"
   echo -e "GLOBAL FLAGS=$G_FLAGS\nSET FLAGS=$set_flags\nFILTER=$FILTER\nTIMEOUT=$TIMEOUT\n"
   SRC1="${src^^}" ; SRC1="${SRC1%:*}";DEST1="${dest^^}" ; DEST1="${DEST1%:*}"
   $SRC_SAS && export "RCLONE_CONFIG_""${SRC1//-/_}""_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$COUNT.json
   export "RCLONE_CONFIG_""${DEST1//-/_}""_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$COUNT.json
-}
-run_rclone_w_flags () {
-  rotate_sas
-  $TIMEOUT rclone $sync $src $dest $maxtrans $G_FLAGS $set_flags $FILTER
-  exitcode=$?;echo EXIT CODE = $exitcode
-  echo -e "FINISHED $sync from $src to $dest wJSON $COUNT.json\n"
+  set -x;rclone $sync $src $dest $G_FLAGS $set_flags $flags $FILTER;EXITCODE=$?;set +x
 }
 process_pairs () {
   column -t $SET_DIR/$set_file|tee /dev/tty|sed '/^\s*#.*$/d'|\
-  while IFS=' ' read -r sync src dest maxtrans set_flags;do exitcode=8
-    set_flags="$set_flags $flags";maxtrans="--max-transfer=$maxtrans"
+  while IFS=' ' read -r sync src dest maxtrans set_flags;do
     source sasync.conf
     source rc_check
-    if ${AUTO_SAS,,} || ! ${CALC_SIZE,,};then
-      echo -e "AUTO SAS is $AUTO_SAS and CALC SIZE is $CALC_SIZE. RCLONE will cycle until done.\n"
-      while [ "$exitcode" -ne "0" ];do run_rclone_w_flags;done
-    else echo -e "Auto SAS is $AUTO_SAS. RCLONE will cycle through $SAs SAs.\n"
-      for SA in $(seq $SAs);do run_rclone_w_flags;done;fi
+    while [[ "$EXITCODE" =~ ^(5|6|7|8)$ ]] && (($SAs));do ((SAs--));run_rclone_w_flags;done
     source clean_tds
   done > >(tee "logs/stdout_$set_file.log") 2> >(tee "logs/stderr_$set_file.log" >&2)
 }
