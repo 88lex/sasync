@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+SASYNC_DIR=/opt/sasync                 # Location of the sasync script itself
+SET_DIR=/opt/sasync/sasets             # Location of your set files
+JSON_DIR=/opt/sa                       # Location of DIR with service account .json files. No trailing slash
+JSON_COUNT=$SASYNC_DIR/json.count      # Location of json.count file
+
+[ ! -f $SASYNC_DIR/json.count ] && echo $MIN_JSON >$SASYNC_DIR/json.count
+mkdir -p $SASYNC_DIR/config_backup $SASYNC_DIR/logs
+cp $SASYNC_DIR/sasync.conf $SASYNC_DIR/config_backup/sasync.conf_$(date +%y%m%d)
+find $SASYNC_DIR/config_backup/sasync.conf* -type f -mtime +14 -exec rm {} \;
