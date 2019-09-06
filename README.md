@@ -1,5 +1,6 @@
-NEW VERSION OF SASYNC, 2.0
-I have not edited the README below to reflect the changes. Will do shortly    
+NEW VERSION OF SASYNC, 2.0    
+
+README below does not reflect all changes. Will do shortly    
 
 You must use the new config file for the new script to work. Run `cp sasync.conf.default sasync.conf` and edit new config as needed.    
 
