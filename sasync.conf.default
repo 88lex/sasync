@@ -1,41 +1,30 @@
 #!/usr/bin/env bash
-SASYNC_DIR=/opt/sasync
-SET_DIR=$SASYNC_DIR/sasets             # Location of sasync set.* files
 JSON_DIR=/opt/sa                       # Location of DIR with service account .json files. No trailing slash
 JSON_COUNT=$SASYNC_DIR/json.count      # Location of json.count file
 MIN_JSON=1
-MAX_JSON=1200                          # CHANGE `MAX_JSON` TO THE MAX JSON FILE # IN JSON_DIR
-AUTO_SAS=true                          # Default=true=Let rclone run loops until done
-SKIP_IF_EQUAL=false                    # Runs rclone check command, skips to next pair if true. Can take time to calc. Def=false
-CALC_SIZE=false                        # Calculates size of source and destination then estimates SAs required
+MAX_JSON=4500                          # CHANGE `MAX_JSON` TO THE MAX JSON FILE # IN JSON_DIR
+FILE_COMPARE=true                      # Runs rclone check command which compares files. Skips to next pair if true. Def=false
+CALC_SIZE=true                         # Runs check size and estimates SAs which would be used with set maxtransfer size
 TIMEOUT=""                             # Timeout bypasses rclone hangs. Set to 2h (2 hours) or 1d (1 day) if not needed
 TIMEOUT_DMC=""                         # Allow longer timeout for --disable move,copy which is slower than server-side
-CLEAN_DEST=false                       # Set to true if you want to dedupe and clean trash
+EXITCODE=8                             # Placeholder exit code for rclone. Used control while  loop
+CLEAN_DEST=false                       # Set to true if you want to clean the destination or source
 CLEAN_SRC=false
-PRE_CLEAN_TDS=false                    # If you want to clean your remotes before running rclone w SAs then change this to TRUE
-FILTER=" --filter-from=$SASYNC_DIR/filter"
-FILTER_DMC=" --filter-from=$SASYNC_DIR/filter.dmc"  # Used with upload/download runs. Allow filetypes that hang w server side copy
-DMC=" --disable copy --max-transfer=10T"  # Disable server side, uses high max transfer to allow graceful exit. Slower than server side
+PRE_CLEAN_TDS=false                    # If you want to clean the TDs before running rclone w SAs then change this to TRUE
+FILTER=" --filter-from=filter"
+FILTER_DMC=" --filter-from=filter.dmc" # Used with upload/download runs. Allow filetypes that hang w SS
+DMC=" --disable move,copy"             # Disable server side
 G_FLAGS="
-  --tpslimit=5
-  --tpslimit-burst=40
   --fast-list
-  --transfers=8
   -vP
   --stats=5s
   --max-backlog=2000000
   --ignore-case
   --no-update-modtime
-  --drive-chunk-size=256M
+  --drive-chunk-size=128M
   --drive-use-trash=false
-  --drive-server-side-across-configs=true
-    "
-# Please LEAVE SPACES AND QUOTATION MARKS ABOVE to allow rclone to interpret the flags
-# Add or remove flags as needed. Flags in set files (if any) will override global flags
-# --tpslimit and -burst are set for safety. I omit both tpslimit and -burst and have no problems
-# --fast-list can create some dupes in destination. omit if you like, but rclone is much slower
+  --max-transfer=$maxtrans
+  $set_flags $flags"
+#   Please LEAVE SPACES AND QUOTATION MARKS ABOVE to allow rclone to interpret the flags
+#   Add or remove flags as needed. Flags in set files (if any) will override global flags
 
-[ ! -f $SASYNC_DIR/json.count ] && echo $MIN_JSON >$SASYNC_DIR/json.count
-mkdir -p $SASYNC_DIR/config_backup $SASYNC_DIR/logs
-cp $SASYNC_DIR/sasync.conf $SASYNC_DIR/config_backup/sasync.conf_$(date +%y%m%d)
-find $SASYNC_DIR/config_backup/sasync.conf* -type f -mtime +14 -exec rm {} \;
