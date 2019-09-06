@@ -3,8 +3,8 @@ JSON_DIR=/opt/sa                       # Location of DIR with service account .j
 JSON_COUNT=$SASYNC_DIR/json.count      # Location of json.count file
 MIN_JSON=1
 MAX_JSON=4500                          # CHANGE `MAX_JSON` TO THE MAX JSON FILE # IN JSON_DIR
-FILE_COMPARE=true                      # Runs rclone check command which compares files. Skips to next pair if true. Def=false
 CALC_SIZE=true                         # Runs check size and estimates SAs which would be used with set maxtransfer size
+FILE_COMPARE=false                     # Runs rclone check command which compares files. Skips to next pair if true. Def=false
 TIMEOUT=""                             # Timeout bypasses rclone hangs. Set to 2h (2 hours) or 1d (1 day) if not needed
 TIMEOUT_DMC=""                         # Allow longer timeout for --disable move,copy which is slower than server-side
 EXITCODE=8                             # Placeholder exit code for rclone. Used control while  loop
@@ -15,6 +15,8 @@ FILTER=" --filter-from=filter"
 FILTER_DMC=" --filter-from=filter.dmc" # Used with upload/download runs. Allow filetypes that hang w SS
 DMC=" --disable move,copy"             # Disable server side
 G_FLAGS="
+  --tpslimit=5
+  --tpslimit-burst=40
   --fast-list
   -vP
   --stats=5s
