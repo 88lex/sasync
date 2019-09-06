@@ -13,6 +13,6 @@ echo $srcsizeGB GB = $srcsize bytes = SIZE of SOURCE $src
 echo $destsizeGB GB = $destsize bytes = SIZE of DEST $dest
 echo -e "DIFF is $srcdestdiffGB GB = $srcdestdiff bytes"
 
-MAXT=${maxtrans//[^0-9.]/}
+MAXT=${maxtrans::-1}
 SAs=$(( ($MAXT+${srcdestdiffGB#-}-1)/$MAXT ))
-echo -e "Estimated number of SAs is $SAs with Max Transfer = $MAXT\n"
+echo -e "Estimated number of SAs is $SAs with Max Transfer = $maxtrans\n"
