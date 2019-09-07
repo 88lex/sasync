@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
 echo -e "STARTING SASYNC v2.0\n";set_file=$1;shift;flags=$@
-source sasync_init
+source sasync.init
 
 run_rclone_w_flags () {
   COUNT=$(<$JSON_COUNT);echo $(( $COUNT>=$MAX_JSON?$MIN_JSON:$COUNT+1 ))>$JSON_COUNT
   echo -e "BEGIN $sync of $src to $dest w $COUNT/$MAX_JSON.json from $set_file\n"
-  echo -e "GLOBAL FLAGS=$G_FLAGS\nSET FLAGS=$set_flags\nFILTER=$FILTER\nTIMEOUT=$TIMEOUT\n"
-  SRC1="${src^^}" ; SRC1="${SRC1%:*}";DEST1="${dest^^}" ; DEST1="${DEST1%:*}"
-  $SRC_SAS && export "RCLONE_CONFIG_""${SRC1//-/_}""_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$COUNT.json
-  export "RCLONE_CONFIG_""${DEST1//-/_}""_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$COUNT.json
-  set -x;rclone $sync $src $dest $G_FLAGS $set_flags $flags $FILTER;EXITCODE=$?;set +x
+  echo -e "FLAGS=$FLAGS\nFILTER=$FILTER\nTIMEOUT=$TIMEOUT\n"
+  $SRC_SAS && export "RCLONE_CONFIG_"$SRC1"_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$COUNT.json
+  export "RCLONE_CONFIG_"$DEST1"_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$COUNT.json
+  set -x;rclone $sync $src $dest $FLAGS $FILTER;EXITCODE=$?;set +x
 }
 process_pairs () {
   column -t $SET_DIR/$set_file|tee /dev/tty|sed '/^\s*#.*$/d'|\
