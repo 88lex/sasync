@@ -14,7 +14,7 @@ PRE_CLEAN_TDS=false                    # If you want to clean the TDs before run
 FILTER=" --filter-from=filter"
 FILTER_DMC=" --filter-from=filter.dmc" # Used with upload/download runs. Allow filetypes that hang w SS
 DMC=" --disable move,copy"             # Disable server side
-G_FLAGS="
+FLAGS="
   --tpslimit=5
   --tpslimit-burst=40
   --fast-list
@@ -29,4 +29,3 @@ G_FLAGS="
   $set_flags $flags"
 #   Please LEAVE SPACES AND QUOTATION MARKS ABOVE to allow rclone to interpret the flags
 #   Add or remove flags as needed. Flags in set files (if any) will override global flags
-
