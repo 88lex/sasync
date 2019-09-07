@@ -1,36 +1,37 @@
 #!/usr/bin/env bash
 echo -e "\nCHECKING RCLONE REMOTES for $src and $dest\n"
 
-if ! rclone config show ${src%:*} &>/dev/null;then echo CHECK config for $src;exit;fi
-if ! rclone config show ${dest%:*} &>/dev/null;then echo CHECK config for $dest;exit;fi
+DEST_SAS="false";dest1="${dest%:*}";DEST1="${dest1^^}";DEST1="${DEST1//-/_}"
+SRC_SAS="false";src1="${src%:*}";SRC1="${src1^^}";SRC1="${SRC1//-/_}"
 
-DEST1="${dest%:*}";TEST1=$(<$JSON_COUNT);DEST_SAS="false"
-if [ "$(rclone config show $DEST1 | grep team_drive | wc -m)" -gt 15 ]
-  then echo "SUCCESS-TD: DESTINATION $DEST1 is a Team Drive"
-  else echo "FATAL ERROR-TD: DESTINATION $DEST1 is NOT a Team Drive";exit
-fi
-if rclone lsd $dest --drive-service-account-file="$JSON_DIR/$TEST1.json" &>/dev/null
+if ! rclone config show $src1 &>/dev/null;then echo CHECK config for $src;exit;fi
+if ! rclone config show $dest1 &>/dev/null;then echo CHECK config for $dest;exit;fi
+
+if [ "$(rclone config show $dest1 | grep team_drive | wc -m)" -gt 15 ]
+  then echo "SUCCESS-TD: DESTINATION $dest1 is a Team Drive"
+  else echo "FATAL ERROR-TD: DESTINATION $dest1 is NOT a Team Drive";exit;fi
+
+if rclone lsd $dest --drive-service-account-file="$JSON_DIR/$(<$JSON_COUNT).json" &>/dev/null
   then DEST_SAS=true;echo "SUCCESS-SA: DESTINATION $dest works correctly with SAs."
-  else echo "FAILURE-SA: CHECK $dest config and SA permissions in $set_file";exit
-fi
+  else echo "FAILURE-SA: CHECK $dest config and SA permissions in $set_file";exit;fi
+
 if ! rclone lsd $src &>/dev/null
-  then echo "FAILURE-CONFIG: CHECK permissions and rclone config for $src in $set_file";exit
-fi
-SRC1="${src%:*}";SRC_SAS="false"
-if [ "$(rclone config show $SRC1 | grep team_drive | wc -m)" -gt 15 ];
-  then echo "SUCCESS-TD: SOURCE $SRC1 is a Team Drive"
-  else echo "NOT-A-TD: SOURCE $SRC1 is NOT a Team Drive"
-fi
-if rclone lsd $src --drive-service-account-file="$JSON_DIR/$TEST1.json" &>/dev/null
+  then echo "FAILURE-CONFIG: CHECK permissions and rclone config for $src in $set_file";exit;fi
+
+if [ "$(rclone config show $src1 | grep team_drive | wc -m)" -gt 15 ];
+  then echo "SUCCESS-TD: SOURCE $src1 is a Team Drive"
+  else echo "NOT-A-TD: SOURCE $src1 is NOT a Team Drive";fi
+
+if rclone lsd $src --drive-service-account-file="$JSON_DIR/$(<$JSON_COUNT).json" &>/dev/null
   then SRC_SAS="true";echo "SUCCESS-SA: SOURCE $src works correctly with SAs."
-  else SRC_SAS="false";echo "NO-SA: SOURCE $src cannot use SAs. Check source outbound quotas."
-fi
+  else SRC_SAS="false";echo "NO-SA: SOURCE $src cannot use SAs. Check source outbound quotas.";fi
 
 ${PRE_CLEAN_TDS,,} && source clean_tds
-SAs=$MAX_JSON;$CALC_SIZE && source size_calc && if [ $srcsize == $destsize ]; then
+SAs=$MAX_JSON;${CALC_SIZE,,} && source size_calc && if [ $srcsize == $destsize ]; then
   echo "SKIPPING TO NEXT SOURCE-DESTINATION PAIR. SOURCE $srcsize = DEST $destsize.";continue;fi
 
 ${FILE_COMPARE,,} && if rclone check $src $dest --one-way --fast-list &> >(grep '0 differences')
   then echo "SKIPPING: $src and $dest already synced, moving to next pair"; continue;fi
-if [[ $G_FLAGS$set_flags == *"disable"* ]];then TIMEOUT=$TIMEOUT_DMC;FILTER=$FILTER_DMC;fi
+
+if [[ $FLAGS$set_flags == *"disable"* ]];then TIMEOUT=$TIMEOUT_DMC;FILTER=$FILTER_DMC;fi
 echo -e "RCLONE REMOTE CHECK COMPLETED\n"
