@@ -2,15 +2,15 @@
 # clean_tds dedupes identical files and permanently deletes trash
 
 ${CLEAN_DEST,,} && { echo -e "STARTING DEDUPE of identical files from $dest\n"
-  rclone dedupe skip $dest -v --drive-use-trash=false --fast-list --transfers=40 --drive-service-account-file="$JSON_DIR/$MIN_JSON.json"
-  echo -e "PERMANENTLY DELETING TRASH from $dest\n"
-  rclone delete $dest -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40 --drive-service-account-file="$JSON_DIR/$MIN_JSON.json"
+  rclone dedupe skip $dest -v --drive-use-trash=false --no-traverse --tpslimit=5
+  echo -e "PERMANENTLY DELETING TRASH from $dest1\n"
+  rclone delete $dest1: -vv --drive-trashed-only --drive-use-trash=false --tpslimit=5
   echo -e "REMOVING EMPTY DIRECTORIES from $dest\n"
-  rclone rmdirs $dest -v --drive-use-trash=false --fast-list --transfers=40 --leave-root --drive-service-account-file="$JSON_DIR/$MIN_JSON.json"; }
+  rclone rmdirs $dest -v --drive-use-trash=false --fast-list --tpslimit=5 --leave-root ; }
 
 ${CLEAN_SRC,,} = true ] && { echo -e "STARTING DEDUPE of identical files from $src\n"
-  rclone dedupe skip $src -v --drive-use-trash=false --fast-list --transfers=40 --drive-service-account-file="$JSON_DIR/$MIN_JSON.json"
-  echo -e "PERMANENTLY DELETING TRASH from $src\n"
-  rclone delete $src -v --drive-trashed-only --drive-use-trash=false --fast-list --transfers=40 --drive-service-account-file="$JSON_DIR/$MIN_JSON.json"
+  rclone dedupe skip $src -v --drive-use-trash=false --no-traverse --tpslimit=5
+  echo -e "PERMANENTLY DELETING TRASH from $src1\n"
+  rclone delete $src1: -vv --drive-trashed-only --drive-use-trash=false --tpslimit=5
   echo -e "REMOVING EMPTY DIRECTORIES from $src\n"
-  rclone rmdirs $src -v --drive-use-trash=false --fast-list --transfers=40 --leave-root --drive-service-account-file="$JSON_DIR/$MIN_JSON.json"; }
+  rclone rmdirs $src -v --drive-use-trash=false --fast-list --tpslimit=5 --leave-root ; }
