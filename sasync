@@ -8,7 +8,7 @@ run_rclone_w_flags () {
   echo -e "FLAGS=$FLAGS\nFILTER=$FILTER\nTIMEOUT=$TIMEOUT\n"
   $SRC_SAS && export "RCLONE_CONFIG_"$SRC1"_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$COUNT.json
   export "RCLONE_CONFIG_"$DEST1"_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$COUNT.json
-  set -x;rclone $sync $src $dest $FLAGS $FILTER;EXITCODE=$?;set +x
+  set -x;$TIMEOUT rclone $sync $src $dest $FLAGS $FILTER;EXITCODE=$?;set +x
 }
 process_pairs () {
   column -t $SET_DIR/$set_file|tee /dev/tty|sed '/^\s*#.*$/d'|\
