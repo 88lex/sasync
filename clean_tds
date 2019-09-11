@@ -8,7 +8,7 @@ ${CLEAN_DEST,,} && { echo -e "STARTING DEDUPE of identical files from $dest\n"
   echo -e "REMOVING EMPTY DIRECTORIES from $dest\n"
   rclone rmdirs $dest -v --drive-use-trash=false --fast-list --tpslimit=5 --leave-root ; }
 
-${CLEAN_SRC,,} = true ] && { echo -e "STARTING DEDUPE of identical files from $src\n"
+${CLEAN_SRC,,} = true && { echo -e "STARTING DEDUPE of identical files from $src\n"
   rclone dedupe skip $src -v --drive-use-trash=false --no-traverse --tpslimit=5
   echo -e "PERMANENTLY DELETING TRASH from $src1\n"
   rclone delete $src1: -vv --drive-trashed-only --drive-use-trash=false --tpslimit=5
