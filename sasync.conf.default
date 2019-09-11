@@ -4,9 +4,9 @@ SASYNC_DIR="/opt/sasync"              # Location of the sasync script
 SET_DIR="$SASYNC_DIR/sasets"          # Location of your set files
 JSON_DIR="/opt/sa"                    # Location of DIR with SA .json files. No trailing slash
 MIN_JSON=1
-MAX_JSON=4500                         # CHANGE `MAX_JSON` TO THE MAX JSON FILE IN YOUR SET
+MAX_JSON=1200                         # CHANGE `MAX_JSON` TO THE MAX JSON FILE IN YOUR SET
 JSON_COUNT="$SASYNC_DIR/json.count"   # Location of json.count file (NOT the jsons themselves)
-EXIT_ON_BAD_PAIR=false                 # Exit (true) or continue (false) if set pair is bad
+EXIT_ON_BAD_PAIR=false                # Exit (true) or continue (false) if set pair is bad
 
 # Flags to control which checks and what cleaning is done. All = false works in standard case
 CHECK_REMOTES=true                    # Check if remotes are configured in rclone. Faster if set to false
