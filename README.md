@@ -31,11 +31,9 @@ copy      teamdrive:photos   backup:photos   350G           --transfers=8
 - If any of the above not true then you are better off using rclone sync/copy directly.
 
 **Source** 
-- Must have read permission
+- Must have read permission 
 - Best case if the source is a TD
 - Must have at least read permissions to SAs
-
-
 - If all of the above are true then SAs will rotate with both source and destination, and sync/copy limits can be higher. Each SA has a 750GB upload/inbound quota and a 10TB download/outbound quota.
 - If Source does not have SA read access then you need to consider your outbound quotas (e.g. 10 TB for GDrive, ? for others).
 
@@ -126,19 +124,21 @@ running an older version of sasync.  The new set file has 5 columns vs 7 in olde
 Set files are easy to edit in github/gitlab and can be easily added to / updated to any machines running sasync.
 
 **There are several files in the repo at the moment.**
-1. **`sasync`** is the main script that pulls sync sets from 'set' files and runs rclone sync/copy/move.
-2. **`sasync.conf.default`** contains major variables and rclone global flags.
-3. **`sacalc`** estimates the number of service accounts required to sync/copy the gap between source and destination.
-4. **`clean_tds`** deletes exact dupes, removes empty directories and permanently deletes trash. By default for DESTINATION only, 
+- **`sasync`** is the main script that pulls sync sets from 'set' files and runs rclone sync/copy/move.
+- **`sasync.conf.default`** contains major variables and rclone global flags.
+- **`rc_check`** checks rclone remote status
+- **`sacalc`** estimates the number of service accounts required to sync/copy the gap between source and destination.
+- **`clean_tds`** deletes exact dupes, removes empty directories and permanently deletes trash. By default for DESTINATION only, 
 but can be set to clean SOURCE as well.
-5. **`json.count`** is an external counter for the json set. This allows running multiple instances of sasync that pull in 
+- **`json.count`** is an external counter for the json set. This allows running multiple instances of sasync that pull in 
 sequence from the jsons without wasting or duplicating usage.
-6. Two sample set files with rclone source, destination and max-transfer size. **`set.tv.sample`** and **`set.movies.sample`**
-7. **`filter`** contain file patterns to include or exclude from sasync. You may customize the filters in many ways to suit your own needs.
-8. **`utils` folder** contains a few misc scripts. `readsets` will check if your set.* files are readable by sasync. `cleansets` will 
+- Two sample set files with rclone source, destination and max-transfer size. **`set.tv.sample`** and **`set.movies.sample`**
+- **`filter`** contain file patterns to include or exclude from sasync. You may customize the filters in many ways to suit your own needs.
+- `msg` contains messages called by the script
+- **`utils` folder** contains a few misc scripts. `readsets` will check if your set.* files are readable by sasync. `cleansets` will 
 replace tabs and unreadable characters in your set.* files. Syntax is `./cleansets set.video`.
-9. **`install_sasync`** will automate some installation tasks for you. It is intended for use during initial install, but can be used with subsequent installs.
-10. Put your actual set files in the `sasets` folder. If you put them in a different folder be sure to change the SET_DIR in sasync.conf
+- **`install_sasync`** will automate some installation tasks for you. It is intended for use during initial install, but can be used with subsequent installs.
+- Put your actual set files in the `sasets` folder. If you put them in a different folder be sure to change the SET_DIR in sasync.conf
 
 The set.* files specify which sync pairs you would like to run along with rclone flags for that sync pair. The format would be as follows (The # comment lines are entirely optional/unnecessary):
 <pre>
