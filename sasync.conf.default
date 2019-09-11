@@ -1,22 +1,24 @@
 #!/usr/bin/env bash
-JSON_DIR=/opt/sa                       # Location of DIR with service account .json files. No trailing slash
-JSON_COUNT=$SASYNC_DIR/json.count      # Location of json.count file
+# Double check these flags point to your files/folders and that the json count is correct
+SASYNC_DIR="/opt/sasync"              # Location of the sasync script
+SET_DIR="$SASYNC_DIR/sasets"          # Location of your set files
+JSON_DIR="/opt/sa"                    # Location of DIR with SA .json files. No trailing slash
 MIN_JSON=1
-MAX_JSON=1200                          # CHANGE `MAX_JSON` TO THE MAX JSON FILE # IN JSON_DIR
-CALC_SIZE=true                         # Runs check size and estimates SAs which would be used with set maxtransfer size
-FILE_COMPARE=false                     # Runs rclone check command which compares files. Skips to next pair if true. Def=false
-TIMEOUT=""                             # Timeout bypasses rclone hangs. Set to 2h (2 hours) or 1d (1 day) if not needed
-TIMEOUT_DMC=""                         # Allow longer timeout for --disable move,copy which is slower than server-side
-EXITCODE=8                             # Placeholder exit code for rclone. Used control while  loop
-CLEAN_DEST=false                       # Set to true if you want to clean the destination or source
-CLEAN_SRC=false
-PRE_CLEAN_TDS=false                    # If you want to clean the TDs before running rclone w SAs then change this to TRUE
-FILTER=" --filter-from=filter"
-FILTER_DMC=" --filter-from=filter.dmc" # Used with upload/download runs. Allow filetypes that hang w SS
-DMC=" --disable move,copy"             # Disable server side
+MAX_JSON=4500                         # CHANGE `MAX_JSON` TO THE MAX JSON FILE IN YOUR SET
+JSON_COUNT="$SASYNC_DIR/json.count"   # Location of json.count file (NOT the jsons themselves)
+EXIT_ON_BAD_PAIR=false                 # Exit (true) or continue (false) if set pair is bad
+
+# Flags to control which checks and what cleaning is done. All = false works in standard case
+CHECK_REMOTES=true                    # Check if remotes are configured in rclone. Faster if set to false
+CALC_SIZE=true                        # Runs check size and estimates number of SAs required
+FILE_COMPARE=false                    # Runs hash check against files
+CLEAN_DEST=false                      # Set to true if you want to clean the destination
+CLEAN_SRC=false                       # Set to true if you want to clean the source
+PRE_CLEAN_TDS=false                   # Set to true to clean remotes fore running rclone
+TMOUT=""                              # Syntax is TMOUT="timeout 30m". Use only if rclone hangs
+
+# These flags are applied to all sets. Tweak them as you like
 FLAGS="
-  --tpslimit=5
-  --tpslimit-burst=40
   --fast-list
   -vP
   --stats=5s
@@ -25,7 +27,18 @@ FLAGS="
   --no-update-modtime
   --drive-chunk-size=128M
   --drive-use-trash=false
-  --max-transfer=$maxtrans
-  $set_flags $flags"
-#   Please LEAVE SPACES AND QUOTATION MARKS ABOVE to allow rclone to interpret the flags
-#   Add or remove flags as needed. Flags in set files (if any) will override global flags
+  --filter-from=filter
+  --drive-server-side-across-configs=true
+  "
+
+# Initialize vars and folders. DO NOT CHANGE
+set_clean=$(grep -Ev '#|^$' "$SET_DIR/$set_file"|tee /dev/tty)
+[ $EXIT_ON_BAD_PAIR = true ] && CON_EX="exit" || CON_EX="continue"
+STD_LOG="$SASYNC_DIR/logs/stdout_$set_file.log"
+ERR_LOG="$SASYNC_DIR/logs/stderr_$set_file.log"
+[ ! -f $SASYNC_DIR/json.count ] && echo $MIN_JSON >$SASYNC_DIR/json.count
+mkdir -p $SASYNC_DIR/config_backup $SASYNC_DIR/logs
+cp $SASYNC_DIR/sasync.conf $SASYNC_DIR/config_backup/sasync.conf_$(date +%y%m%d)
+find $SASYNC_DIR/config_backup/sasync.conf* -type f -mtime +14 -exec rm {} \;
+# End of Init
+. msg conf_ok
