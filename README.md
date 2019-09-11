@@ -70,10 +70,21 @@ THE MAIN CHANGES ARE:
 
 - `rc_check` checks if the source and destination are TDs, MDs, shared folders or local. This then determines if SAs are used for the source and adjusts flags accordingly    
 
+- You can now choose to exit or continue when source-destination remotes are bad
+
 There are a few other changes but these are the big ones.    
 
 
 **IMPORTANT**:   
+
+- When upgrading you can overwrite local files/changes by running 
+
+  `git fetch`  
+  `git reset --hard origin/develop`  
+  `cp sasync.conf.default sasync.conf`  
+  `chmod +x sasync`  
+  `./sasync set.p8`  
+  Then edit sasync.conf 
 
 - ==>  If this is your first time running sasync then copy `sasync.conf.default` to `sasync.conf`. If you are updating sasync then double check `sasync.conf.default` to see if there are any new settings.   
 
