@@ -1,23 +1,25 @@
 #!/usr/bin/env bash
-echo -e "STARTING SASYNC v2.0\n";set_file=$1;shift;flags=$@
-source sasync.init
+set_file=$1;shift;cmd_flags=$@
+. msg start;. sasync.conf
+
+next_json () {
+  COUNT=$(<$JSON_COUNT);echo $(( $COUNT>=$MAX_JSON?$MIN_JSON:$COUNT+1 ))>$JSON_COUNT
+  [ $SRC_SAS = "true" ]&&export "RCLONE_CONFIG_"$SRC1"_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$COUNT.json
+  export "RCLONE_CONFIG_"$DEST1"_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$COUNT.json
+}
 
 run_rclone_w_flags () {
-  COUNT=$(<$JSON_COUNT);echo $(( $COUNT>=$MAX_JSON?$MIN_JSON:$COUNT+1 ))>$JSON_COUNT
-  echo -e "BEGIN $sync of $src to $dest w $COUNT/$MAX_JSON.json from $set_file\n"
-  echo -e "FLAGS=$FLAGS\nFILTER=$FILTER\nTIMEOUT=$TIMEOUT\n"
-  $SRC_SAS && export "RCLONE_CONFIG_"$SRC1"_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$COUNT.json
-  export "RCLONE_CONFIG_"$DEST1"_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$COUNT.json
-  set -x;$TIMEOUT rclone $sync $src $dest $FLAGS $FILTER;EXITCODE=$?;set +x
+  next_json;. msg run_rc; (set -x
+  $TMOUT rclone $sync $src $dest $FLAGS $set_flags $maxt1 $cmd_flags;EXCODE=$?)
 }
-process_pairs () {
-  column -t $SET_DIR/$set_file|tee /dev/tty|sed '/^\s*#.*$/d'|\
-  while IFS=' ' read -r sync src dest maxtrans set_flags;do
-    source sasync.conf
-    source rc_check
-    while [[ "$EXITCODE" =~ ^(5|6|7|8)$ ]] && (($SAs));do ((SAs--));run_rclone_w_flags;done
-    source clean_tds
-  done > >(tee "logs/stdout_$set_file.log") 2> >(tee "logs/stderr_$set_file.log" >&2)
-}
-process_pairs $@
-echo -e "\nSASYNC COMPLETED and EXITING\n"
+
+run_pairs () {
+  while IFS=' ' read -r sync src dest maxt set_flags;do 
+    . rc_check;EXCODE=8
+    while [[ "$EXCODE" =~ ^(7|8)$ ]] && (($SAs));do ((SAs--));run_rclone_w_flags;done
+    . msg fin_sync;. clean_tds
+  done <<<"$set_clean" > >(tee "$STD_LOG") 2> >(tee "$ERR_LOG" >&2)
+  }
+
+run_pairs $@
+. msg complete
