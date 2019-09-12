@@ -1,0 +1,14 @@
+# FILTERS are not used by default in sasync.
+# You can create your own filter set(s) and add them in the sasync command line, in a set file or in the config file.
+# rclone allows multiple filters to be applied. Be careful if you use more than 1 filter.
+# The rclone syntax is "--filter-from=filename"
+- mounted.bin
+- desktop.ini
+- *.DS_store
+- thumbs.db
+- *.icns
+- *.part_*
+- *.gsl
+- *._gs
+- *._gsdata_
+
