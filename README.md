@@ -1,4 +1,3 @@
-
 **SASYNC 2.1**:   SASYNC uses rclone and Google Service Accounts (SAs) to sync, copy or move files between rclone remotes.  
 **Usage**:  `./sasync set.file`
 - [OPTION] Add `-c configfile` before the set file to use a different config file  
@@ -66,7 +65,6 @@ THE MAIN CHANGES ARE:
 
 There are a few other changes but these are the big ones.    
 
-
 **IMPORTANT**:   
 
 - When upgrading you can overwrite local files/changes by running  
@@ -98,7 +96,7 @@ You can copy via `cp sasync.conf.default sasync.conf`. If you keep your existing
 *  **Flexible unlimited rclone flags in the set files**:  Add multiple rclone flags to each/all pairs in the set.* file. Flags in the set file will override
 flags in the config file.
 
-**NOTE: sasync intentionally does not create missing folders, as rclone could accidentally create and copy to a local folder = DANGEROUS.**
+* **NOTE: sasync intentionally does not create missing folders, as rclone could accidentally create and copy to a local folder = DANGEROUS.**
 
 *  **Log files**:  sasync creates two log files with each run. `stderr_set.name.log` and `stdout_set.name.log` and puts them in the `logs` folder
 
@@ -109,6 +107,8 @@ running an older version of sasync.  The new set file has 5 columns vs 7 in olde
 
 *  You may consider creating your own private repo called `sasets` in github/lab/bucket that contains your personal set files. 
 Set files are easy to edit in github/gitlab and can be easily added to / updated to any machines running sasync.
+
+* There are a number of small utilities in the `utils` folder. They do things like install sasync, update rclone, clean set files, remove all comments.
 
 **Files in the repo (incomplete)**
 - **`sasync`** is the main script that pulls sync sets from 'set' files and runs rclone sync/copy/move.
