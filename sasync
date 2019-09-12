@@ -10,8 +10,8 @@ next_json () {
 }
 
 run_rclone_w_flags () {
-  next_json;. msg run_rc
-  $TMOUT rclone $sync $src $dest $FLAGS $set_flags $maxt1 $cmd_flags;EXCODE=$?
+  next_json;. msg run_rc;set -x
+  $TMOUT rclone $sync $src $dest $FLAGS $set_flags $maxt1 $cmd_flags;EXCODE=$?;set +x
 }
 
 run_pairs () {
