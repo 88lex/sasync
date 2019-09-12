@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+[ "$1"="-c" ]&&{ CFILE=$2;shift 2; }
 set_file=$1;shift;cmd_flags=$@
-. msg start;. sasync.conf
+. msg start;. ${CFILE:-sasync.conf}
 
 next_json () {
   COUNT=$(<$JSON_COUNT);echo $(( $COUNT>=$MAX_JSON?$MIN_JSON:$COUNT+1 ))>$JSON_COUNT
