@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+cp $1 $1.bak
+sed -E 's@[[:blank:]]*(//|#).*@@;T;/./!d' $1.bak>$1
+echo -e "$1 has been cleaned\n Backup of original $1.bak created"
