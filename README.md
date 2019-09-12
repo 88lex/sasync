@@ -1,6 +1,6 @@
 **SASYNC 2.1**:   SASYNC uses rclone and Google Service Accounts (SAs) to sync, copy or move files between rclone remotes.  
 **Usage**:  `./sasync set.file`
-- [OPTION] Add `-c configfile` before the set file to use a different config file  
+- [OPTION] Add `-c file.conf` before the set file to use a different config file  
 - [OPTION] Add rcloneflag(s) to the command line after the set file.
 - Example: `./sasync -c sasync2.conf set.file --disable copy`
 - After downloading enable execution with `chmod +x sasync` each time you update.  
