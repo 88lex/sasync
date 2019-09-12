@@ -2,3 +2,9 @@
 **/sasets
 **/sa
 **/config_backup
+**/old-files
+**/test
+**/.vscode
+.vscode/settings.json
+sasyn*.conf
+json.count
