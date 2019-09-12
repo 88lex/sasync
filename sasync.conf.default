@@ -32,7 +32,7 @@ FLAGS="
   "
 
 # Initialize vars and folders. DO NOT CHANGE
-#set_clean=$(grep -Ev '#|^$' "$SET_DIR/$set_file"|tee /dev/tty)
+#set_clean=$(column -t $SET_DIR/$set_file|tee /dev/tty|sed '/^\s*#.*$/d')
 set_clean=$(grep -o '^[^#]*' "$SET_DIR/$set_file"|tee /dev/tty)
 [ $EXIT_ON_BAD_PAIR = true ] && CON_EX="exit" || CON_EX="continue"
 STD_LOG="$SASYNC_DIR/logs/stdout_$set_file.log"
