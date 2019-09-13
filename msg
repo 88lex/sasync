@@ -14,7 +14,7 @@ case ${1,,} in
     echo -e "\nRCLONE REMOTE CHECK COMPLETED FOR $src and $dest\n" ;;
 
   rc_bad) 
-    echo -e "\nERROR: CHECK the rclone config for remote=$2\n" ;;
+    echo -e "***\nFAILURE: CHECK the rclone config for remote=$2\n***"|tee -a $FAIL_LOG ;;
 
   ok_td) 
     echo -e "SUCCESS-TD: REMOTE $2 is a TEAM DRIVE" ;;
@@ -29,7 +29,7 @@ case ${1,,} in
     echo -e "FAILURE-SA: CHECK $2 config and SA permissions in $set_file" ;;
 
   fail_rem) 
-    echo -e "FAILURE-REMOTE: CHECK PERMISSIONS and rclone config for $2 in $set_file" ;;
+    echo -e "***\nFAILURE-REMOTE: CHECK PERMISSIONS and rclone config for $2 in $set_file"|tee -a $FAIL_LOG ;;
 
   skip2next) 
     echo -e "SKIPPING TO NEXT SRC-DEST PAIR. SOURCE $src = DEST $dest." ;;
@@ -51,7 +51,9 @@ case ${1,,} in
     echo -e "\nFINISHED $sync FROM $src TO $dest" ;;
 
   complete) 
-    echo -e "\nSASYNC COMPLETED FOR SET FILE $set_file. NOW EXITING\n" ;;
+    echo -e "\nSASYNC COMPLETED FOR SET FILE $set_file. NOW EXITING\n"
+    cat $FAIL_LOG ;;
+
   *) 
     echo !! Yo! You forgot to add a message for this !! ;;
 
