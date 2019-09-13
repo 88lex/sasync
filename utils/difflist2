@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-rclone tree -d -i --level 2 $1>tmp1
-rclone tree -d -i --level 2 $2>tmp2
+rclone tree -di --level 2 $1>tmp1
+rclone tree -di --level 2 $2>tmp2
 
 sort tmp1>tmp11;mv tmp11 tmp1
 sort tmp2>tmp22;mv tmp22 tmp2
