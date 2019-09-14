@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+rclone tree -di --level 2 $1>tmp1
+rclone tree -di --level 2 $2>tmp2
+
+sort tmp1>tmp11;mv tmp11 tmp1
+sort tmp2>tmp22;mv tmp22 tmp2
+
+combine tmp1 not tmp2>not_in_2
+combine tmp2 not tmp1>not_in_1
+
+rm tmp1
+rm tmp2

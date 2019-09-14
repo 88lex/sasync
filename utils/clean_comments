@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
-
 # This script will remove all comments from a file.
 # Syntax is ./clean_comments filename
 # Original is copied to filename.bak then replaced with a clean file
 
 cp $1 $1.bak
 sed -E 's@[[:blank:]]*(//|#).*@@;T;/./!d' $1.bak>$1
-echo -e "$1 has been cleaned\n Backup of original $1.bak created"
+echo -e "$1 has been cleaned\n Backup of original $1.bak created. Done"
