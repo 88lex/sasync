@@ -1,13 +1,7 @@
 #!/usr/bin/env bash
 [ "$1"="-c" ]&&{ CFILE=$2;shift 2; }
 set_file=$1;shift;cmd_flags=$@
-. msg start
-sleep 2s
-. ${CFILE:-sasync.conf}
-sleep 2s
-. sainit
-
-sleep 5s
+. msg start;. ${CFILE:-sasync.conf};. sainit
 
 next_json () {
   COUNT=$(<$JSCOUNT);echo $(( $COUNT>=$MAXJS?$MINJS:$COUNT+1 ))>$JSCOUNT
