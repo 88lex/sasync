@@ -1,12 +1,18 @@
 #!/usr/bin/env bash
 [ "$1"="-c" ]&&{ CFILE=$2;shift 2; }
 set_file=$1;shift;cmd_flags=$@
-. msg start;. ${CFILE:-sasync.conf}
+. msg start
+sleep 2s
+. ${CFILE:-sasync.conf}
+sleep 2s
+. sainit
+
+sleep 5s
 
 next_json () {
-  COUNT=$(<$JSON_COUNT);echo $(( $COUNT>=$MAX_JSON?$MIN_JSON:$COUNT+1 ))>$JSON_COUNT
-  [ $SRC_SAS = "true" ]&&export "RCLONE_CONFIG_"$SRC1"_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$COUNT.json
-  export "RCLONE_CONFIG_"$DEST1"_SERVICE_ACCOUNT_FILE="$JSON_DIR"/"$COUNT.json
+  COUNT=$(<$JSCOUNT);echo $(( $COUNT>=$MAXJS?$MINJS:$COUNT+1 ))>$JSCOUNT
+  [ $SRC_SAS = "true" ]&&export "RCLONE_CONFIG_"$SRC1"_SERVICE_ACCOUNT_FILE="$JSDIR"/"$COUNT.json
+  export "RCLONE_CONFIG_"$DEST1"_SERVICE_ACCOUNT_FILE="$JSDIR"/"$COUNT.json
 }
 
 run_rclone_w_flags () {
@@ -15,10 +21,10 @@ run_rclone_w_flags () {
 }
 
 run_pairs () {
-  while IFS=' ' read -r sync src dest maxt set_flags;do 
-    . rc_check;EXCODE=8
+  while IFS=' ' read -r sync src dest maxt set_flags;do
+    . rccheck;EXCODE=8
     while [[ "$EXCODE" =~ ^(7|8)$ ]] && (($SAs));do ((SAs--));run_rclone_w_flags;done
-    . msg fin_sync;. clean_tds
+    . msg fin_sync;. cleantds
   done <<<"$set_clean" > >(tee "$STD_LOG") 2> >(tee "$ERR_LOG" >&2)
   }
 

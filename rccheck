@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-
 # Setting temp variables
-COUNT=$(<$JSON_COUNT);EXCODE=8;SRC_SAS="true";maxt1="--max-transfer $maxt"
+COUNT=$(<$JSCOUNT);EXCODE=8;SRC_SAS="true";maxt1="--max-transfer $maxt"
 dest1="${dest%:*}";DEST1="${dest1^^}";DEST1="${DEST1//-/_}"
 src1="${src%:*}";SRC1="${src1^^}";SRC1="${SRC1//-/_}"
 
@@ -18,17 +17,17 @@ if [ ${CHECK_REMOTES,,} = "true" ];then . msg ck_rem
   if [ "$(rclone config show $dest1 | grep team_drive | wc -m)" -gt 15 ]
     then . msg ok_td $dest1;else . msg not_td $dest1;fi
 
-  if rclone lsd $dest --drive-service-account-file="$JSON_DIR/$COUNT.json" &>/dev/null
-    then . msg ok_sa $dest;else . msg no_sa $dest;fi
-
-  if rclone lsd $src --drive-service-account-file="$JSON_DIR/$COUNT.json" &>/dev/null
+  if rclone lsd $src --drive-service-account-file="$JSDIR/$COUNT.json" &>/dev/null
     then . msg ok_sa $src;else . msg no_sa $src;SRC_SAS="false";fi
+
+  if rclone lsd $dest --drive-service-account-file="$JSDIR/$COUNT.json" &>/dev/null
+    then . msg ok_sa $dest;else . msg no_sa $dest;fi
 fi
 
-if [ ${PRE_CLEAN_TDS,,} = "true" ];then source clean_tds;fi
+if [ ${PRE_CLEAN_TDS,,} = "true" ];then . cleantds;fi
 
-SAs=$MAX_JSON;if [ ${CALC_SIZE,,} = "true" ]
-  then source sacalc && [ $srcsize == $destsize ] && . msg skip2next && continue;fi
+SAs=$MAXJS;if [ ${CALC_SIZE,,} = "true" ]
+  then . sacalc && [ $srcsize == $destsize ] && . msg skip2next && continue;fi
 
 [ ${FILE_COMPARE,,} = "true" ] && { echo -e "\nComparing files in $src and $dest\n"
   if rclone check $src $dest --one-way --fast-list &> >(grep '0 differences')

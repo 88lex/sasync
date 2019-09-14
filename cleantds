@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# cleantds dedupes identical files and permanently deletes trash
+
+cleanup () {
+  . msg dedupe $1
+  rclone dedupe skip $1 -v --drive-use-trash=false --no-traverse --tpslimit=5
+  . msg perm_del $1
+  rclone delete $2: -vv --drive-trashed-only --drive-use-trash=false --tpslimit=5
+  rclone rmdirs $1 -v --drive-use-trash=false --fast-list --tpslimit=5 --leave-root ; }
+
+${CLEAN_DEST,,} && cleanup $dest $dest1
+
+${CLEAN_SRC,,} = true && cleanup $src $src1

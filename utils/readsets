@@ -3,12 +3,12 @@
 # Syntax is ./readsets set.videos <= substituting your set file name/location
 echo;echo CHECKING IF YOUR SETS CAN BE READ CORRECTLY BY SASYNC;echo
 
-# if your sets are in another directory, change SET_DIR
-SET_DIR=/opt/sasync/sasets
+# if your sets are in another directory, change SETDIR
+SETDIR=/opt/sasync/sasets
 
 process_sets () {
-  for set_file in $@; do echo;echo Set file is $SET_DIR/$set_file
-    column -t $SET_DIR/$set_file|tee /dev/tty|sed '/^\s*#.*$/d'|\
+  for set_file in $@; do echo;echo Set file is $SETDIR/$set_file
+    column -t $SETDIR/$set_file|tee /dev/tty|sed '/^\s*#.*$/d'|\
     while IFS=' ' read -r sync src dest maxtrans set_flags;do
     echo READ: $sync $src $dest $maxtrans $set_flags
     done
