@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # sacalc calculates source and destination size
-
 . msg ck_size
 srcsize=`rclone size $src --json | cut -d ":" -f3 | cut -d "}" -f1`
 srcsizeGB=$(( $srcsize/1024**3 ))
@@ -9,5 +8,5 @@ destsizeGB=$(( $destsize/1024**3 ))
 srcdestdiff=$(( $srcsize-$destsize ))
 srcdestdiffGB=$(( $srcdestdiff/1024**3 ))
 MAXT=${maxt::-1}
-SAs=$(( ($MAXT+${srcdestdiffGB#-}-1)/$MAXT ))
+SAs=$(( ($MAXT+${srcdestdiffGB#-})/$MAXT ))
 . msg diff_size
