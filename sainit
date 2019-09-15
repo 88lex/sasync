@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
-
 # Initialize vars and folders. DO NOT CHANGE
+if [ ${ADD_SASYNC_TO_PATH,,} = "true"];then
+[[ ":$PATH:" != *":sasync:"* ]] && PATH="$SASDIR:$SETDIR:${PATH}";fi
 
-#[[ ":$PATH:" != *":/path/to/add:"* ]] && PATH="/path/to/add:${PATH}"
-[[ ":$PATH:" != *":sasync:"* ]] && PATH="$SASDIR:$SETDIR:${PATH}"
-
+#  set_clean=$(column -t -s '\,' $SETDIR/$set_file | grep -o '^[^#]*' | tee /dev/tty)
 #  set_clean=$(column -t -s '\,' $SETDIR/$set_file | sed '/^\s*#.*$/d' | tee /dev/tty)
   set_clean=$(column -t -s '\,' $SETDIR/$set_file | sed '/^\s*#.*$/d;s/\r//g' | tee /dev/tty)
 
-#  set_clean=$(column -t -s '\,' $SETDIR/$set_file | grep -o '^[^#]*' | tee /dev/tty)
   [ $EXIT_ON_BAD_PAIR = true ] && CON_EX="exit" || CON_EX="continue"
 
   STD_LOG="$SASDIR/logs/stdout_$set_file.log"
