@@ -14,7 +14,7 @@ case ${1,,} in
     echo -e "\nRCLONE REMOTE CHECK COMPLETED FOR $src and $dest" ;;
 
   rc_bad)
-    echo -e "***\nFAILURE: CHECK the rclone config for remote=$2\n***"|tee -a $FAIL_LOG ;;
+    echo -e "***\nFAILURE: CHECK the rclone config for remote = $2\n***"|tee -a $FAIL_LOG ;;
 
   ok_td)
     echo -e "SUCCESS-TD: REMOTE $2 is a TEAM DRIVE" ;;
