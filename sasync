@@ -15,7 +15,8 @@ run_rclone_w_flags () {
 }
 
 run_pairs () {
-  while IFS=' ' read -r sync src dest maxt set_flags;do
+#  while IFS=' ' read -r sync src dest maxt set_flags;do
+  while IFS=$' \t\n\r' read -r sync src dest maxt set_flags;do
     . rccheck;EXCODE=8
     while [[ "$EXCODE" =~ ^(7|8)$ ]] && (($SAs));do ((SAs--));run_rclone_w_flags;done
     . msg fin_sync;. cleantds
