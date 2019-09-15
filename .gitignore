@@ -3,6 +3,7 @@
 **/sa
 **/config_backup
 **/old-files
+**/**bak
 **/test
 **/.vscode
 .vscode/settings.json
