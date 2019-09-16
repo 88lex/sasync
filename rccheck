@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Setting temp variables
-COUNT=$(<$JSCOUNT);EXCODE=8;SRC_SAS="true";maxt1="--max-transfer $maxt"
+COUNT=$(<$JSCOUNT);EXCODE=8;SRC_SAS="true";
+
 dest1="${dest%:*}";DEST1="${dest1^^}";DEST1="${DEST1//-/_}"
 src1="${src%:*}";SRC1="${src1^^}";SRC1="${SRC1//-/_}"
 
@@ -26,11 +27,12 @@ fi
 
 if [ ${PRE_CLEAN_TDS,,} = "true" ];then . cleantds;fi
 
-SAs=$MAXJS;if [ ${CALC_SIZE,,} = "true" ]
+SAs=$MAXJS
+if [ ${CALC_SIZE,,} = "true" ]
   then . sacalc && [ $srcsize == $destsize ] && . msg skip2next && continue;fi
 
 [ ${FILE_COMPARE,,} = "true" ] && { echo -e "\nComparing files in $src and $dest\n"
-  if rclone check $src $dest --one-way --fast-list &> >(grep '0 differences')
+if rclone check $src $dest --one-way --fast-list &> >(grep '0 differences')
   then . msg skip2next;continue;fi; }
 
 . msg ck_fin

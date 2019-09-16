@@ -51,7 +51,7 @@ case ${1,,} in
 
   run_rc)
     echo -e "\nBEGIN $sync of $src to $dest w $COUNT/$MAXJS.json from $set_file\n"
-    echo -e "FLAGS=$FLAGS\nset_flags=$set_flags\nTIMEOUT=$TIMEOUT\n";sleep 0.3s ;;
+    echo -e "FLAGS=$FLAGS\nset_flags=$set_flags\nTIMEOUT=$TMOUT\n";sleep 0.3s ;;
 
   fin_sync)
     echo -e "\nFINISHED $sync FROM $src TO $dest" ;;

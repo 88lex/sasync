@@ -1,27 +1,26 @@
 #!/usr/bin/env bash
-[ "$1"="-c" ]&&{ CFILE=$2;shift 2; }
+[ "$1" = "-c" ] && { CFILE=$2;shift 2; }
 set_file=$1;shift;cmd_flags=$@
-. msg start;. ${CFILE:-sasync.conf};. sainit
+. msg start;. "${CFILE:-sasync.conf}";. sainit
 
-next_json () {
+next_sa () {
   COUNT=$(<$JSCOUNT);echo $(( $COUNT>=$MAXJS?$MINJS:$COUNT+1 ))>$JSCOUNT
-  [ $SRC_SAS = "true" ]&&export "RCLONE_CONFIG_"$SRC1"_SERVICE_ACCOUNT_FILE="$JSDIR"/"$COUNT.json
+  [ $SRC_SAS = "true" ] &&
+  export "RCLONE_CONFIG_"$SRC1"_SERVICE_ACCOUNT_FILE="$JSDIR"/"$COUNT.json
   export "RCLONE_CONFIG_"$DEST1"_SERVICE_ACCOUNT_FILE="$JSDIR"/"$COUNT.json
+  flags="$FLAGS $set_flags --max-transfer $maxt $cmd_flags"
 }
 
 run_rclone_w_flags () {
-  next_json;. msg run_rc;set -x
-  $TMOUT rclone $sync $src $dest $FLAGS $set_flags $maxt1 $cmd_flags;EXCODE=$?;set +x
+  next_sa;. msg run_rc
+  set -x;$TMOUT rclone $sync $src $dest $flags;EXCODE=$?;set +x
 }
 
 run_pairs () {
-#  while IFS=' ' read -r sync src dest maxt set_flags;do
-  while IFS=$' \t\n\r' read -r sync src dest maxt set_flags;do
-    . rccheck;EXCODE=8
+  while IFS=$' \t\n\r' read -r sync src dest maxt set_flags;do . rccheck;EXCODE=8
     while [[ "$EXCODE" =~ ^(7|8)$ ]] && (($SAs));do ((SAs--));run_rclone_w_flags;done
     . msg fin_sync;. cleantds
   done <<<"$set_clean" > >(tee "$STD_LOG") 2> >(tee "$ERR_LOG" >&2)
   }
 
-run_pairs $@
-. msg complete
+run_pairs && . msg complete
