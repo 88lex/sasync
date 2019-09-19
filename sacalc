@@ -5,8 +5,10 @@ srcsize=`rclone size $src --json | cut -d ":" -f3 | cut -d "}" -f1`
 srcsizeGB=$(( $srcsize/1024**3 ))
 destsize=`rclone size $dest --json | cut -d ":" -f3 | cut -d "}" -f1`
 destsizeGB=$(( $destsize/1024**3 ))
-srcdestdiff=$(( $srcsize-$destsize ))
-srcdestdiffGB=$(( $srcdestdiff/1024**3 ))
+diff=$(( $srcsize-$destsize ))
+diffGB=$(( $diff/1024**3 ))
+LIM=${SRC_LIMIT:-$diffGB}
+LIM=$((diffGB>LIM?LIM:diffGB))
 MAXT=${maxt::-1}
-SAs=$(( ($MAXT+${srcdestdiffGB#-})/$MAXT ))
+SAs=$(( ($MAXT+${LIM#-})/$MAXT ))
 . msg diff_size

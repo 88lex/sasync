@@ -38,10 +38,12 @@ case ${1,,} in
     echo -e "\nCHECKING SIZE of $src and $dest BE PATIENT" ;;
 
   diff_size)
-    echo -e "$srcsizeGB GB = $srcsize bytes = SIZE of SOURCE $src"
-    echo -e "$destsizeGB GB = $destsize bytes = SIZE of DEST $dest"
-    echo -e "DIFF is $srcdestdiffGB GB = $srcdestdiff bytes"
-    echo -e "EST NUM OF SAs is $SAs with Max Transfer = $maxt\n" ;;
+    echo "SIZE is $srcsizeGB GB in SOURCE $src  ( $srcsize bytes )"
+    echo "SIZE is $destsizeGB GB in DEST $dest  ( $destsize bytes )"
+    echo "DIFF is $diffGB GB  ( $diff bytes )"
+    [[ $SRC_LIMIT ]] && echo -e "DAILY SRC transfer limit is $SRC_LIMIT GB"
+    [[ $diff != 0 ]] && echo -e "EST NUM OF SAs is $SAs \nMax Transfer per SA is $maxt"
+    : ;;
 
   dedupe)
     echo -e "STARTING DEDUPE of identical files from $2\n" ;;

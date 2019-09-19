@@ -9,3 +9,4 @@
 .vscode/settings.json
 sasyn*.conf
 json.count
+sasync[0-9]
