@@ -1,9 +1,10 @@
-### **SASYNC 2.3**
+## **SASYNC 2.3**
 
->Uses rclone and Google Service Accounts (SAs) to sync, copy or move files between rclone remotes.
-<br>Usage: &emsp; `./sasync set.file ` &emsp; &emsp; [[enable execution with `chmod +x sasync`]]
+**>Uses rclone and Google Service Accounts (SAs) to sync, copy or move files between rclone remotes.
+<br>Usage: &emsp; `./sasync set.file ` &emsp; &emsp; [[enable execution with `chmod +x sasync`]]**
 
-How does it work?  `sasync` will run rclone copy or sync for each source-destination pair in your set file using a service accounts (SA) then move to the next SA until done.
+### **How does it work?**
+`sasync` will run rclone copy or sync for each source-destination pair in your set file using a service accounts (SA) then move to the next SA until done.
 
 <pre>
 # set.test
@@ -18,48 +19,6 @@ copy      teamdrive:photos   backup:photos   350G           --transfers=8
 - A source and destination remote folder
 - A breakpoint (--max-transfer) which tells sasync to move to the next SA
 - Any additional rclone flags which you would like to apply to individual source/destination pairs
-
-Features
-- Add `-c file.conf` before the set file to use a different config file
-- Add rcloneflag(s) to the command line after the set file.
-- Add flags in the command line which will apply to all sets
-- Use alternative config files with -c flag
-- Check if each source and destination remote exists in the rclone.conf file and if they are Team Drives (now called Shared Drives)
-- Check if each remote has read and service account permissions
-- Clean Source and Destination remotes of duplicates and trash. Can be done before and/or after the sync
-- Check if file count in Source and Destination are equal
-- If equal then skip to the next source-destination pair in the set file
-- Check if total file size in Source and Destination are equal
-- If equal then skip to the next source-destination pair in the set file
-- If not equal then estimate number of SA's required
-- Choose whether to EXIT or CONTINUE when there is a problem with any source-destination pair in a set file
-- The `sasync.conf` file is backed up daily to a `./backup` folder and kept for 14 days (default, adjustable)
-- The config file in the repo is called **`sasync.conf.default`** so you do not not overwrite an existing `sasync.config`
-- You can copy via `cp sasync.conf.default sasync.conf`. If you keep your existing `sasync.conf` check carefully not to omit new flags
-- The default `filter` file excludes some system files. Open and customize it to suit your own needs
-- Flexible unlimited rclone flags in the set files:  Add multiple rclone flags to each/all pairs in the set.* file. Flags in the set file will override flags in the config file
-- sasync intentionally does not create missing folders, as rclone could accidentally create and copy to a local folder = DANGEROUS**
-- Log files sasync creates two log files with each run. `stderr_set.name.log` and `stdout_set.name.log` and puts them in the `logs` folder
-- Set files go by default in a sub folder called `sasets`:  The new format requires changing the content of your set.* files if you were running an older version of sasync.  The new set file has 5 columns vs 7 in older versions
-- Skips same-size source-dest pairs:  Skips a sync pair if source and destination are exactly equal in size, then moves on to the next sync pair
-- You may consider creating your own private repo called `sasets` in github/lab/bucket that contains your personal set files
-Set files are easy to edit in github/gitlab and can be easily added to / updated to any machines running sasync
-- There are a number of small utilities in the `utils` folder. They do things like install sasync, update rclone, clean set files, remove all comments
-
-###  Destination requirements
-
-- Must be a Team Drive (TD) or local drive
-- Must work with Service Accounts (SA)
-- Must have read/write (RW) permission
-- If any of the above not true then you are better off using rclone sync/copy directly.
-
-###  Source requirements
-
-- Must have read permission
-- Best case if the source is a TD
-- Must have at least read permissions to SAs
-- If all of the above are true then SAs will rotate with both source and destination, and sync/copy limits can be higher. Each SA has a 750GB upload/inbound quota and a 10TB download/outbound quota
-- If Source does not have SA read access then you need to consider your outbound quotas (e.g. 10 TB for GDrive, ? for others)
 
 <br>
 
@@ -87,6 +46,59 @@ v2.3 CHANGES:
 - [REMOVED] SWEEPER. No longer needed
 
 - [REMOVED] SASYNC-DEST. sasync should now copy destination-only SA files correctly
+
+<br>
+
+###  Destination requirements
+
+- Must be a Team Drive (TD) or local drive
+- Must work with Service Accounts (SA)
+- Must have read/write (RW) permission
+- If any of the above not true then you are better off using rclone sync/copy directly.
+
+###  Source requirements
+
+- Must have read permission
+- Best case if the source is a TD
+- Must have at least read permissions to SAs
+- If all of the above are true then SAs will rotate with both source and destination, and sync/copy limits can be higher. Each SA has a 750GB upload/inbound quota and a 10TB download/outbound quota
+- If Source does not have SA read access then you need to consider your outbound quotas (e.g. 10 TB for GDrive, ? for others)
+
+<br>
+
+### Features
+
+- Add `-c file.conf` before the set file to use a different config file
+
+- Add rcloneflag(s) to the command line after the set file.
+
+- Check if each source and destination remote exists in the rclone.conf file and if they are Team Drives (now called Shared Drives)
+
+- Check if each remote has read and service account permissions
+
+- Clean Source and Destination remotes of duplicates and trash. Can be done before and/or after the sync
+
+- Check if file count in Source and Destination are equal
+
+  - If equal then skip to the next source-destination pair in the set file
+
+- Check if total file size in Source and Destination are equal
+
+  - If equal then skip to the next source-destination pair in the set file
+
+  - If not equal then estimate number of SA's required
+
+- Choose whether to EXIT or CONTINUE when there is a problem with any source-destination pair in a set file
+
+- The `sasync.conf` file is backed up daily to a `./backup` folder and kept for 14 days (default, adjustable)
+
+- The config file in the repo is called **`sasync.conf.default`** so you do not not overwrite an existing `sasync.config`
+
+- The default `filter` file excludes some system files. Open and customize it to suit your own needs
+
+- Flexible unlimited rclone flags in the set files:  Add multiple rclone flags to each/all pairs in the set.* file. Flags in the set file will override flags in the config file
+
+- Log files sasync creates two log files with each run. `stderr_set.name.log` and `stdout_set.name.log` and puts them in the `logs` folder
 
 <br>
 
@@ -252,7 +264,10 @@ FLAGS="
 - sasync will NOT create base folders. e.g. If you specify `remote:movies` in a set file, you must create the `movies` folder in `remote:` before syncing
   - Example set pair: `sync my_video:media/kids bak_video:media/kids` If /media exists but the `kids` folder does not then rclone does not create the `kids` folder
 
+- You may consider creating your own private repo called `sasets` in github/lab/bucket that contains your personal set files
+Set files are easy to edit in github/gitlab and can be easily added to / updated to any machines running sasync
 
+- There are a number of small utilities in the `utils` folder. They do things like install sasync, update rclone, clean set files, remove all comments
 
 - Versions of rclone from 1.48 require a new flag `--drive-server-side-across-configs` in order to do server-side sync/copy. This flag has been added to sasync as a default. If you are running an older version of rclone or wish to not execute server-side copies simply delete the flag from sasync.conf
 
@@ -260,7 +275,7 @@ FLAGS="
 
 <br>
 
-## **Files in the repo (incomplete)**
+## **Files in the repo**
 - **`sasync`** is the main script that pulls sync sets from 'set' files and runs rclone sync/copy/move.
 - **`sasync.conf.default`** contains major variables and rclone global flags.
 - **`rccheck`** checks rclone remote status
