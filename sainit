@@ -10,7 +10,7 @@ FAIL_LOG="$SASDIR/logs/fail_$set_file.log"
 
 [ ! -f $SASDIR/json.count ] && echo $MIN_JS >$SASDIR/json.count
 
-mkdir -p $SASDIR/config_backup $SASDIR/logs
-cp $SASDIR/sasync.conf "$SASDIR/config_backup/sasync.conf_$(date +%y%m%d)"
-find $SASDIR/config_backup/sasync.conf* -type f -mtime +14 -exec rm {} \;
+mkdir -p $SASDIR/backup $SASDIR/logs
+cp $SASDIR/sasync.conf "$SASDIR/backup/sasync.conf_$(date +%y%m%d)"
+find $SASDIR/backup/sasync.conf* -type f -mtime +14 -exec rm {} \;
 . msg conf_ok

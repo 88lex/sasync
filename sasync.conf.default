@@ -4,7 +4,7 @@ SASDIR="/opt/sasync"                  # Location of the sasync script
 SETDIR="$SASDIR/sasets"               # Location of your set files
 JSDIR="/opt/sa"                       # Location of DIR with SA .json files. No trailing slash
 MINJS=1                               # First json file number in your JSON directory (JSDIR)
-MAXJS=1200                            # CHANGE `MAXJS` TO THE MAX JSON FILE IN YOUR SET
+MAXJS=1200                            # SET `MAXJS` TO THE MAX JSON FILE IN YOUR SET
 JSCOUNT="$SASDIR/json.count"          # Location of json.count file (NOT the jsons themselves)
 FILTER="$SASDIR/filter"               # Location of your default filter file
 
