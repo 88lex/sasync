@@ -8,7 +8,7 @@ ERR_LOG="$SASDIR/logs/stderr_$set_file.log"
 FAIL_LOG="$SASDIR/logs/fail_$set_file.log"
 >"$FAIL_LOG"
 
-[ ! -f $SASDIR/json.count ] && echo $MIN_JS >$SASDIR/json.count
+[ ! -f $SASDIR/json.count ] && echo $MINJS >$SASDIR/json.count
 
 mkdir -p $SASDIR/backup $SASDIR/logs
 cp $SASDIR/sasync.conf "$SASDIR/backup/sasync.conf_$(date +%y%m%d)"
