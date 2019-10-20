@@ -3,9 +3,9 @@
 
 set_clean=$(column -t -s '\,' "$SETDIR/$set_file" | grep -o '^[^#]*' | column -t)
 echo -e "$set_clean"
-STD_LOG="$SASDIR/logs/stdout_$set_file.log"
-ERR_LOG="$SASDIR/logs/stderr_$set_file.log"
-FAIL_LOG="$SASDIR/logs/fail_$set_file.log"
+STD_LOG="$SASDIR/logs/stdout_$set_file_$(date +%y%m%d%H%M).log"
+ERR_LOG="$SASDIR/logs/stderr_$set_file_$(date +%y%m%d%H%M).log"
+FAIL_LOG="$SASDIR/logs/fail_$set_file_$(date +%y%m%d%H%M).log"
 >"$FAIL_LOG"
 
 [ ! -f $SASDIR/json.count ] && echo $MINJS >$SASDIR/json.count
