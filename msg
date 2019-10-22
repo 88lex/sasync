@@ -2,37 +2,58 @@
 
 case ${1,,} in
   start)
-    echo -e "\nSTARTING SASYNC v2.3 with $set_file\n" ;;
+    echo -e "\nSTARTING SASYNC v2.3 \nSET FILE= $set_file\n" ;;
 
   conf_ok)
     echo -e "\nSASYNC CONFIG AND INIT COMPLETED" ;;
 
   ck_rem)
-    echo -e "\nBEGIN CHECK OF RCLONE REMOTES FOR $src and $dest\n" ;;
+    echo -e "\nBEGIN CHECK OF RCLONE REMOTES FOR \nSOURCE = $src\nDEST =   $dest\n" ;;
 
   ck_fin)
     echo -e "\nRCLONE REMOTE CHECK COMPLETED FOR $src and $dest" ;;
 
+  ok_cfg)
+    echo -e "SUCCESS CONFIG   $2 EXISTS in rclone.conf file" ;;
+
   rc_bad)
-    echo -e "***\nFAILURE: CHECK the rclone config for remote = $2\n***"|tee -a $FAIL_LOG ;;
+    echo -e "***\nFAILURE REMOTE $2 CHECK RCLONE CONFIG\n***"|tee -a $FAIL_LOG ;;
 
   ok_td)
-    echo -e "SUCCESS-TD: REMOTE $2 is a TEAM DRIVE" ;;
+    echo -e "SUCCESS TD       $2 is a TEAM DRIVE" ;;
 
   not_td)
-    echo -e "FAILURE-TD: REMOTE $2 is NOT a TEAM DRIVE" ;;
+    echo -e "FAILURE TD       $2 is NOT a TEAM DRIVE" ;;
 
   ok_sa)
-    echo -e "SUCCESS-SA: REMOTE $2 works correctly with SAs." ;;
+    echo -e "SUCCESS SA       $2 works correctly with SAs." ;;
 
   no_sa)
-    echo -e "FAILURE-SA: CHECK $2 config and SA permissions in $set_file" ;;
+    echo -e "FAILURE SA       $2 config and SA permissions in $set_file" ;;
 
-  fail_rem)
-    echo -e "***\nFAILURE-REMOTE: CHECK PERMISSIONS and rclone config for $2 in $set_file"|tee -a $FAIL_LOG ;;
+  ok_read)
+    echo -e "SUCCESS READ     $2" ;;
+
+  fail_read)
+    echo -e "***\nFAILURE READ     $2 : CHECK PERMISSIONS and rclone config"|tee -a $FAIL_LOG ;;
+
+  ok_write)
+    echo -e "SUCCESS WRITE    $2" ;;
+
+  fail_write)
+    echo -e "FAILURE WRITE    $2" ;;
+
+  ok_del)
+    echo -e "SUCCESS DELETE   $2" ;;
+
+  fail_del)
+    echo -e "FAILURE DELETE   $2" ;;
 
   skip2next)
     echo -e "SKIPPING TO NEXT SRC-DEST PAIR. SOURCE $src = DEST $dest." ;;
+
+  file_cmp)
+    echo -e "\nComparing files in $src and $dest\n" ;;
 
   ck_size)
     echo -e "\nCHECKING SIZE of $src and $dest BE PATIENT" ;;

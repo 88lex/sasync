@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 [ "$EXIT_ON_BAD_PAIR" = true ] && CON_EX="exit" || CON_EX="continue"
 
-set_clean=$(column -t -s '\,' "$SETDIR/$set_file" | grep -o '^[^#]*' | column -t)
-echo -e "$set_clean"
+set_clean=$(grep -o '^[^#]*' "$SETDIR/$set_file" | tr '\t' ' '|awk -v OFS='|' -F '[ ][ ]+' '{print $1,$2,$3,$4,$5 }')
+echo -e "$set_clean" | column -t -s '|'
+
+#set_clean=$(column -t -s '\,' "$SETDIR/$set_file" | grep -o '^[^#]*' | column -t)
+
 STD_LOG="$SASDIR"/logs/stdout_"$set_file"_$(date +%y%m%d%H%M).log
 ERR_LOG="$SASDIR"/logs/stderr_"$set_file"_$(date +%y%m%d%H%M).log
 FAIL_LOG="$SASDIR"/logs/fail_"$set_file"_$(date +%y%m%d%H%M).log
-#>"$FAIL_LOG"
 
 [ ! -f $SASDIR/json.count ] && echo $MINJS >$SASDIR/json.count
 

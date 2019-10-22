@@ -1,28 +1,45 @@
 #!/usr/bin/env bash
 # Setting temp variables
 COUNT=$(<$JSCOUNT);EXCODE=8;SRC_SAS="true";
-
-dest1="${dest%:*}";DEST1="${dest1^^}";DEST1="${DEST1//-/_}"
-src1="${src%:*}";SRC1="${src1^^}";SRC1="${SRC1//-/_}"
+dest1="${dest//\"}"
+dest1="${dest1%:*}"
+DEST1="${dest1^^}"
+DEST1="${DEST1//-/_}"
+src1="${src//\"}"
+src1="${src1%:*}"
+SRC1="${src1^^}"
+SRC1="${SRC1//-/_}"
 
 if [ ${CHECK_REMOTES,,} = "true" ];then . msg ck_rem
-  if ! rclone config show $src1 &>/dev/null;then . msg rc_bad $src;$CON_EX;fi
-  if ! rclone config show $dest1 &>/dev/null;then . msg rc_bad $dest;$CON_EX;fi
+  if rclone config show "$src1" &>/dev/null
+    then . msg ok_cfg "$src1";else . msg rc_bad "$src1";$CON_EX;fi
 
-  if ! rclone lsd $src &>/dev/null;then . msg fail_rem $src;$CON_EX;fi
-  if ! rclone lsd $dest &>/dev/null;then . msg fail_rem $dest;$CON_EX;fi
+  if rclone config show "$dest1" &>/dev/null
+    then . msg ok_cfg "$dest1";else . msg rc_bad "$dest1";$CON_EX;fi
 
-  if [ "$(rclone config show $src1 | grep team_drive | wc -m)" -gt 15 ]
-    then . msg ok_td $src1;else . msg not_td $src1;fi
+  if [ "$(rclone config show "$src1" | grep team_drive | wc -m)" -gt 15 ]
+    then . msg ok_td "$src1";else . msg not_td "$src1";fi
 
-  if [ "$(rclone config show $dest1 | grep team_drive | wc -m)" -gt 15 ]
-    then . msg ok_td $dest1;else . msg not_td $dest1;fi
+  if [ "$(rclone config show "$dest1" | grep team_drive | wc -m)" -gt 15 ]
+    then . msg ok_td "$dest1";else . msg not_td "$dest1";fi
 
-  if rclone lsd $src --drive-service-account-file="$JSDIR/$COUNT.json" &>/dev/null
-    then . msg ok_sa $src;else . msg no_sa $src;SRC_SAS="false";fi
+  if eval rclone lsd "$src" --drive-service-account-file="$JSDIR/$COUNT.json" &>/dev/null
+    then . msg ok_sa "$src";else . msg no_sa "$src";SRC_SAS="false";fi
 
-  if rclone lsd $dest --drive-service-account-file="$JSDIR/$COUNT.json" &>/dev/null
-    then . msg ok_sa $dest;else . msg no_sa $dest;fi
+  if eval rclone lsd "$dest" --drive-service-account-file="$JSDIR/$COUNT.json" &>/dev/null
+    then . msg ok_sa "$dest";else . msg no_sa "$dest";fi
+
+  if eval rclone lsd "$src" &>/dev/null
+    then . msg ok_read "$src";else . msg fail_read "$src";$CON_EX;fi
+
+  if eval rclone lsd "$dest" &>/dev/null
+    then . msg ok_read "$dest";else . msg fail_read "$dest";$CON_EX;fi
+
+  if rclone touch "$dest/sasync.bin" &>/dev.null
+    then . msg ok_write "$dest";else . msg fail_write "$dest";fi
+
+  if rclone deletefile --drive-use-trash=false -q "$dest"/sasync.bin &>/dev/null
+    then . msg ok_del "$dest";else . msg fail_del "$dest";fi
 fi
 
 if [ ${PRE_CLEAN_TDS,,} = "true" ];then . cleantds;fi
@@ -31,8 +48,8 @@ SAs=$MAXJS
 if [ ${CALC_SIZE,,} = "true" ]
   then . sacalc && [ $srcsize == $destsize ] && . msg skip2next && continue;fi
 
-[ ${FILE_COMPARE,,} = "true" ] && { echo -e "\nComparing files in $src and $dest\n"
-if rclone check $src $dest --one-way --fast-list &> >(grep '0 differences')
+[ ${FILE_COMPARE,,} = "true" ] && { . msg file_cmp
+if rclone check "$src" "$dest" --one-way --fast-list &> >(grep '0 differences')
   then . msg skip2next;continue;fi; }
 
 . msg ck_fin
