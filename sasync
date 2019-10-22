@@ -17,7 +17,7 @@ run_rclone_w_flags () {
 }
 
 run_pairs () {
-#  while IFS=$' \t\n\r' read -r sync src dest maxt set_flags;do
+#  while IFS=$' \t\n\r' read -r sync src dest maxt set_flags; do
   while IFS=$'|' read -r sync src dest maxt set_flags;do
     . rccheck
     EXCODE=8

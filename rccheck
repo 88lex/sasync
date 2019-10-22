@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Setting temp variables
-COUNT=$(<$JSCOUNT);EXCODE=8;SRC_SAS="true";
+COUNT=$(<$JSCOUNT);EXCODE=8;SRC_SAS="true"
 dest1="${dest//\"}"
 dest1="${dest1%:*}"
 DEST1="${dest1^^}"

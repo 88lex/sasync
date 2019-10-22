@@ -8,7 +8,7 @@ case ${1,,} in
     echo -e "\nSASYNC CONFIG AND INIT COMPLETED" ;;
 
   ck_rem)
-    echo -e "\nBEGIN CHECK OF RCLONE REMOTES FOR \nSOURCE = $src\nDEST =   $dest\n" ;;
+    echo -e "\nBEGIN CHECK OF RCLONE REMOTES \nSOURCE = $src\nDEST =   $dest\n" ;;
 
   ck_fin)
     echo -e "\nRCLONE REMOTE CHECK COMPLETED FOR $src and $dest" ;;

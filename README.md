@@ -152,6 +152,7 @@ CHECK_REMOTES=true
 CALC_SIZE=false
   - Checks the size of the source and destination folders in the current set pair, then calculates the difference
   - Using --maxtransfer from the set file, estimates the number of service accounts (SAs) required to copy/sync the difference
+  - The estimated number of SAs acts as an upper limit to the number that sasync will use before moving to the next pair in the set file
   - If source and destination size are identical then tells sasync to skip to the next pair in the set file
 
 FILE_COMPARE=false
