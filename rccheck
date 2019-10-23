@@ -35,7 +35,7 @@ if [ ${CHECK_REMOTES,,} = "true" ];then . msg ck_rem
   if eval rclone lsd "$dest" &>/dev/null
     then . msg ok_read "$dest";else . msg fail_read "$dest";$CON_EX;fi
 
-  if rclone touch "$dest/sasync.bin" &>/dev.null
+  if rclone touch "$dest/sasync.bin" &>/dev/null
     then . msg ok_write "$dest";else . msg fail_write "$dest";fi
 
   if rclone deletefile --drive-use-trash=false -q "$dest"/sasync.bin &>/dev/null

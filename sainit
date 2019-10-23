@@ -9,6 +9,7 @@ echo -e "$set_clean" | column -t -s '|'
 STD_LOG="$SASDIR"/logs/stdout_"$set_file"_$(date +%y%m%d%H%M).log
 ERR_LOG="$SASDIR"/logs/stderr_"$set_file"_$(date +%y%m%d%H%M).log
 FAIL_LOG="$SASDIR"/logs/fail_"$set_file"_$(date +%y%m%d%H%M).log
+>"$FAIL_LOG"
 
 [ ! -f $SASDIR/json.count ] && echo $MINJS >$SASDIR/json.count
 
