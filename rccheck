@@ -18,16 +18,16 @@ if [ ${CHECK_REMOTES,,} = "true" ];then . msg ck_rem
     then . msg ok_cfg "$dest1";else . msg rc_bad "$dest1";$CON_EX;fi
 
   if [ "$(rclone config show "$src1" | grep team_drive | wc -m)" -gt 15 ]
-    then . msg ok_td "$src1";else . msg not_td "$src1";fi
+    then . msg ok_td "$src1";else . msg not_td_src "$src1";fi
 
   if [ "$(rclone config show "$dest1" | grep team_drive | wc -m)" -gt 15 ]
-    then . msg ok_td "$dest1";else . msg not_td "$dest1";fi
+    then . msg ok_td "$dest1";else . msg not_td_dest "$dest1";$CON_EX;fi
 
   if eval rclone lsd "$src" --drive-service-account-file="$JSDIR/$COUNT.json" &>/dev/null
-    then . msg ok_sa "$src";else . msg no_sa "$src";SRC_SAS="false";fi
+    then . msg ok_sa "$src";else . msg no_sa_src "$src";SRC_SAS="false";fi
 
   if eval rclone lsd "$dest" --drive-service-account-file="$JSDIR/$COUNT.json" &>/dev/null
-    then . msg ok_sa "$dest";else . msg no_sa "$dest";fi
+    then . msg ok_sa "$dest";else . msg no_sa_dest "$dest";fi
 
   if eval rclone lsd "$src" &>/dev/null
     then . msg ok_read "$src";else . msg fail_read "$src";$CON_EX;fi

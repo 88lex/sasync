@@ -17,19 +17,28 @@ case ${1,,} in
     echo -e "SUCCESS CONFIG   $2 EXISTS in rclone.conf file" ;;
 
   rc_bad)
-    echo -e "***\nFAILURE REMOTE $2 CHECK RCLONE CONFIG\n***"|tee -a $FAIL_LOG ;;
+    echo -e "***\nFAILURE     $2 DOES NOT EXIST IN YOUR RCLONE CONFIG\n***"|tee -a $FAIL_LOG ;;
 
   ok_td)
     echo -e "SUCCESS TD       $2 is a TEAM DRIVE" ;;
 
-  not_td)
-    echo -e "FAILURE TD       $2 is NOT a TEAM DRIVE" ;;
+  not_td_src)
+    echo -e "SRC NOT TD       $2 is NOT a TEAM DRIVE\n***NON-FATAL BUT QUOTA FOR SOURCE $2 MAY BE LIMITED" ;;
+
+  not_td_dest)
+    echo -e "DEST NOT TD      $2 is NOT a TEAM DRIVE"
+    echo -e "***\nFATAL ERROR. CANNOT USE SAs/SASYNC IF DESTINATION IS NOT A TD\n***" ;;
 
   ok_sa)
     echo -e "SUCCESS SA       $2 works correctly with SAs." ;;
 
-  no_sa)
-    echo -e "FAILURE SA       $2 config and SA permissions in $set_file" ;;
+  no_sa_src)
+    echo -e "FAILURE SA       $2 config and SA permissions in $set_file"
+    echo -e "***NON-FATAL BUT QUOTA FOR SOURCE $2 MAY BE LIMITED"  ;;
+
+  no_sa_dest)
+    echo -e "FAILURE SA       $2 config and SA permissions in $set_file"
+    echo -e "***\nFATAL ERROR. CANNOT USE SAs/SASYNC IF DEST $2 DOES NOT HAVE SA PERMISSIONS\n***" ;;
 
   ok_read)
     echo -e "SUCCESS READ     $2" ;;
