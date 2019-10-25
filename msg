@@ -2,7 +2,7 @@
 
 case ${1,,} in
   start)
-    echo -e "\nSTARTING SASYNC v2.3 \nSET FILE= $set_file\n" ;;
+    echo -e "\nSTARTING SASYNC v2.5 \nSET FILE= $set_file\n" ;;
 
   conf_ok)
     echo -e "\nSASYNC CONFIG AND INIT COMPLETED" ;;

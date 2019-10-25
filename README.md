@@ -1,4 +1,4 @@
-## **SASYNC 2.3**
+## **SASYNC 2.5**
 
 **>Uses rclone and Google Service Accounts (SAs) to sync, copy or move files between rclone remotes.
 <br>Usage: &emsp; `./sasync set.file ` &emsp; &emsp; [[enable execution with `chmod +x sasync`]]**
@@ -23,6 +23,13 @@ copy      teamdrive:photos   backup:photos   350G           --transfers=8
 <br>
 
 ###  Changelog
+
+v2.5 TBD
+- [NEW] Optional backup of old files to separate directory, rather than deletion. Uses --backup-dir rclone flag
+
+- [NEW] Handles missing jsons, skips to next existing json
+
+- [IMPROVED] Better checking of remote configs, service accounts and read/write status of destination
 
 v2.3 CHANGES:
 - [NEW] rclone flag pass through in the command line ==> `sasync set1 --flag1 --flag2 --etc`
