@@ -67,7 +67,8 @@ v2.3 CHANGES:
 
 - Must have read permission
 - Best case if the source is a TD
-- Must have at least read permissions to SAs
+- If source is not a TD then you MUST use `CHECK_REMOTES=true` in the config file. Otherwise will not work
+- If source does not have SA read permissions then you MUST use `CHECK_REMOTES=true`
 - If all of the above are true then SAs will rotate with both source and destination, and sync/copy limits can be higher. Each SA has a 750GB upload/inbound quota and a 10TB download/outbound quota
 - If Source does not have SA read access then you need to consider your outbound quotas (e.g. 10 TB for GDrive, ? for others)
 

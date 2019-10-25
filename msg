@@ -30,8 +30,7 @@ case ${1,,} in
     echo -e "***\nFATAL ERROR. CANNOT USE SAs/SASYNC IF DESTINATION IS NOT A TD\n***" ;;
 
   ok_sa)
-    echo -e "SUCCESS SA       $2 works correctly with SAs."
-    SRC_SAS="true" ;;
+    echo -e "SUCCESS SA       $2 works correctly with SAs." ;;
 
   no_sa_src)
     echo -e "FAILURE SA       $2 config and SA permissions in $set_file"

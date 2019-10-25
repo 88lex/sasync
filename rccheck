@@ -2,8 +2,8 @@
 # Setting temp variables
 COUNT=$(<$JSCOUNT)
 EXCODE=8
-SRC_SAS="true"
 SAs=$MAXJS
+SRC_SAS="true"
 bak=""
 dest1="${dest//\"}"
 dest1="${dest1%:*}"
@@ -29,7 +29,7 @@ if [ ${CHECK_REMOTES,,} = "true" ];then . msg ck_rem
     then . msg ok_td "$dest1";else . msg not_td_dest "$dest1";$CON_EX;fi
 
   if eval rclone lsd "$src" --drive-service-account-file="$JSDIR/$COUNT.json" &>/dev/null
-    then . msg ok_sa "$src";else . msg no_sa_src "$src";SRC_SAS="false";fi
+    then . msg ok_sa "$src";else export SRC_SAS="false";. msg no_sa_src "$src";fi
 
   if eval rclone lsd "$dest" --drive-service-account-file="$JSDIR/$COUNT.json" &>/dev/null
     then . msg ok_sa "$dest";else . msg no_sa_dest "$dest";fi
