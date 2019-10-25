@@ -30,11 +30,13 @@ case ${1,,} in
     echo -e "***\nFATAL ERROR. CANNOT USE SAs/SASYNC IF DESTINATION IS NOT A TD\n***" ;;
 
   ok_sa)
-    echo -e "SUCCESS SA       $2 works correctly with SAs." ;;
+    echo -e "SUCCESS SA       $2 works correctly with SAs."
+    SRC_SAS="true" ;;
 
   no_sa_src)
     echo -e "FAILURE SA       $2 config and SA permissions in $set_file"
-    echo -e "***NON-FATAL BUT QUOTA FOR SOURCE $2 MAY BE LIMITED"  ;;
+    echo -e "***NON-FATAL BUT QUOTA FOR SOURCE $2 MAY BE LIMITED"
+    SRC_SAS="false" ;;
 
   no_sa_dest)
     echo -e "FAILURE SA       $2 config and SA permissions in $set_file"

@@ -5,25 +5,28 @@ set_file=$1;shift;cmd_flags=$@
 
 next_sa () {
   COUNT=$(<$JSCOUNT);echo $(( $COUNT>=$MAXJS?$MINJS:$COUNT+1 ))>$JSCOUNT
+  [ -f "$JSDIR"/"$COUNT".json ] || next_sa
   [ $SRC_SAS = "true" ] &&
   export "RCLONE_CONFIG_"$SRC1"_SERVICE_ACCOUNT_FILE="$JSDIR"/"$COUNT.json
   export "RCLONE_CONFIG_"$DEST1"_SERVICE_ACCOUNT_FILE="$JSDIR"/"$COUNT.json
-  flags="$FLAGS $set_flags --max-transfer $maxt $cmd_flags"
+  flags="$FLAGS $set_flags --max-transfer $maxt $cmd_flags $bak"
 }
 
 run_rclone_w_flags () {
-  next_sa;. msg run_rc
-  set -x;$TMOUT rclone $sync $src $dest $flags;EXCODE=$?;set +x
+  while [[ "$EXCODE" =~ ^(7|8)$ ]] && (($SAs));do
+    next_sa;. msg run_rc;((SAs--))
+    set -x;$TMOUT rclone $sync $src $dest $flags;EXCODE=$?;set +x
+  done
 }
 
 run_pairs () {
-#  while IFS=$' \t\n\r' read -r sync src dest maxt set_flags; do
+  #  while IFS=$' \t\n\r' read -r sync src dest maxt set_flags; do
   while IFS=$'|' read -r sync src dest maxt set_flags;do
     . rccheck
-    EXCODE=8
-    while [[ "$EXCODE" =~ ^(7|8)$ ]] && (($SAs));do ((SAs--));run_rclone_w_flags;done
-    . msg fin_sync;. cleantds
+    run_rclone_w_flags
+    . msg fin_sync
+    . cleantds
   done <<<"$set_clean" > >(tee "$STD_LOG") 2> >(tee "$ERR_LOG" >&2)
-  }
+}
 
 run_pairs && . msg complete

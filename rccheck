@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 # Setting temp variables
-COUNT=$(<$JSCOUNT);EXCODE=8;SRC_SAS="true"
+COUNT=$(<$JSCOUNT)
+EXCODE=8
+SRC_SAS="true"
+SAs=$MAXJS
+bak=""
 dest1="${dest//\"}"
 dest1="${dest1%:*}"
+destdir="${dest#*:}"
 DEST1="${dest1^^}"
 DEST1="${DEST1//-/_}"
 src1="${src//\"}"
@@ -44,7 +49,12 @@ fi
 
 if [ ${PRE_CLEAN_TDS,,} = "true" ];then . cleantds;fi
 
-SAs=$MAXJS
+if [ ${BAK_FILES,,} = "true" ];then
+  bak="$dest1:$BAK_DIR/$destdir"
+  rclone mkdir $bak
+  bak="--backup-dir $bak"
+fi
+
 if [ ${CALC_SIZE,,} = "true" ]
   then . sacalc && [ $srcsize == $destsize ] && . msg skip2next && continue;fi
 
