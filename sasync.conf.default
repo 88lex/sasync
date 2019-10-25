@@ -18,7 +18,7 @@ PRE_CLEAN_TDS=false               # Set to true to clean remotes fore running rc
 TMOUT=""                          # Syntax is TMOUT="timeout 30m". Use only if rclone hangs
 EXIT_ON_BAD_PAIR=false            # Exit (true) or continue (false) if set pair is bad
 SRC_LIMIT=                        # Daily limit in GB. Blank if none. To use, CALC_SIZE must be true
-BAK_FILES=true                    # (true/false)Send files to backup dir rather than delete them
+BAK_FILES=false                   # (true/false)Send files to backup dir rather than delete them
 BAK_DIR=backup                    # Backup files sent to destination/BAK_FILE_DIR
 
 # These flags are applied to all sets. Tweak them as you like
