@@ -1,4 +1,4 @@
-## **SASYNC 2.5**
+## **SASYNC 2.6**
 
 **>Uses rclone and Google Service Accounts (SAs) to sync, copy or move files between rclone remotes.
 <br>Usage: &emsp; `./sasync set.file ` &emsp; &emsp; [[enable execution with `chmod +x sasync`]]**
@@ -9,8 +9,8 @@
 <pre>
 # set.test
 #0action  1source            2destination    3maxtransfer   4rcloneflags
-sync      teamdrive:docs     backup:docs     350G
-copy      teamdrive:photos   backup:photos   350G           --transfers=8
+sync      teamdrive:docs     my_td:docs     350G
+copy      teamdrive:photos   my_td:photos   350G           --transfers=8
 #end-of-file
 </pre>
 
@@ -24,8 +24,13 @@ copy      teamdrive:photos   backup:photos   350G           --transfers=8
 
 ###  Changelog
 
-v2.5 TBD
-- [NEW] Optional backup of old files to separate directory, rather than deletion. Uses --backup-dir rclone flag
+v2.6
+- [NEW] Added an adjustable field separator for set files (called `IFS1`). Default `' ,|'` handles space, comma or | as a separator.
+  - If your remote name has a space then edit set file to use , or | as a field separator, then change `IFS`=',|'`.
+  - One method to change spaces to ',' in your set file is to run `sed -r 's/\s+/,/g' set.file > set.file.new` in a bash terminal.
+
+- [NEW] Optional backup of old files to separate directory, rather than deletion [default=false]. Uses --backup-dir rclone flag.
+  - If source is root of remote `:` then no backup is made. rclone does not allow backups from root level.
 
 - [NEW] Handles missing jsons, skips to next existing json
 
@@ -48,7 +53,7 @@ v2.3 CHANGES:
 - [NEW] SRC_LIMIT allows limiting a sasync copy to a fixed TB/GB for situations where you do not have SA access (thus using quota from a single account on source side)
   - Limit applies to EACH set pair. Be careful how you use it if you have multiple folders pulling from the same root source
 
-- [CHANGED] The /config_backup folder is changed to /backup to allow for other backups in future
+- [CHANGED] The sasync/config_backup folder is changed to sasync/backup to allow for other backups in future
 
 - [REMOVED] SWEEPER. No longer needed
 

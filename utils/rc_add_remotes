@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+SADIR=/opt/sa
+
+rclone_update () {
+  sed '/^\s*#.*$/d' $1|\
+  while read line;do set $line
+    let count+=1
+    rclone config update $1 type drive scope drive team_drive $2 service_account_file $SADIR/$count.json
+  done; }
+
+rclone_update $1

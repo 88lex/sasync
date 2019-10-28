@@ -3,11 +3,12 @@
 COUNT=$(<$JSCOUNT)
 EXCODE=8
 SAs=$MAXJS
-SRC_SAS="true"
-bak=""
+SRC_SAS=true
+DEST_SAS=true
+bak=
 dest1="${dest//\"}"
+destdir="${dest1#*:}"
 dest1="${dest1%:*}"
-destdir="${dest#*:}"
 DEST1="${dest1^^}"
 DEST1="${DEST1//-/_}"
 src1="${src//\"}"
@@ -26,13 +27,13 @@ if [ ${CHECK_REMOTES,,} = "true" ];then . msg ck_rem
     then . msg ok_td "$src1";else . msg not_td_src "$src1";fi
 
   if [ "$(rclone config show "$dest1" | grep team_drive | wc -m)" -gt 15 ]
-    then . msg ok_td "$dest1";else . msg not_td_dest "$dest1";$CON_EX;fi
+    then . msg ok_td "$dest1";else . msg not_td_dest "$dest1";fi
 
   if eval rclone lsd "$src" --drive-service-account-file="$JSDIR/$COUNT.json" &>/dev/null
-    then . msg ok_sa "$src";else export SRC_SAS="false";. msg no_sa_src "$src";fi
+    then . msg ok_sa "$src";else SRC_SAS="false";. msg no_sa_src "$src";fi
 
   if eval rclone lsd "$dest" --drive-service-account-file="$JSDIR/$COUNT.json" &>/dev/null
-    then . msg ok_sa "$dest";else . msg no_sa_dest "$dest";fi
+    then . msg ok_sa "$dest";else DEST_SAS="false";. msg no_sa_dest "$dest";fi
 
   if eval rclone lsd "$src" &>/dev/null
     then . msg ok_read "$src";else . msg fail_read "$src";$CON_EX;fi
@@ -41,18 +42,18 @@ if [ ${CHECK_REMOTES,,} = "true" ];then . msg ck_rem
     then . msg ok_read "$dest";else . msg fail_read "$dest";$CON_EX;fi
 
   if eval rclone touch "$dest/sasync.bin" &>/dev/null
-    then . msg ok_write "$dest";else . msg fail_write "$dest";fi
+    then . msg ok_write "$dest";else . msg fail_write "$dest";$CON_EX;fi
 
   if eval rclone deletefile --drive-use-trash=false -q "$dest"/sasync.bin &>/dev/null
-    then . msg ok_del "$dest";else . msg fail_del "$dest";fi
+    then . msg ok_del "$dest";else . msg fail_del "$dest";$CON_EX;fi
 fi
 
 if [ ${PRE_CLEAN_TDS,,} = "true" ];then . cleantds;fi
 
-if [ ${BAK_FILES,,} = "true" ];then
+if [ ${BAK_FILES,,} = "true" ] && [ ! -z $destdir ];then
   bak="$dest1:$BAK_DIR/$destdir"
-  rclone mkdir $bak
-  bak="--backup-dir $bak"
+  rclone mkdir "$dest1:$BAK_DIR/$destdir"
+  bak="--backup-dir "$bak
 fi
 
 if [ ${CALC_SIZE,,} = "true" ]

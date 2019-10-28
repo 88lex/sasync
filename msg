@@ -2,7 +2,7 @@
 
 case ${1,,} in
   start)
-    echo -e "\nSTARTING SASYNC v2.5 \nSET FILE= $set_file\n" ;;
+    echo -e "\nSTARTING SASYNC v2.6 \nSET FILE= $set_file\n" ;;
 
   conf_ok)
     echo -e "\nSASYNC CONFIG AND INIT COMPLETED" ;;
@@ -26,20 +26,18 @@ case ${1,,} in
     echo -e "SRC NOT TD       $2 is NOT a TEAM DRIVE\n***NON-FATAL BUT QUOTA FOR SOURCE $2 MAY BE LIMITED" ;;
 
   not_td_dest)
-    echo -e "DEST NOT TD      $2 is NOT a TEAM DRIVE"
-    echo -e "***\nFATAL ERROR. CANNOT USE SAs/SASYNC IF DESTINATION IS NOT A TD\n***" ;;
+    echo -e "DEST NOT TD      $2 is NOT a TEAM DRIVE \n***NON-FATAL BUT QUOTA FOR DEST $2 MAY BE LIMITED" ;;
 
   ok_sa)
     echo -e "SUCCESS SA       $2 works correctly with SAs." ;;
 
   no_sa_src)
     echo -e "FAILURE SA       $2 config and SA permissions in $set_file"
-    echo -e "***NON-FATAL BUT QUOTA FOR SOURCE $2 MAY BE LIMITED"
-    SRC_SAS="false" ;;
+    echo -e "***NON-FATAL BUT QUOTA FOR SOURCE $2 MAY BE LIMITED";SRC_SAS="false" ;;
 
   no_sa_dest)
     echo -e "FAILURE SA       $2 config and SA permissions in $set_file"
-    echo -e "***\nFATAL ERROR. CANNOT USE SAs/SASYNC IF DEST $2 DOES NOT HAVE SA PERMISSIONS\n***" ;;
+    echo -e "***NON-FATAL BUT QUOTA FOR DEST $2 MAY BE LIMITED";DEST_SAS="false" ;;
 
   ok_read)
     echo -e "SUCCESS READ     $2" ;;
@@ -84,7 +82,8 @@ case ${1,,} in
 
   run_rc)
     echo -e "\nBEGIN $sync of $src to $dest w $COUNT/$MAXJS.json from $set_file\n"
-    echo -e "FLAGS=$FLAGS\nset_flags=$set_flags\nTIMEOUT=$TMOUT\n";sleep 0.3s ;;
+    echo -e "FLAGS=$FLAGS\nset_flags=$set_flags\nTIMEOUT=$TMOUT\n"
+    echo -e "Max SAs to be used for this set = $SAs" ;;
 
   fin_sync)
     echo -e "\nFINISHED $sync FROM $src TO $dest" ;;
