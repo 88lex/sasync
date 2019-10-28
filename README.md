@@ -25,6 +25,17 @@ copy      teamdrive:photos   my_td:photos   350G           --transfers=8
 ###  Changelog
 
 v2.6
+- [NEW] sasync can now do sync/copy without SAs in source or destination.
+  - This is not the primary use-case, but if you want to
+include syncs to destinations where you do not have SA access or where SAs do not work (like My Drive) you can include that pair in
+your set file.
+  - NOTE: Without SAs the sync cannot exceed whatever quota your source or destination has.
+
+- [NEW] Added a couple of utilities in /utils folder. These are very similar to the rcgen.sh script that Max includes in his TD mount script.
+  - `rc_add_remotes remotes.test` will create/update rclone TD remotes using a text file (remotes.test which includes a list
+  of remote names and TD IDs.
+  - `rc_add_remotes1 remotes.test existingremote` will pull client_id, client_secret and the token from an existing remote.
+  - `rc_add_remote2 remotes.test` is interactive, and will let you choose if you want SAs, tokens or both.
 - [NEW] Added an adjustable field separator for set files (called `IFS1`). Default `' ,|'` handles space, comma or | as a separator.
   - If your remote name has a space then edit set file to use , or | as a field separator, then change `IFS`=',|'`.
   - One method to change spaces to ',' in your set file is to run `sed -r 's/\s+/,/g' set.file > set.file.new` in a bash terminal.
