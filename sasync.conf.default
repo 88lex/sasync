@@ -7,6 +7,7 @@ MINJS=1                           # First json file number in your JSON director
 MAXJS=1200                        # SET `MAXJS` TO THE MAX JSON FILE IN YOUR SET
 JSCOUNT="$SASDIR/json.count"      # Location of json.count file (NOT the jsons themselves)
 FILTER="$SASDIR/filter"           # Location of your default filter file
+IFS1=' ,|'                        # Field separator for set files. Use ',' or '|'
 
 # Flags to control which checks and what cleaning is done. All = false works in standard case
 CHECK_REMOTES=true                # Check if remotes are configured in rclone. Faster if set to false
