@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 [ "$1" = "-c" ] && { CFILE=$2;shift 2; }
-set_file=$1;shift;cmd_flags=$@
+set_file=$1;shift;cmd_flags=$@;. sasync.conf.default
 . msg start;. "${CFILE:-sasync.conf}";. sainit
 
 export_json () {
