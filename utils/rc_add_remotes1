@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+# run `rc_add_remotes remote.list` where remote.list is a text/csv file with
+# two columns that include `remote_name` and`teamdriveID`.
+# OR run `rc_add_remotes remote.list existing_remote_name`
+# `remote_name` is what you want to call your rclone remote, without a colon ':'
+# Copy `teamdriveID` from your browser url at root of teamdrive. Typically looks like `0APabc123def49PVA`
+#
+# Optionally, you could include `id`, `secret` and `token` in the set file if you like
+
 SETDIR=/opt/sasets
 SADIR=/opt/sa
 
@@ -16,7 +24,7 @@ rc_update () {
     [ "$4" ] && secret="client_secret $4"
     [ "$5" ] && token="token $5"
     let count+=1
-    rclone config update $1 type drive scope drive team_drive $2 service_account_file $SADIR/$count.json $id $secret $token
+    rclone config update "${1%:*}" type drive scope drive team_drive $2 service_account_file $SADIR/$count.json $id $secret $token
   done
 }
 

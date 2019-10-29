@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# run `rc_add_remotes remote.list` where remote.list is a text/csv file with two columns
+# that include `remote_name` and`teamdriveID`.
+# remote_name is what you want to call your rclone remote, without a colon ':'
+# teamdriveID can be copied from your browser url when at root of your teamdrive. Typically looks like `0APabc123def49PVA`
+
 SADIR=/opt/sa
 
 rclone_update () {

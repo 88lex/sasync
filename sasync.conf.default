@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Double check these flags point to your files/folders and that the json count is correct
+# Double check these flags point to your files/folders
 SASDIR="/opt/sasync"              # Location of the sasync script
 SETDIR="$SASDIR/sasets"           # Location of your set files
 JSDIR="/opt/sa"                   # Location of DIR with SA .json files. No trailing slash
@@ -7,7 +7,7 @@ MINJS=1                           # First json file number in your JSON director
 MAXJS=1200                        # SET `MAXJS` TO THE MAX JSON FILE IN YOUR SET
 JSCOUNT="$SASDIR/json.count"      # Location of json.count file (NOT the jsons themselves)
 FILTER="$SASDIR/filter"           # Location of your default filter file
-IFS1=' ,|'                        # Field separator for set files. Use ',' or '|'
+IFS1=' ,|'                        # Field separator for set files. Use ',' or '|' if you do not use space
 
 # Flags to control which checks and what cleaning is done. All = false works in standard case
 CHECK_REMOTES=true                # Check if remotes are configured in rclone. Faster if set to false
