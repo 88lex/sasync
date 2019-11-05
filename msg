@@ -39,6 +39,9 @@ case ${1,,} in
   ok_read)
     echo -e "SUCCESS READ     $2" ;;
 
+  ok_crypt)
+    echo -e "REMOTE ENCRYPTED $2" ;;
+
   fail_read)
     echo -e "***\nFAILURE READ     $2 : CHECK PERMISSIONS and rclone config\n"|tee -a $FAIL_LOG ;;
 

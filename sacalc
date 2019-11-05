@@ -11,11 +11,10 @@ destsizeGB=$(( $destsize/1024**3 ))
 diff=$(( $srcsize-$destsize ))
 diffGB=$(( $diff/1024**3 ))
 
-set -x
 SRC_LIMIT=${SRC_LIMIT%%[A-Za-z]*}
 LIM=${SRC_LIMIT:-$diffGB}
 LIM=$((diffGB>LIM?LIM:diffGB))
 MAXT=${maxt%%[A-Za-z]*}
 SAs=$(( ($MAXT+${LIM#-})/$MAXT ))
-set +x
+
 . msg diff_size

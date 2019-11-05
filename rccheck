@@ -4,6 +4,7 @@ COUNT=$(<$JSCOUNT)
 ret=8;SAs=$MAXJS;bak=
 SRC_SAS=true
 DEST_SAS=true
+CRYPT=false
 maxt_flag="--max-transfer=$maxt"
 SRC=`sed 's/-/_/g;s/./\U&/g' <<<${src%:*}`
 DEST=`sed 's/-/_/g;s/./\U&/g' <<<${dest%:*}`
@@ -21,6 +22,9 @@ if ${CHECK_REMOTES,,};then . msg ck_rem
 
     if `rclone lsd "${!rem}" &>/dev/null`
       then . msg ok_read "${!rem}";else . msg fail_read "${!rem}";$CON_EX;fi
+
+    if `rclone config show ${!rem%:*} | grep "type = crypt" &>/dev/null`
+      then CRYPT=true;. msg ok_crypt ${!rem%:*};fi
   done
 
   if rclone touch "$dest/sasync.bin" &>/dev/null

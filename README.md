@@ -43,6 +43,7 @@ sync,teamdrive:docs,my_td:docs,350G,--max-age=3d
   - `csu` = cd /opt/sasync/utils
   - `sas` = will run sasync. So `sas set.bak` rather than `./sasync set.bak`
   - `c..` = cd ..
+  - `t0`  = tmux a -t 0
 
 - [NEW] Trying to accommodate set files with various formats. At the moment you should be able to separate your fields with
 spaces, tabs, commas[,] or vertical bars[|].
