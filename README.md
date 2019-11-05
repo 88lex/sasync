@@ -37,6 +37,13 @@ sync,teamdrive:docs,my_td:docs,350G,--max-age=3d
 
 - [NEW] Added RW Read/Write check for destination when you enable rccheck [default=true]
 
+- [NEW] New script `add_aliases` which will add shortcuts to move around sasync folders easily.
+  - `csa` = cd /opt/sasync
+  - `cse` = cd /opt/sasync/sasets
+  - `csu` = cd /opt/sasync/utils
+  - `sas` = will run sasync. So `sas set.bak` rather than `./sasync set.bak`
+  - `c..` = cd ..
+
 - [NEW] Trying to accommodate set files with various formats. At the moment you should be able to separate your fields with
 spaces, tabs, commas[,] or vertical bars[|].
   - Use only one type of field separator. Do not mix separators in the same file - results may be unpredictable.
