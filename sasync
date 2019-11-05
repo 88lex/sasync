@@ -1,33 +1,30 @@
 #!/usr/bin/env bash
-[ "$1" = "-c" ] && { CFILE=$2;shift 2; }
-set_file=$1;shift;cmd_flags=$@;. sasync.conf.default
-. msg start;. "${CFILE:-sasync.conf}";. sainit
 
-export_json () {
-  export "RCLONE_CONFIG_"$1"_SERVICE_ACCOUNT_FILE="$JSDIR"/"$COUNT.json; }
+export_js ()
+{ export "RCLONE_CONFIG_"$1"_SERVICE_ACCOUNT_FILE="$JSDIR"/"$COUNT.json; }
 
-next_sa () {
-  COUNT=$(<$JSCOUNT);echo $(( $COUNT>=$MAXJS?$MINJS:$COUNT+1 ))>$JSCOUNT
+next_sa ()
+{ COUNT=$(<$JSCOUNT)
+  echo $(( $COUNT>=$MAXJS?$MINJS:$COUNT+1 ))>$JSCOUNT
   [ -f "$JSDIR"/"$COUNT".json ] || next_sa
-  [ $SRC_SAS = "true" ] && export_json "$SRC1"
-  [ $DEST_SAS = "true" ] && export_json "$DEST1" || SAs=1
-  flags="$FLAGS $set_flags --max-transfer $maxt $cmd_flags $bak"
-}
+  if $SRC_SAS && $DEST_SAS;then sa_flag="$dsaf=$JSDIR/$COUNT.json "
+    elif $SRC_SAS;then export_js "$SRC"
+    if $DEST_SAS;then export_js "$DEST";else SAs=1;fi
+  fi; ((SAs--)); }
 
-run_rclone_w_flags () {
-  while [[ "$EXCODE" =~ ^(6|7|8)$ ]] && (($SAs));do
-    next_sa;. msg run_rc;((SAs--))
-    set -x;$TMOUT rclone $sync "${src//\"}" "${dest//\"}" $flags;EXCODE=$?;set +x
-  done
-}
+run_rclone_w_flags ()
+{ while [[ $ret =~ ^(7|8)$ ]] && (($SAs));do . msg run_rc
+    next_sa
+    set -x;$TMOUT rclone $sync "$src" "$dest" $sa_flag $FLAGS\
+    $set_flags $maxt_flag $bak $cmd_flags;ret=$?;set +x;done; }
 
-run_pairs () {
-  while IFS=$IFS1 read -r sync src dest maxt set_flags;do
-    . rccheck
+run_pairs ()
+{ while IFS=$IFS1 read -r sync src dest maxt set_flags;do
+    . rccheck || continue
     run_rclone_w_flags
     . msg fin_sync
     . cleantds
-  done <<<"$set_clean" > >(tee "$STD_LOG") 2> >(tee "$ERR_LOG" >&2)
-}
+  done <<<"$set_clean" > >(tee "$STD_LOG") 2> >(tee "$ERR_LOG" >&2); }
 
+. sainit $@
 run_pairs && . msg complete

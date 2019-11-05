@@ -1,49 +1,46 @@
 #!/usr/bin/env bash
 
+VER=2.8
 case ${1,,} in
   start)
-    echo -e "\nSTARTING SASYNC v2.6 \nSET FILE= $set_file\n" ;;
+    echo -e "\nSTARTING SASYNC $VER \nSET FILE= $set_file\n" ;;
 
-  conf_ok)
-    echo -e "\nSASYNC CONFIG AND INIT COMPLETED" ;;
+  init_complete)
+    echo -e "\nSASYNC STARTUP CONFIG COMPLETED" ;;
 
   ck_rem)
-    echo -e "\nBEGIN CHECK OF RCLONE REMOTES \nSOURCE = $src\nDEST =   $dest\n" ;;
+    echo -e "\nBEGIN CHECK OF RCLONE REMOTES \nACTION = $sync\nSOURCE = $src\nDEST   = $dest" ;;
 
   ck_fin)
-    echo -e "\nRCLONE REMOTE CHECK COMPLETED FOR $src and $dest" ;;
+    echo -e "\nCHECK OF RCLONE REMOTES COMPLETED FOR $src and $dest" ;;
 
   ok_cfg)
+    echo -e "\nCHECKING         $2"
     echo -e "SUCCESS CONFIG   $2 EXISTS in rclone.conf file" ;;
 
   rc_bad)
-    echo -e "***\nFAILURE     $2 DOES NOT EXIST IN YOUR RCLONE CONFIG\n***"|tee -a $FAIL_LOG ;;
+    echo -e "\nCHECKING         $2"
+    echo -e "FAILURE          $2 DOES NOT EXIST IN YOUR RCLONE CONFIG"|tee -a $FAIL_LOG ;;
 
   ok_td)
     echo -e "SUCCESS TD       $2 is a TEAM DRIVE" ;;
 
-  not_td_src)
-    echo -e "SRC NOT TD       $2 is NOT a TEAM DRIVE\n***NON-FATAL BUT QUOTA FOR SOURCE $2 MAY BE LIMITED" ;;
-
-  not_td_dest)
-    echo -e "DEST NOT TD      $2 is NOT a TEAM DRIVE \n***NON-FATAL BUT QUOTA FOR DEST $2 MAY BE LIMITED" ;;
+  not_td)
+    echo -e "NOT A TD         $2 is NOT a TEAM DRIVE"
+    echo -e "                 NOT FATAL BUT QUOTA FOR $2 MAY BE LIMITED" ;;
 
   ok_sa)
     echo -e "SUCCESS SA       $2 works correctly with SAs." ;;
 
-  no_sa_src)
+  no_sa)
     echo -e "FAILURE SA       $2 config and SA permissions in $set_file"
-    echo -e "***NON-FATAL BUT QUOTA FOR SOURCE $2 MAY BE LIMITED";SRC_SAS="false" ;;
-
-  no_sa_dest)
-    echo -e "FAILURE SA       $2 config and SA permissions in $set_file"
-    echo -e "***NON-FATAL BUT QUOTA FOR DEST $2 MAY BE LIMITED";DEST_SAS="false" ;;
+    echo -e "                 NON-FATAL BUT QUOTA FOR $2 MAY BE LIMITED" ;;
 
   ok_read)
     echo -e "SUCCESS READ     $2" ;;
 
   fail_read)
-    echo -e "***\nFAILURE READ     $2 : CHECK PERMISSIONS and rclone config"|tee -a $FAIL_LOG ;;
+    echo -e "***\nFAILURE READ     $2 : CHECK PERMISSIONS and rclone config\n"|tee -a $FAIL_LOG ;;
 
   ok_write)
     echo -e "SUCCESS WRITE    $2" ;;
@@ -82,8 +79,8 @@ case ${1,,} in
 
   run_rc)
     echo -e "\nBEGIN $sync of $src to $dest w $COUNT/$MAXJS.json from $set_file\n"
-    echo -e "FLAGS=$FLAGS\nset_flags=$set_flags\nTIMEOUT=$TMOUT\n"
-    echo -e "Max SAs to be used for this set = $SAs" ;;
+    echo -e "FLAGS= $FLAGS\nset_flags= $set_flags\n\nTIMEOUT= $TMOUT\n"
+    echo -e "Max SAs for this set = $SAs ( = MAXJS if no size calculated )\n" ;;
 
   fin_sync)
     echo -e "\nFINISHED $sync FROM $src TO $dest" ;;
@@ -93,6 +90,6 @@ case ${1,,} in
     cat $FAIL_LOG ;;
 
   *)
-    echo !! MISSING MESSAGE Yo! You forgot to add a message for this command $0 $1 $2!! ;;
+    echo !! MISSING MESSAGE!! You forgot to add a message for this command $0 $1 $2!! ;;
 
 esac

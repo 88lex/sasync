@@ -1,18 +1,29 @@
-## **SASYNC 2.6**
+## **SASYNC 2.8**
 
 **>Uses rclone and Google Service Accounts (SAs) to sync, copy or move files between rclone remotes.
 <br>Usage: &emsp; `./sasync set.file ` &emsp; &emsp; [[enable execution with `chmod +x sasync`]]**
 
 ### **How does it work?**
-`sasync` will run rclone copy or sync for each source-destination pair in your set file using a service accounts (SA) then move to the next SA until done.
+`sasync` will run rclone copy or sync for each source-destination pair in your set file using a service account (SA) then move to the next SA until done.
 
+Sets must have an rclone action (sync, copy, move) , a source and destination and a maxtransfer value to work with sasync.
+- Fields in the set can be separated by spaces, tabs, commas `,` or a bar `|`. But each set can only use one of these.
+- If you have remote or folder names with spaces then you MUST use , or | as field separators. Otherwise sasync cannot differentiate.
+[[Avoid using commas or bars in remote/folder names. This can confuse sasync.]]
+- The sample set file has column labels for reference. They are entirely unnecessary for sasync to run.
 <pre>
-# set.test
-#0action  1source            2destination    3maxtransfer   4rcloneflags
-sync      teamdrive:docs     my_td:docs     350G
-copy      teamdrive:photos   my_td:photos   350G           --transfers=8
-#end-of-file
+#0action  1source            2destination   3maxtransfer   4rcloneflags
+sync      teamdrive:docs     my_td:docs     350G           --max-age=3d
 </pre>
+OR
+<pre>
+sync,teamdrive:docs,my_td:docs,350G,--max-age=3d
+</pre>
+OR
+<pre>
+sync,teamdrive:docs,my_td:docs,350G,--max-age=3d
+</pre>
+
 
 #### SASYNC reads from a **set file**. Each line in the set file describes
 - An action that rclone will execute (`sync`, `copy` or `move`)
@@ -22,23 +33,19 @@ copy      teamdrive:photos   my_td:photos   350G           --transfers=8
 
 <br>
 
-###  Changelog
+###  Changelog  V2.6 - 2.8
 
-v2.6
+- [NEW] Added RW Read/Write check for destination when you enable rccheck [default=true]
+
+- [NEW] Trying to accommodate set files with various formats. At the moment you should be able to separate your fields with
+spaces, tabs, commas[,] or vertical bars[|].
+  - Use only one type of field separator. Do not mix separators in the same file - results may be unpredictable.
+  - One method to change space separators to ',' in your set file is to run `sed -r 's/\s+/,/g' set.file > set.file.new` in a bash terminal.
+
 - [NEW] sasync can now do sync/copy without SAs in source or destination.
-  - This is not the primary use-case, but if you want to
-include syncs to destinations where you do not have SA access or where SAs do not work (like My Drive) you can include that pair in
-your set file.
-  - NOTE: Without SAs the sync cannot exceed whatever quota your source or destination has.
-
-- [NEW] Added a couple of utilities in /utils folder. These are very similar to the rcgen.sh script that Max includes in his TD mount script.
-  - `rc_add_remotes remotes.test` will create/update rclone TD remotes using a text file (remotes.test which includes a list
-  of remote names and TD IDs.
-  - `rc_add_remotes1 remotes.test existingremote` will pull client_id, client_secret and the token from an existing remote.
-  - `rc_add_remote2 remotes.test` is interactive, and will let you choose if you want SAs, tokens or both.
-- [NEW] Added an adjustable field separator for set files (called `IFS1`). Default `' ,|'` handles space, comma or | as a separator.
-  - If your remote name has a space then edit set file to use , or | as a field separator, then change `IFS`=',|'`.
-  - One method to change spaces to ',' in your set file is to run `sed -r 's/\s+/,/g' set.file > set.file.new` in a bash terminal.
+  - This is not the primary use-case, but if you want to include syncs to destinations where you do not have SA
+  access or where SAs do not work (like My Drive) you can include that pair in your set file.
+  - NOTE: Without SAs the sync cannot exceed whatever quota your single source or destination account has.
 
 - [NEW] Optional backup of old files to separate directory, rather than deletion [default=false]. Uses --backup-dir rclone flag.
   - If source is root of remote `:` then no backup is made. rclone does not allow backups from root level.
@@ -46,6 +53,14 @@ your set file.
 - [NEW] Handles missing jsons, skips to next existing json
 
 - [IMPROVED] Better checking of remote configs, service accounts and read/write status of destination
+
+- [UPDATED] sasync should work with encrypted remotes now, but only when both source and destination have service accounts/SAs. [You MUST turn rccheck and sacalc to `false` to allow encrypted sync to work with SAs.]
+
+- [NEW] Added a couple of utilities in /utils folder. These are very similar to the rcgen.sh script that Max includes in his TD mount script.
+  - `rc_add_remotes remotes.test` will create/update rclone TD remotes using a text file (remotes.test which includes a list
+  of remote names and TD IDs.
+  - `rc_add_remotes1 remotes.test existingremote` will pull client_id, client_secret and the token from an existing remote.
+  - `rc_add_remote2 remotes.test` is interactive, and will let you choose if you want SAs, tokens or both.
 
 v2.3 CHANGES:
 - [NEW] rclone flag pass through in the command line ==> `sasync set1 --flag1 --flag2 --etc`
@@ -74,10 +89,9 @@ v2.3 CHANGES:
 
 ###  Destination requirements
 
-- Must be a Team Drive (TD) or local drive
-- Must work with Service Accounts (SA)
-- Must have read/write (RW) permission
-- If any of the above not true then you are better off using rclone sync/copy directly.
+- Must be a Team Drive (TD) to work with Service Accounts (SA)
+- Must have read/write/delete (RWD) permissions on the destination
+- You can use `sasync` with destinations that do not have service accounts, but quotas may limit what you can copy/sync
 
 ###  Source requirements
 
@@ -272,6 +286,10 @@ FLAGS="
 <br>
 
 ###  Tips and Notes
+
+- sasync can be run with crontab or as a task in windows
+
+- sasync runs even faster if you use --max-age=1d or 1w. This is especially handy when running with crontab
 
 - sasync is designed to work with Google Drive as well as local drives as the source. It may work with other rclone remote types but has been tested mostly with gdrive.
 - When upgrading you can overwrite local files/changes by running

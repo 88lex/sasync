@@ -1,60 +1,39 @@
 #!/usr/bin/env bash
-# Setting temp variables
+# Setting variables
 COUNT=$(<$JSCOUNT)
-EXCODE=8
-SAs=$MAXJS
+ret=8;SAs=$MAXJS;bak=
 SRC_SAS=true
 DEST_SAS=true
-bak=
-dest1="${dest//\"}"
-destdir="${dest1#*:}"
-dest1="${dest1%:*}"
-DEST1="${dest1^^}"
-DEST1="${DEST1//-/_}"
-src1="${src//\"}"
-src1="${src1%:*}"
-SRC1="${src1^^}"
-SRC1="${SRC1//-/_}"
+maxt_flag="--max-transfer=$maxt"
+SRC=`sed 's/-/_/g;s/./\U&/g' <<<${src%:*}`
+DEST=`sed 's/-/_/g;s/./\U&/g' <<<${dest%:*}`
 
-if [ ${CHECK_REMOTES,,} = "true" ];then . msg ck_rem
-  if rclone config show "$src1" &>/dev/null
-    then . msg ok_cfg "$src1";else . msg rc_bad "$src1";$CON_EX;fi
+if ${CHECK_REMOTES,,};then . msg ck_rem
+  for rem in src dest;do
+    if `rclone config show ${!rem%:*} &>/dev/null`
+      then . msg ok_cfg ${!rem%:*};else . msg rc_bad ${!rem%:*};$CON_EX;fi
 
-  if rclone config show "$dest1" &>/dev/null
-    then . msg ok_cfg "$dest1";else . msg rc_bad "$dest1";$CON_EX;fi
+    if [ `rclone config show ${!rem%:*} | grep team_drive | wc -m` -gt 18 ]
+      then TD=true;. msg ok_td "${!rem%:*}";else TD=false;. msg not_td ${!rem%:*};fi
 
-  if [ "$(rclone config show "$src1" | grep team_drive | wc -m)" -gt 15 ]
-    then . msg ok_td "$src1";else . msg not_td_src "$src1";fi
+    if `rclone lsd "${!rem}" $dsaf="$JSDIR/$(<$JSCOUNT).json" &>/dev/null` && ${TD}
+      then . msg ok_sa "${!rem}";else declare "${rem^^}_SAS=false";. msg no_sa "${!rem}";fi
 
-  if [ "$(rclone config show "$dest1" | grep team_drive | wc -m)" -gt 15 ]
-    then . msg ok_td "$dest1";else . msg not_td_dest "$dest1";fi
+    if `rclone lsd "${!rem}" &>/dev/null`
+      then . msg ok_read "${!rem}";else . msg fail_read "${!rem}";$CON_EX;fi
+  done
 
-  if eval rclone lsd "$src" --drive-service-account-file="$JSDIR/$COUNT.json" &>/dev/null
-    then . msg ok_sa "$src";else SRC_SAS="false";. msg no_sa_src "$src";fi
-
-  if eval rclone lsd "$dest" --drive-service-account-file="$JSDIR/$COUNT.json" &>/dev/null
-    then . msg ok_sa "$dest";else DEST_SAS="false";. msg no_sa_dest "$dest";fi
-
-  if eval rclone lsd "$src" &>/dev/null
-    then . msg ok_read "$src";else . msg fail_read "$src";$CON_EX;fi
-
-  if eval rclone lsd "$dest" &>/dev/null
-    then . msg ok_read "$dest";else . msg fail_read "$dest";$CON_EX;fi
-
-  if eval rclone touch "$dest/sasync.bin" &>/dev/null
+  if rclone touch "$dest/sasync.bin" &>/dev/null
     then . msg ok_write "$dest";else . msg fail_write "$dest";$CON_EX;fi
 
-  if eval rclone deletefile --drive-use-trash=false -q "$dest"/sasync.bin &>/dev/null
+  if rclone deletefile --drive-use-trash=false -q "$dest"/sasync.bin &>/dev/null
     then . msg ok_del "$dest";else . msg fail_del "$dest";$CON_EX;fi
 fi
 
 if [ ${PRE_CLEAN_TDS,,} = "true" ];then . cleantds;fi
 
-if [ ${BAK_FILES,,} = "true" ] && [ ! -z $destdir ];then
-  bak="$dest1:$BAK_DIR/$destdir"
-  rclone mkdir "$dest1:$BAK_DIR/$destdir"
-  bak="--backup-dir "$bak
-fi
+if ${BAK_FILES,,} && [ ! -z "${dest#*:}" ];then
+  bak="--backup-dir="$(sed "s/:/:$BAK_DIR\//g"<<<$dest);else unset bak;fi
 
 if [ ${CALC_SIZE,,} = "true" ]
   then . sacalc && [ $srcsize == $destsize ] && . msg skip2next && continue;fi
