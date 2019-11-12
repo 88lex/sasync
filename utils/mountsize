@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# mountsize accepts a command line filter now.  e.g. `./mountsize tv` will check
+# only remotes that have `tv` in them
+# Set mounts manually using a list of some/all of your remotes in `mounts` below.
+# Or remove the hash in front of the readarray line and the script will cycle
+# through all remotes configured in rclone.
+
+> mount.sizes
+filter=$1
+
+: <<'END'
+mounts=(
+my_tv:
+my_movies:
+)
+END
+
+rclone listremotes | grep "$filter"
+readarray mounts < <( rclone listremotes | grep "$filter" )
+for i in ${mounts[@]}; do
+  echo; echo For $i | tee -a mount.sizes
+  rclone size $i --fast-list | tee -a mount.sizes
+done

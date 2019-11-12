@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
 
-curl https://rclone.org/install.sh | sudo bash -s beta
+# run as `rclone_update` to install rclone standard release.
+# run as `rclone_update beta` to install the beta release.
 
+curl https://rclone.org/install.sh | sudo bash -s $1
