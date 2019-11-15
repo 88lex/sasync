@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+<<<<<<< HEAD
 # Double check that these flags point to your files/folders
 SASDIR="/opt/sasync"              # Location of the sasync script
 SETDIR="$SASDIR/sasets"           # Location of your set files
@@ -8,6 +9,39 @@ MAXJS=1200                        # Hughest/max json file number in your JSON di
 JSCOUNT="$SASDIR/json.count"      # Location of json.count file (NOT the jsons themselves)
 FILTER="$SASDIR/filter"           # Location of your default filter file
 IFS1=' ,|'                        # Field separator for set file. Use ',' or '|' if you do not use space
+=======
+SASYNC_DIR=/opt/sasync
+SET_DIR=$SASYNC_DIR/sasets                 # Location of sasync set.* files
+JSON_DIR=/opt/sa                           # Location of DIR with service account .json files. No trailing slash
+JSON_COUNT=$SASYNC_DIR/json.count          # Location of json.count file
+MIN_JSON=1
+MAX_JSON=1200                              # CHANGE `MAX_JSON` TO THE MAX JSON FILE # IN JSON_DIR
+TIMEOUT=30m                                # Timeout bypasses rclone hangs. Set to 2h (2 hours) or 1d (1 day) if not needed
+TIMEOUT_SWEEP=90m                          # Allow longer timeout for sweeper. Disable move,copy is slower than server-side
+CLEAN_DEST=TRUE
+CLEAN_SRC=FALSE
+PRE_CLEAN_TDS=FALSE                        # If you want to clean the TDs before running rclone w SAs then change this to TRUE
+SWEEP=FALSE                                # To copy files that won't copy server-side set SWEEP=TRUE. Otherwise leave as FALSE
+FILTER="--filter-from="$SASYNC_DIR/filter
+DMC=""
+GLOBAL_FLAGS="
+    --tpslimit=5
+    --tpslimit-burst=50
+    --transfers=10
+    --fast-list
+    -vP
+    --size-only
+    --stats=5s
+    --max-backlog=2000000
+    --stats-file-name-length=128
+    --ignore-case
+    --drive-chunk-size=128M
+    --drive-use-trash=false
+    --drive-server-side-across-configs=true
+    "
+#   Please LEAVE SPACES AND QUOTATION MARKS ABOVE to allow rclone to interpret the flags
+#   Add or remove flags as needed. Flags in set files (if any) will override global flags
+>>>>>>> f8ff717c5fbc01f5743632f978a66b87eb3f476a
 
 # Flags to control which checks and what cleaning is done. All = false works in standard case
 CHECK_REMOTES=true                # Check if remotes are configured in rclone. Faster if set to false
