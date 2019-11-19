@@ -15,7 +15,7 @@ next_sa ()
 
 run_rclone_w_flags ()
 { while [[ $ret =~ ^(7|8)$ ]] && (($SAs));do . msg run_rc
-    next_sa
+    if [ $sync != "move" ];then next_sa;fi
     set -x;$TMOUT rclone $sync "$src" "$dest" $sa_flag $FLAGS\
     $set_flags $maxt_flag $bak $cmd_flags;ret=$?;set +x;done; }
 
