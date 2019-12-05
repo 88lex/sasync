@@ -38,7 +38,7 @@ sync,teamdrive:docs,my_td:docs,350G,--max-age=3d
 - [NEW] Added `-p n` option to run 'n' parallel instances of sasync. Usage: For 3 parallel instances `./sasync -p 3 set.file`
   - Requires tmux and parallel apps to be installed `sudo apt install parallel tmux`
   - Sends sasync to n tmux windows. App will provide a link to open tmux
-  - Can run a single instance of sasync in tmux with `./sasync -n 1 set.file`
+  - Can run a single instance of sasync in tmux with `./sasync -p 1 set.file`
   - When one set pair finishes next one auto loads
   - sasync works as usual without tmux or parallel when running `./sasync set.file`
 
