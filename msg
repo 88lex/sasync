@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VER=2.8
+VER=3.0
 case ${1,,} in
   start)
     echo -e "\nSTARTING SASYNC $VER \n" ;;

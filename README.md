@@ -1,4 +1,4 @@
-## **SASYNC 2.8**
+## **SASYNC 3.0**
 
 **>Uses rclone and Google Service Accounts (SAs) to sync, copy or move files between rclone remotes.
 <br>Usage: &emsp; `./sasync set.file ` &emsp; &emsp; [[enable execution with `chmod +x sasync`]]**
@@ -33,7 +33,29 @@ sync,teamdrive:docs,my_td:docs,350G,--max-age=3d
 
 <br>
 
-###  Changelog  V2.6 - 2.8
+###  Changelog  V3.0
+
+- [NEW] Added `-p n` option to run 'n' parallel instances of sasync. Usage: For 3 parallel instances `./sasync -p 3 set.file`
+  - Requires tmux and parallel apps to be installed
+  - Sends sasync to n tmux windows. App will provide a link to open tmux
+  - Can run a single instance of sasync in tmux with `./sasync -n 1 set.file`
+  - When one set pair finishes next one auto loads
+  - sasync works as usual without tmux or parallel when running `./sasync set.file`
+
+- [NEW-AGAIN] Added back ability to run with multiple set files
+  - `./sasync -p n set.file1 set.file2 set.file3`
+  - Will merge set files then run in n tmux windows
+  - When one set pair finishes next one auto loads
+  - Works without `-p` running in main terminal one set pair at a time
+
+- [UNCHANGED] sasync still supports custom config files as well as infinite rclone flags at the end, along with new -p options.
+  - `./sasync -c my.conf set.file1 --flag1--flag2 -v --dry-run`
+
+- [NEW] Allows making missing directories in the destination remote with MAKE_DESTDIR [Deault: false]
+  - Be careful with this option. If your remote does not exist it could create directories on your local disk
+
+
+###  Changelog  V2.8
 
 - [NEW] Added RW Read/Write check for destination when you enable rccheck [default=true]
 
