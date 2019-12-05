@@ -86,6 +86,9 @@ case ${1,,} in
   start_par)
       echo -e "Starting max $n parallel instances of tmux" ;;
 
+  fin_par)
+      echo -e "Finished parallel instances of tmux" ;;
+
   run_rc)
     echo -e "\nBEGIN $sync of $src to $dest w $COUNT/$MAXJS.json from $files\n"
     echo -e "FLAGS= $FLAGS\nset_flags= $set_flags\n\nTIMEOUT= $TMOUT\n"

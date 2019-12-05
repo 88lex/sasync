@@ -7,7 +7,7 @@ next_sa ()
 { COUNT=$(<$JSCOUNT)
   echo $(( $COUNT>=$MAXJS?$MINJS:$COUNT+1 ))>$JSCOUNT
   [ -f "$JSDIR"/"$COUNT".json ] || next_sa
-  if $SRC_SAS && $DEST_SAS && $CRYPT;then sa_flag="$dsaf=$JSDIR/$COUNT.json "
+  if $SRC_SAS && $DEST_SAS && $CRYPT;then sa_flag="$dsaf$COUNT.json "
   else
     if $SRC_SAS;then export_js "$SRC";fi
     if $DEST_SAS;then export_js "$DEST";else SAs=1;fi

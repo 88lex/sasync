@@ -54,6 +54,19 @@ sync,teamdrive:docs,my_td:docs,350G,--max-age=3d
 - [NEW] Allows making missing directories in the destination remote with MAKE_DESTDIR [Deault: false]
   - Be careful with this option. If your remote does not exist it could create directories on your local disk
 
+- [NEW] Changed remote check from `rclone lsd` to `rclone about`. Should make it much quicker
+
+- [NEW] Added `--drive-service-account-file` to READ/WRITE/DELETE checks. Should make check more reliable
+
+- [ADDED] Added `csl` to alias shortcuts to navigate to logs directory
+  - To access aliases run `cd /opt/sasync/utils;chmod +x add_aliases;./add_aliases`. Works on next boot
+  - sas='/opt/sasync/sasync'
+  - csa='cd /opt/sasync'
+  - cse='cd /opt/sasync/sasets'
+  - csl='cd /opt/sasync/logs'
+  - csu='cd /opt/sasync/utils'
+  - c..='cd ..'
+  - t0='tmux a -t 0'
 
 ###  Changelog  V2.8
 

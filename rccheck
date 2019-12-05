@@ -3,7 +3,8 @@
 COUNT=$(<$JSCOUNT)
 ret=8;SAs=$MAXJS;bak=
 if "$EXIT_ON_BAD_PAIR";then CON_EX="exit";else CON_EX="return 1";fi
-dsaf="--drive-service-account-file"
+dsaf="--drive-service-account-file=$JSDIR/"
+dsaf1="$dsaf$(<$JSCOUNT).json"
 
 SRC_SAS=true
 DEST_SAS=true
@@ -23,21 +24,30 @@ if ${CHECK_REMOTES,,};then . msg ck_rem
     if [ `rclone config show ${!rem%:*} | grep team_drive | wc -m` -gt 18 ]
       then TD=true;. msg ok_td "${!rem%:*}";else TD=false;. msg not_td ${!rem%:*};fi
 
-    if `rclone lsd "${!rem}" $dsaf="$JSDIR/$(<$JSCOUNT).json" &>/dev/null` && ${TD}
-      then . msg ok_sa "${!rem}";else declare "${rem^^}_SAS=false";. msg no_sa "${!rem}";fi
+    #if `rclone lsd "${!rem}" "$dsaf1" &>/dev/null` && ${TD}
+    #  then . msg ok_sa "${!rem}";else declare "${rem^^}_SAS=false";. msg no_sa "${!rem}";fi
 
-    if `rclone lsd "${!rem}" &>/dev/null`
+    #if `rclone lsd "${!rem}" &>/dev/null`
+    #  then . msg ok_read "${!rem}";else . msg fail_read "${!rem}";$CON_EX;fi
+
+    if `rclone about "${!rem}" "$dsaf1" &>/dev/null` && ${TD}
+      then oksa="true";. msg ok_sa "${!rem}";else declare "${rem^^}_SAS=false";. msg no_sa "${!rem}";fi
+
+    if [ $oksa == "true" ];then dsaff=$dsaf1;else unset dsaff;fi
+
+    if `rclone about "${!rem}" $dsaff &>/dev/null`
       then . msg ok_read "${!rem}";else . msg fail_read "${!rem}";$CON_EX;fi
 
     if `rclone config show ${!rem%:*} | grep "type = crypt" &>/dev/null`
       then CRYPT=true;. msg ok_crypt ${!rem%:*};fi
   done
 
-  if rclone touch "$dest/sasync.bin" &>/dev/null
+  if rclone touch "$dest/sasync.bin" $dsaff &>/dev/null
     then . msg ok_write "$dest";else . msg fail_write "$dest";$CON_EX;fi
+  sleep 3s
 
-  if rclone deletefile --drive-use-trash=false -q "$dest"/sasync.bin &>/dev/null
-    then . msg ok_del "$dest";else . msg fail_del "$dest";$CON_EX;fi
+  if rclone deletefile -q "$dest/sasync.bin" $dsaff &>/dev/null
+    then . msg ok_del "$dest";else . msg fail_del "$dest";fi
 fi
 
 if [ ${PRE_CLEAN_TDS,,} = "true" ];then . cleantds;fi
