@@ -21,12 +21,13 @@ EXIT_ON_BAD_PAIR=false            # Exit (true) or continue (false) if set pair 
 SRC_LIMIT=                        # Daily limit in GB. Blank if none. To use, CALC_SIZE must be true
 BAK_FILES=false                   # (true/false)Send files to backup dir rather than delete them
 BAK_DIR=backup                    # Backup files sent to destination/BAK_FILE_DIR
+MAKE_DESTDIR=false                # To make missing directories set to true.
 
 # These flags are applied to all sets. Tweak them as you like
 FLAGS="
   --fast-list
-  -vP
-  --stats=5s
+  -P
+  --stats=10s
   --max-backlog=2000000
   --ignore-case
   --no-update-modtime

@@ -2,6 +2,9 @@
 # Setting variables
 COUNT=$(<$JSCOUNT)
 ret=8;SAs=$MAXJS;bak=
+if "$EXIT_ON_BAD_PAIR";then CON_EX="exit";else CON_EX="return 1";fi
+dsaf="--drive-service-account-file"
+
 SRC_SAS=true
 DEST_SAS=true
 CRYPT=false
@@ -13,6 +16,9 @@ if ${CHECK_REMOTES,,};then . msg ck_rem
   for rem in src dest;do
     if `rclone config show ${!rem%:*} &>/dev/null`
       then . msg ok_cfg ${!rem%:*};else . msg rc_bad ${!rem%:*};$CON_EX;fi
+
+    if ${MAKE_DESTDIR} && [ "$rem" == "$dest" ];then
+      rclone mkdir $dest;fi
 
     if [ `rclone config show ${!rem%:*} | grep team_drive | wc -m` -gt 18 ]
       then TD=true;. msg ok_td "${!rem%:*}";else TD=false;. msg not_td ${!rem%:*};fi

@@ -3,7 +3,7 @@
 VER=2.8
 case ${1,,} in
   start)
-    echo -e "\nSTARTING SASYNC $VER \nSET FILE= $set_file\n" ;;
+    echo -e "\nSTARTING SASYNC $VER \n" ;;
 
   init_complete)
     echo -e "\nSASYNC STARTUP CONFIG COMPLETED" ;;
@@ -13,6 +13,9 @@ case ${1,,} in
 
   ck_fin)
     echo -e "\nCHECK OF RCLONE REMOTES COMPLETED FOR $src and $dest" ;;
+
+  bad_src)
+    echo -e "\nSOURCE REMOTE $SRC IS EMPTY OR PERMISSIONS ARE BAD. CHECK SOURCE CONFIG & SA PERMISSIONS" ;;
 
   ok_cfg)
     echo -e "\nCHECKING         $2"
@@ -33,7 +36,7 @@ case ${1,,} in
     echo -e "SUCCESS SA       $2 works correctly with SAs." ;;
 
   no_sa)
-    echo -e "FAILURE SA       $2 config and SA permissions in $set_file"
+    echo -e "FAILURE SA       $2 config and SA permissions in $files"
     echo -e "                 NON-FATAL BUT QUOTA FOR $2 MAY BE LIMITED" ;;
 
   ok_read)
@@ -80,16 +83,22 @@ case ${1,,} in
   perm_del)
       echo -e "PERMANENTLY DELETING TRASH and EMPTY DIRECTORIES from $2\n" ;;
 
+  start_par)
+      echo -e "Starting max $n parallel instances of tmux" ;;
+
   run_rc)
-    echo -e "\nBEGIN $sync of $src to $dest w $COUNT/$MAXJS.json from $set_file\n"
+    echo -e "\nBEGIN $sync of $src to $dest w $COUNT/$MAXJS.json from $files\n"
     echo -e "FLAGS= $FLAGS\nset_flags= $set_flags\n\nTIMEOUT= $TMOUT\n"
     echo -e "Max SAs for this set = $SAs ( = MAXJS if no size calculated )\n" ;;
+
+  sa_js)
+    echo -e "$COUNT.json added to config for $2" ;;
 
   fin_sync)
     echo -e "\nFINISHED $sync FROM $src TO $dest" ;;
 
   complete)
-    echo -e "\nSASYNC COMPLETED FOR SET FILE $set_file. NOW EXITING\n"
+    echo -e "\nSASYNC COMPLETED FOR SET FILE $files. NOW EXITING\n"
     cat $FAIL_LOG ;;
 
   *)
