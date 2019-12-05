@@ -33,9 +33,9 @@ find $SASDIR/logs/* -type f -mtime +7 -exec rm {} \;
 . msg init_complete
 
 parallel_sasync ()
-{ while read pair;do ((z++));echo $pair>$SETDIR/temp_$file1'_'$z;done <<< "$set_clean"
-  find $SETDIR/temp_$file1* -type f -printf "%f\n"|parallel -j $n --tmux ./sasync {} $cmd_flags
-  rm $SETDIR/temp_$file1* ; }
+{ rm $SETDIR/tmp_$file1_*;let z=1
+  while read pair;do ((z++));echo $pair>$SETDIR/tmp_$file1'_'$z;done <<< "$set_clean"
+  find $SETDIR/tmp_$file1_* -type f -printf "%f\n"|parallel -j $n --tmux ./sasync {} $cmd_flags
+  rm $SETDIR/tmp_$file1_* ; }
 
-#if [ ${par,,} == "true" ];then echo PAR TRUE;exit;parallel_sasync;fi
 if [ ${par,,} == "true" ];then . msg start_par; parallel_sasync;. msg fin_par;exit;fi
