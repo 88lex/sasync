@@ -31,9 +31,10 @@ if ${CHECK_REMOTES,,};then . msg ck_rem
     #  then . msg ok_read "${!rem}";else . msg fail_read "${!rem}";$CON_EX;fi
 
     if `rclone about "${!rem}" "$dsaf1" &>/dev/null` && ${TD}
-      then oksa="true";. msg ok_sa "${!rem}";else declare "${rem^^}_SAS=false";. msg no_sa "${!rem}";fi
+      then oksa="true";. msg ok_sa "${!rem}"
+    else oksa="false";declare "${rem^^}_SAS=false";. msg no_sa "${!rem}";fi
 
-    if [ $oksa == "true" ];then dsaff=$dsaf1;else unset dsaff;fi
+    if [ ${oksa} = "true" ];then dsaff=$dsaf1;else unset dsaff;fi
 
     if `rclone about "${!rem}" $dsaff &>/dev/null`
       then . msg ok_read "${!rem}";else . msg fail_read "${!rem}";$CON_EX;fi
