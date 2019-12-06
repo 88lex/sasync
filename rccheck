@@ -32,7 +32,7 @@ if ${CHECK_REMOTES,,};then . msg ck_rem
 
     if `rclone about "${!rem}" "$dsaf1" &>/dev/null` && ${TD}
       then oksa="true";. msg ok_sa "${!rem}"
-    else oksa="false";declare "${rem^^}_SAS=false";. msg no_sa "${!rem}";fi
+    else oksa="false";export "${rem^^}_SAS=false";. msg no_sa "${!rem}";fi
 
     if [ ${oksa} = "true" ];then dsaff=$dsaf1;else unset dsaff;fi
 
