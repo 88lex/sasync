@@ -18,7 +18,7 @@ if ${CHECK_REMOTES,,};then . msg ck_rem
       then TD=true;. msg ok_td "${!rem%:*}";else TD=false;. msg not_td ${!rem%:*};fi
 
     if `rclone lsd "${!rem}" $dsaf="$JSDIR/$(<$JSCOUNT).json" &>/dev/null` && ${TD}
-      then . msg ok_sa "${!rem}";else declare "${rem^^}_SAS=false";. msg no_sa "${!rem}";fi
+      then . msg ok_sa "${!rem}";else export "${rem^^}_SAS=false";. msg no_sa "${!rem}";fi
 
     if `rclone lsd "${!rem}" &>/dev/null`
       then . msg ok_read "${!rem}";else . msg fail_read "${!rem}";$CON_EX;fi
