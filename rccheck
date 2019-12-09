@@ -1,66 +1,75 @@
 #!/usr/bin/env bash
-# Setting variables
-COUNT=$(<$JSCOUNT)
-ret=8;SAs=$MAXJS;bak=
-if "$EXIT_ON_BAD_PAIR";then CON_EX="exit";else CON_EX="return 1";fi
-dsaf="--drive-service-account-file=$JSDIR/"
-dsaf1="$dsaf$(<$JSCOUNT).json"
 
-SRC_SAS=true
-DEST_SAS=true
-CRYPT=false
-maxt_flag="--max-transfer=$maxt"
-SRC=`sed 's/-/_/g;s/./\U&/g' <<<${src%:*}`
-DEST=`sed 's/-/_/g;s/./\U&/g' <<<${dest%:*}`
+#*****************************************************************************************
+# Check if rclone remotes exist and read/write/delete status w SAs where authed
+#*****************************************************************************************
+check_remotes() {
+  COUNT=$(<$JSCOUNT)
+  ret=8;SAs=$MAXJS;bak=
+  if "$EXIT_ON_BAD_PAIR";then CON_EX="exit";else CON_EX="return 1";fi
+  dsaf="--drive-service-account-file=$JSDIR/"
+  dsaf1="$dsaf$COUNT.json"
 
-if ${CHECK_REMOTES,,};then . msg ck_rem
-  for rem in src dest;do
-    if `rclone config show ${!rem%:*} &>/dev/null`
-      then . msg ok_cfg ${!rem%:*};else . msg rc_bad ${!rem%:*};$CON_EX;fi
+  SRC_SAS=true
+  DEST_SAS=true
+  CRYPT=false
+  maxt_flag="--max-transfer=$maxt"
+  SRC=`sed 's/-/_/g;s/./\U&/g' <<<${src%:*}`
+  DEST=`sed 's/-/_/g;s/./\U&/g' <<<${dest%:*}`
 
-    if ${MAKE_DESTDIR} && [ "$rem" == "$dest" ];then
-      rclone mkdir $dest;fi
+  if ${CHECK_REMOTES,,};then . msg ck_rem
+    if `rclone config show ${src%:*} &>/dev/null`
+      then . msg ok_cfg ${src%:*};else . msg rc_bad ${src%:*};$CON_EX;fi
 
-    if [ `rclone config show ${!rem%:*} | grep team_drive | wc -m` -gt 18 ]
-      then TD=true;. msg ok_td "${!rem%:*}";else TD=false;. msg not_td ${!rem%:*};fi
+    if [ `rclone config show ${src%:*} | grep team_drive | wc -m` -gt 18 ]
+      then TD=true;. msg ok_td "${src%:*}";else TD=false;. msg not_td ${src%:*};fi
 
-    #if `rclone lsd "${!rem}" "$dsaf1" &>/dev/null` && ${TD}
-    #  then . msg ok_sa "${!rem}";else declare "${rem^^}_SAS=false";. msg no_sa "${!rem}";fi
+    if `rclone lsd "${src}" "$dsaf1" &>/dev/null` && ${TD}
+      then . msg ok_sa "${src}";dsaff="$dsaf1"
+    else SRC_SAS=false;unset dsaff;. msg no_sa "${src}";fi
 
-    #if `rclone lsd "${!rem}" &>/dev/null`
-    #  then . msg ok_read "${!rem}";else . msg fail_read "${!rem}";$CON_EX;fi
+    if `rclone lsd "${src}" $dsaff &>/dev/null`
+      then . msg ok_read "${src}";else . msg fail_read "${src}";$CON_EX;fi
 
-    if `rclone about "${!rem}" "$dsaf1" &>/dev/null` && ${TD}
-      then oksa="true";. msg ok_sa "${!rem}"
-    else oksa="false";declare "${rem^^}_SAS=false";. msg no_sa "${!rem}";fi
+    if `rclone config show ${src%:*} | grep "type = crypt" &>/dev/null`
+      then CRYPT=true;. msg ok_crypt ${src%:*};fi
 
-    if [ ${oksa} = "true" ];then dsaff=$dsaf1;else unset dsaff;fi
+    if `rclone config show ${dest%:*} &>/dev/null`
+      then . msg ok_cfg ${dest%:*};else . msg rc_bad ${dest%:*};$CON_EX;fi
 
-    if `rclone about "${!rem}" $dsaff &>/dev/null`
-      then . msg ok_read "${!rem}";else . msg fail_read "${!rem}";$CON_EX;fi
+    if [ `rclone config show ${dest%:*} | grep team_drive | wc -m` -gt 18 ]
+      then TD=true;. msg ok_td "${dest%:*}";else TD=false;. msg not_td ${dest%:*};fi
 
-    if `rclone config show ${!rem%:*} | grep "type = crypt" &>/dev/null`
-      then CRYPT=true;. msg ok_crypt ${!rem%:*};fi
-  done
+    if `rclone lsd "${dest}" "$dsaf1" &>/dev/null` && ${TD}
+      then . msg ok_sa "${dest}";dsaff="$dsaf1"
+    else DEST_SAS=false;unset dsaff;. msg no_sa "${dest}";fi
 
-  if rclone touch "$dest/sasync.bin" $dsaff &>/dev/null
-    then . msg ok_write "$dest";else . msg fail_write "$dest";$CON_EX;fi
-  sleep 3s
+    if `rclone lsd "${dest}" $dsaff &>/dev/null`
+      then . msg ok_read "${dest}";else . msg fail_read "${dest}";$CON_EX;fi
 
-  if rclone deletefile -q "$dest/sasync.bin" $dsaff &>/dev/null
-    then . msg ok_del "$dest";else . msg fail_del "$dest";fi
-fi
+    if `rclone config show ${dest%:*} | grep "type = crypt" &>/dev/null`
+      then CRYPT=true;. msg ok_crypt ${dest%:*};fi
 
-if [ ${PRE_CLEAN_TDS,,} = "true" ];then . cleantds;fi
+    if rclone touch "$dest/sasync.bin" $dsaff &>/dev/null
+      then . msg ok_write "$dest";else . msg fail_write "$dest";$CON_EX;fi
 
-if ${BAK_FILES,,} && [ ! -z "${dest#*:}" ];then
-  bak="--backup-dir="$(sed "s/:/:$BAK_DIR\//g"<<<$dest);else unset bak;fi
+    if rclone deletefile -q "$dest/sasync.bin" $dsaff &>/dev/null
+      then . msg ok_del "$dest";else . msg fail_del "$dest";fi
+  fi
 
-if [ ${CALC_SIZE,,} = "true" ]
-  then . sacalc && [ $srcsize == $destsize ] && . msg skip2next && continue;fi
+  if ${MAKE_DESTDIR,,};then rclone mkdir $dest;fi
 
-[ ${FILE_COMPARE,,} = "true" ] && { . msg file_cmp
-if rclone check "$src" "$dest" --one-way --fast-list &> >(grep '0 differences')
-  then . msg skip2next;continue;fi; }
+  if ${PRE_CLEAN_TDS,,};then . cleantds;fi
 
-. msg ck_fin
+  if ${BAK_FILES,,} && [ ! -z "${dest#*:}" ];then
+    bak="--backup-dir="$(sed "s/:/:$BAK_DIR\//g"<<<$dest);else unset bak;fi
+
+  if ${CALC_SIZE,,};then
+    sacalc && [ $srcsize == $destsize ] && . msg skip2next && return 1;fi
+
+  if ${FILE_COMPARE,,};then . msg file_cmp
+    if rclone check "$src" "$dest" --one-way --fast-list &> >(grep '0 differences')
+      then . msg skip2next;return 1;fi;fi
+
+  . msg ck_fin
+}
