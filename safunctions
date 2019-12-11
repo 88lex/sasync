@@ -3,7 +3,6 @@
 #*****************************************************************************************
 # Parse stdin arguments from sasync command line
 #*****************************************************************************************
-#process_cmd_args()
 process_cmd_args_and_clean_set_files()
 { . sasync.conf.default
   . sasync.conf
