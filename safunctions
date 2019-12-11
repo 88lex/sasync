@@ -9,17 +9,19 @@ process_cmd_args_and_clean_set_files()
   . sasync.conf
   . rccheck
   par=false
-  while getopts ':c:p:' o;do
+  args="$@"
+  while getopts ':c:p:t' o;do
     case "$o" in
       c) source "${OPTARG:-sasync.conf}" ;;
       p) par=true;n=${OPTARG} ;;
+      t) tmux new "$SASDIR/sasync ${args/-t/}"
     esac
   done
   shift $(($OPTIND - 1))
   args="$@"
   files="${args%% -*}"
   if [ -z "$files" ];then . msg no_files;exit;fi
-  tmp_files=$SETDIR/tmp_"${files/ /_}"_
+  tmp_files=$SETDIR/tmp_"${files// /_}"_
   cmd_flags="${args/$files/}"
   clean_set_files
 }
