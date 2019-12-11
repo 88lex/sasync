@@ -3,9 +3,5 @@
 . msg start
 . safunctions
 process_cmd_args_and_clean_set_files "$@"
-#clean_set_files
-#init_log_n_bak
-#if [ ${par,,} == "true" ];then parallel_sasync;exit;fi
-#run_pairs
 check_remotes_and_run_rclone
-source msg complete
+. msg complete

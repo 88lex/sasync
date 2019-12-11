@@ -3,6 +3,12 @@
 **>Uses rclone and Google Service Accounts (SAs) to sync, copy or move files between rclone remotes.
 <br>Usage: &emsp; `./sasync set.file ` &emsp; &emsp; [[enable execution with `chmod +x sasync`]]**
 
+- Alt Usage: `./sasync -t set.file` to run sasync inside tmux
+- Alt Usage: `./sasync -p 3 set.file` to run sasync sets in 3 parallel tmux windows. `3` can be any number
+- Alt Usage: `./sasync -c my.conf set.file` to run sasync with your custom config file
+- Alt Usage: `./sasync set.file1 set.file2` to run multiple sets in sasync.
+- Above flags/options may be combined.
+
 ### **How does it work?**
 `sasync` will run rclone copy or sync for each source-destination pair in your set file using a service account (SA) then move to the next SA until done.
 
@@ -35,12 +41,14 @@ sync,teamdrive:docs,my_td:docs,350G,--max-age=3d
 
 ###  Changelog  V3.0
 
-- [NEW] Added `-p n` option to run 'n' parallel instances of sasync. Usage: For 3 parallel instances `./sasync -p 3 set.file`
-  - Requires tmux and parallel apps to be installed `sudo apt install parallel tmux`
+- [NEW] Added `-p number` option to run 'number' of parallel instances of sasync. Usage: For 3 parallel instances `./sasync -p 3 set.file`
+  - Requires tmux and parallel apps. Install with command: `sudo apt install parallel tmux`
   - Sends sasync to n tmux windows. App will provide a link to open tmux
   - Can run a single instance of sasync in tmux with `./sasync -p 1 set.file`
   - When one set pair finishes next one auto loads
   - sasync works as usual without tmux or parallel when running `./sasync set.file`
+
+- [NEW] Added -t option to run sasync in tmux. `./sasync -t set.file`
 
 - [NEW-AGAIN] Added back ability to run with multiple set files
   - `./sasync -p n set.file1 set.file2 set.file3`
