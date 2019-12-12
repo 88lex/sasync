@@ -59,7 +59,7 @@ check_remotes()
       then . msg ok_del "${rem[1]}";else . msg fail_del "${rem[1]}";fi
   fi
 
-  if ${PRE_CLEAN_TDS,,};then . cleantds;fi
+  if ${PRE_CLEAN_TDS,,};then clean_remotes;fi
 
   if ${BAK_FILES,,} && [ ! -z "${dest#*:}" ];then
     bak="--backup-dir="$(sed "s/:/:$BAK_DIR\//g"<<<$dest);else unset bak;fi
