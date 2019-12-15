@@ -20,8 +20,7 @@ vars_for_check() {
   DEST=`sed 's/-/_/g' <<<${rem[1]^^}`
 
   if "$EXIT_ON_BAD_PAIR";then CON_EX="exit";else CON_EX="return 1";fi
-  if ${MAKE_DESTDIR,,} && `rclone about "${rem[1]}" &>/dev/null`;then
-    rclone mkdir $dest;sleep 3s;fi
+  if ${MAKE_DESTDIR,,};then rclone mkdir $dest; fi
 }
 
 check_remotes()
