@@ -37,13 +37,13 @@ check_remotes()
       else rem_td[$i]=false;. msg not_td "${rem[$i]}";fi
 
       # Below, testing if rclone about gives same result as rclone lsd
-      #if `rclone lsd "${srcdest[$i]}" "$dsaf$COUNT.json" &>/dev/null` && ${rem_td[$i]}
-      if `rclone about "${srcdest[$i]}" "$dsaf$COUNT.json" &>/dev/null` && ${rem_td[$i]}
+      #if `rclone about "${srcdest[$i]}" "$dsaf$COUNT.json" &>/dev/null` && ${rem_td[$i]}
+      if `rclone lsd "${srcdest[$i]}" "$dsaf$COUNT.json" &>/dev/null` && ${rem_td[$i]}
         then . msg ok_sa "${srcdest[$i]}";dsaff="$dsaf$COUNT.json"
       else rem_sa[$i]=false;unset dsaff;. msg no_sa "${srcdest[$i]}";fi
 
-      #if `rclone lsd "${srcdest[$i]}" $dsaff &>/dev/null`
-      if `rclone about "${srcdest[$i]}" $dsaff &>/dev/null`
+      #if `rclone about "${srcdest[$i]}" $dsaff &>/dev/null`
+      if `rclone lsd "${srcdest[$i]}" $dsaff &>/dev/null`
         then . msg ok_read "${srcdest[$i]}"
       else . msg fail_read "${srcdest[$i]}";$CON_EX;fi
 
