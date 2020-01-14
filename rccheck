@@ -51,10 +51,10 @@ check_remotes()
         then CRYPT[$i]=true;. msg ok_crypt "${rem[$i]}";fi
     done
 
-    if rclone touch "${rem[1]}/sasync.bin" $dsaff &>/dev/null
+    if rclone touch "${rem[1]}:/sasync.bin" $dsaff &>/dev/null
       then . msg ok_write "${rem[1]}";else . msg fail_write "${rem[1]}";$CON_EX;fi
 
-    if rclone deletefile -q "${rem[1]}/sasync.bin" $dsaff &>/dev/null
+    if rclone deletefile -q "${rem[1]}:/sasync.bin" $dsaff &>/dev/null
       then . msg ok_del "${rem[1]}";else . msg fail_del "${rem[1]}";fi
   fi
 

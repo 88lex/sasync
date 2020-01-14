@@ -79,11 +79,11 @@ clean_remotes()
 #*****************************************************************************************
 parallel_sasync()
 { . msg start_par
-  rm -f "$tmp_files"*
+  rm -f $tmp_files*
   echo "$set_clean">"$tmp_files"
   split -l 1 "$tmp_files" "$tmp_files"
   basename -a $tmp_files[a-z]* | parallel -j $n --tmux ./sasync {} $cmd_flags
-  rm -f "$tmp_files"*
+  rm -f $tmp_files*
   . msg fin_par
   }
 
