@@ -1,4 +1,27 @@
-## **SASYNC 3.0**
+## **SASYNC 3.1 alpha**
+
+NOTE: This version of sasync requires the most recent rclone beta (  v1.50.2-131 or later )
+
+Major change: To run the new version of sasync correctly you MUST remove the max transfer field
+(e.g. 600G) from your old set files.
+Suggested method is to copy your set files from /opt/sasync/sasets to /opt/sasync/sets,
+then run the ./remove_maxt script for set.* files in the /sets folder.
+For now it's a good idea to keep the old set files (until the new rclone flag is fully tested).
+
+NOTE: You can get a similar result with sasync 3.0 (master) by adding the --drive-stop-on-upload-limit to sasync.conf
+flag to the sasync.conf, then changing your set file --max-transfer settings to be > 750G
+
+###  Changelog V3.1 alpha
+
+- [NEW] Added --drive-stop-on-upload-limit to sasync.conf
+- [REMOVED] --max-transfer logic and set.file requirement
+- [CHANGED] Default location of set files from /sasets to /sets
+- [NEW] Added a script (remove_maxt) in /sets folder to remove max_transfer variable from set files
+  - Best way to do this is `cp -r /opt/sasync/sasets /opt/sasync/sets` then
+  - `cd /opt/sasync/sets && chmod +x remove_maxt` then `./remove_maxt set.*`
+- [REMOVED] IFS auto sense. Forces user to choose separator in sasync.conf file. e.g. IFS1=' ' or IFS1=','
+- [REMOVED] TMOUT (timeout) flag and code
+
 
 **>Uses rclone and Google Service Accounts (SAs) to sync, copy or move files between rclone remotes.
 <br>Usage: &emsp; `./sasync set.file ` &emsp; &emsp; [[enable execution with `chmod +x sasync`]]**
@@ -18,23 +41,14 @@ Sets must have an rclone action (sync, copy, move) , a source and destination an
 [[Avoid using commas or bars in remote/folder names. This can confuse sasync.]]
 - The sample set file has column labels for reference. They are entirely unnecessary for sasync to run.
 <pre>
-#0action  1source            2destination   3maxtransfer   4rcloneflags
-sync      teamdrive:docs     my_td:docs     350G           --max-age=3d
+#0action  1source            2destination   3rcloneflags
+sync      teamdrive:docs     my_td:docs     --max-age=3d
 </pre>
-OR
-<pre>
-sync,teamdrive:docs,my_td:docs,350G,--max-age=3d
-</pre>
-OR
-<pre>
-sync,teamdrive:docs,my_td:docs,350G,--max-age=3d
-</pre>
-
 
 #### SASYNC reads from a **set file**. Each line in the set file describes
 - An action that rclone will execute (`sync`, `copy` or `move`)
 - A source and destination remote folder
-- A breakpoint (--max-transfer) which tells sasync to move to the next SA
+- REMOVED ~~A breakpoint (--max-transfer) which tells sasync to move to the next SA~~
 - Any additional rclone flags which you would like to apply to individual source/destination pairs
 
 <br>
@@ -50,7 +64,7 @@ sync,teamdrive:docs,my_td:docs,350G,--max-age=3d
 
 - [NEW] Added -t option to run sasync in tmux. `./sasync -t set.file`
 
-- [NEW-AGAIN] Added back ability to run with multiple set files
+- [NEW-AGAIN] Added ability to run with multiple set files
   - `./sasync -p n set.file1 set.file2 set.file3`
   - Will merge set files then run in n tmux windows
   - When one set pair finishes next one auto loads
@@ -59,10 +73,10 @@ sync,teamdrive:docs,my_td:docs,350G,--max-age=3d
 - [UNCHANGED] sasync still supports custom config files as well as infinite rclone flags at the end, along with new -p options.
   - `./sasync -c my.conf set.file1 --flag1--flag2 -v --dry-run`
 
-- [NEW] Allows making missing directories in the destination remote with MAKE_DESTDIR [Deault: false]
+- [NEW] Allows creating missing directories in the destination remote with MAKE_DESTDIR [Deault: false]
   - Be careful with this option. If your remote does not exist it could create directories on your local disk
 
-- [NEW] Changed remote check from `rclone lsd` to `rclone about`. Should make it much quicker
+- ~~[NEW] Changed remote check from `rclone lsd` to `rclone about`. Should make it much quicker~~
 
 - [NEW] Added `--drive-service-account-file` to READ/WRITE/DELETE checks. Should make check more reliable
 
@@ -88,10 +102,9 @@ sync,teamdrive:docs,my_td:docs,350G,--max-age=3d
   - `c..` = cd ..
   - `t0`  = tmux a -t 0
 
-- [NEW] Trying to accommodate set files with various formats. At the moment you should be able to separate your fields with
-spaces, tabs, commas[,] or vertical bars[|].
-  - Use only one type of field separator. Do not mix separators in the same file - results may be unpredictable.
-  - One method to change space separators to ',' in your set file is to run `sed -r 's/\s+/,/g' set.file > set.file.new` in a bash terminal.
+- [NEW] ~~Trying to accommodate set files with various formats. At the moment you should be able to separate your fields with spaces, tabs, commas[,] or vertical bars[|].~~
+  - ~~Use only one type of field separator. Do not mix separators in the same file - results may be unpredictable.~~
+  - ~~One method to change space separators to ',' in your set file is to run `sed -r 's/\s+/,/g' set.file > set.file.new` in a bash terminal.~~
 
 - [NEW] sasync can now do sync/copy without SAs in source or destination.
   - This is not the primary use-case, but if you want to include syncs to destinations where you do not have SA
