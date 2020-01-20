@@ -9,7 +9,7 @@ vars_for_check() {
   SAs=$MAXJS
   bak=
   dsaf="--drive-service-account-file=$JSDIR/"
-  set_flags="$set_flags --max-transfer=$maxt"
+  #set_flags="$set_flags --max-transfer=$maxt"
 
   srcdest=($src $dest)
   rem=(${src%:*} ${dest%:*})

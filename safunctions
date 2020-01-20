@@ -36,7 +36,7 @@ clean_set_files()
   done
 
   set_clean=$(echo "$set_file" | sed '/#/d; /^$/d; s/[\t\r]/ /g; s/\"//g')
-  if echo "$set_clean" | grep -E '\||,' &>/dev/null;then IFS1=',|';fi
+  #if echo "$set_clean" | grep -E '\||,' &>/dev/null;then IFS1=',|';fi
   echo -e "$set_clean" | column -s"$IFS1" -t
   if [ ${par,,} == "true" ];then parallel_sasync;exit;fi
   init_log_n_bak
@@ -104,7 +104,8 @@ sacalc()
   SRC_LIMIT=${SRC_LIMIT%%[A-Za-z]*}
   LIM=${SRC_LIMIT:-$diffGB}
   LIM=$((diffGB>LIM?LIM:diffGB))
-  MAXT=${maxt%%[A-Za-z]*}
+  #MAXT=${maxt%%[A-Za-z]*}
+  MAXT=750
   SAs=$(( ($MAXT+${LIM#-})/$MAXT ))
   . msg diff_size; }
 
@@ -134,7 +135,7 @@ run_rclone_w_flags ()
 { while [[ $ret =~ ^(7|8)$ ]] && (($SAs));do . msg run_rc
     next_sa
     set -x
-    $TMOUT rclone $sync "$src" "$dest" $sa_flag $FLAGS $set_flags $bak $cmd_flags
+    rclone $sync "$src" "$dest" $sa_flag $FLAGS $set_flags $bak $cmd_flags
     ret=$?
     set +x
     done
@@ -144,7 +145,8 @@ run_rclone_w_flags ()
 # Process each line in set file. Check remotes, run rclone then *option* clean the remotes
 #*****************************************************************************************
 check_remotes_and_run_rclone ()
-{ while IFS=$IFS1 read -r sync src dest maxt set_flags;do
+{ #while IFS=$IFS1 read -r sync src dest maxt set_flags;do
+  while IFS=$IFS1 read -r sync src dest set_flags;do
     check_remotes || continue
     run_rclone_w_flags
     . msg fin_sync

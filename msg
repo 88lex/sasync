@@ -84,7 +84,7 @@ case ${1,,} in
     echo "SIZE is $destsizeGB GB in DEST $dest  ( $destsize bytes )"
     echo "DIFF is $diffGB GB  ( $diff bytes )"
     [[ $SRC_LIMIT ]] && echo -e "DAILY SRC transfer limit is $SRC_LIMIT GB"
-    [[ $diff != 0 ]] && echo -e "EST NUM OF SAs is $SAs \nMax Transfer per SA is $maxt"
+    [[ $diff != 0 ]] && echo -e "EST NUM OF SAs is $SAs \n" #Max Transfer per SA is $maxt"
     : ;;
 
   dedupe)
@@ -101,7 +101,7 @@ case ${1,,} in
 
   run_rc)
     echo -e "\nBEGIN $sync of $src to $dest w $COUNT/$MAXJS.json from $files\n"
-    echo -e "FLAGS= $FLAGS\nset_flags= $set_flags\ncmd_flags= $cmd_flags\nTIMEOUT= $TMOUT\n"
+    echo -e "FLAGS= $FLAGS\nset_flags= $set_flags\ncmd_flags= $cmd_flags\n"
     echo -e "Max SAs for this set = $SAs ( = MAXJS if no size calculated )\n" ;;
 
   sa_js)
