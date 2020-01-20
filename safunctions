@@ -1,0 +1,152 @@
+#!/usr/bin/env bash
+
+#*****************************************************************************************
+# Parse stdin arguments from sasync command line
+#*****************************************************************************************
+process_cmd_args_and_clean_set_files()
+{ . sasync.conf.default
+  . sasync.conf
+  . rccheck
+  par=false
+  args="$@"
+  while getopts ':c:p:P:n:t' o;do
+    case "$o" in
+      c) source "${OPTARG:-sasync.conf}" ;;
+      p|P|n) par=true;n=${OPTARG} ;;
+      t) tmux new "$SASDIR/sasync ${args/-t/}"
+    esac
+  done
+  shift $(($OPTIND - 1))
+  args="$@"
+  files="${args%% -*}"
+  if [ -z "$files" ];then . msg no_files;exit;fi
+  tmp_files=$SETDIR/tmp_"${files// /_}"_
+  cmd_flags="${args/$files/}"
+  clean_set_files
+}
+
+#*****************************************************************************************
+# Clean comments and blank lines from set files. Parse , and | delimited files
+#*****************************************************************************************
+clean_set_files()
+{ for file in $files; do
+    if [ -v "$file" ];then set_file+=$(echo "${!files}")
+    elif [ -f "$SETDIR/$file" ]; then set_file+=$(<$SETDIR/$file)$'\n'
+    else . msg no_file;exit;fi
+  done
+
+  set_clean=$(echo "$set_file" | sed '/#/d; /^$/d; s/[\t\r]/ /g; s/\"//g')
+  if echo "$set_clean" | grep -E '\||,' &>/dev/null;then IFS1=',|';fi
+  echo -e "$set_clean" | column -s"$IFS1" -t
+  if [ ${par,,} == "true" ];then parallel_sasync;exit;fi
+  init_log_n_bak
+}
+
+#*****************************************************************************************
+# Initialize log and config backup files. Delete older files
+#*****************************************************************************************
+init_log_n_bak()
+{ STD_LOG="$SASDIR"/logs/$(date +%F)_stdout.log
+  ERR_LOG="$SASDIR"/logs/$(date +%F)_stderr.log
+  FAIL_LOG="$SASDIR"/logs/$(date +%F)_fail.log
+  if [ ! -f $SASDIR/json.count ];then echo $MINJS >$SASDIR/json.count;fi
+  mkdir -p $SASDIR/backup $SASDIR/logs
+  cp $SASDIR/sasync.conf "$SASDIR/backup/$(date +%F)_sasync.conf"
+  find $SASDIR/backup/* -type f -mtime +14 -exec rm {} \;
+  find $SASDIR/logs/* -type f -mtime +7 -exec rm {} \;
+  mkdir -p ~/.parallel
+  touch ~/.parallel/will-cite
+}
+
+#*****************************************************************************************
+# Clean remotes - dedupe identical files, remove empty folders and permanently deletes trash
+#*****************************************************************************************
+cleanup ()
+{ . msg dedupe $1
+  rclone dedupe skip $1 -v --drive-use-trash=false --tpslimit=5
+  . msg perm_del $1
+  rclone delete $2: -vv --drive-trashed-only --drive-use-trash=false --tpslimit=5
+  rclone rmdirs $1 -v --drive-use-trash=false --fast-list --tpslimit=5 --leave-root
+}
+
+clean_remotes()
+{ ${CLEAN_DEST,,} && cleanup $dest ${dest%:*}
+  ${CLEAN_SRC,,} && cleanup $src ${src%:*}
+}
+
+#*****************************************************************************************
+# Start multiple instances of sasync in tmux, starting new set pairs as old ones finish
+#*****************************************************************************************
+parallel_sasync()
+{ . msg start_par
+  rm -f $tmp_files*
+  echo "$set_clean">"$tmp_files"
+  split -l 1 "$tmp_files" "$tmp_files"
+  basename -a $tmp_files[a-z]* | parallel -j $n --tmux ./sasync {} $cmd_flags
+  rm -f $tmp_files*
+  . msg fin_par
+  }
+
+#*****************************************************************************************
+# sacalc calculates the size and difference of source and destination remotes
+#*****************************************************************************************
+sacalc()
+{ . msg ck_size
+  srcsize=`eval rclone size "$src" --json | cut -d ":" -f3 | cut -d "}" -f1`
+  srcsizeGB=$(( $srcsize/1024**3 ))
+
+  destsize=`eval rclone size "$dest" --json | cut -d ":" -f3 | cut -d "}" -f1`
+  destsizeGB=$(( $destsize/1024**3 ))
+
+  diff=$(( $srcsize-$destsize ))
+  diffGB=$(( $diff/1024**3 ))
+
+  SRC_LIMIT=${SRC_LIMIT%%[A-Za-z]*}
+  LIM=${SRC_LIMIT:-$diffGB}
+  LIM=$((diffGB>LIM?LIM:diffGB))
+  MAXT=${maxt%%[A-Za-z]*}
+  SAs=$(( ($MAXT+${LIM#-})/$MAXT ))
+  . msg diff_size; }
+
+#*****************************************************************************************
+# Add 1 to counter, then use next service account in rclone remote ENV or config
+#*****************************************************************************************
+add_1_to_counter ()
+{ COUNT=$(<$JSCOUNT)
+  echo $(( $COUNT>=$MAXJS?$MINJS:$COUNT+1 ))>$JSCOUNT
+  [ -f "$JSDIR"/"$COUNT".json ] || next_sa; }
+
+export_js ()
+{ export "RCLONE_CONFIG_"$1"_SERVICE_ACCOUNT_FILE="$JSDIR"/"$COUNT.json; }
+
+next_sa ()
+{ add_1_to_counter
+  if "${rem_sa[0]}" && "${rem_sa[1]}" && "${CRYPT[1]}";then sa_flag="$dsaf$COUNT.json "
+  else if "${rem_sa[0]}";then export_js "$SRC";fi
+       if "${rem_sa[1]}";then export_js "$DEST";fi
+  fi; ((SAs--))
+}
+
+#*****************************************************************************************
+# Run rclone with flags from config file, set file and command line. Use SAs where authed
+#*****************************************************************************************
+run_rclone_w_flags ()
+{ while [[ $ret =~ ^(7|8)$ ]] && (($SAs));do . msg run_rc
+    next_sa
+    set -x
+    $TMOUT rclone $sync "$src" "$dest" $sa_flag $FLAGS $set_flags $bak $cmd_flags
+    ret=$?
+    set +x
+    done
+}
+
+#*****************************************************************************************
+# Process each line in set file. Check remotes, run rclone then *option* clean the remotes
+#*****************************************************************************************
+check_remotes_and_run_rclone ()
+{ while IFS=$IFS1 read -r sync src dest maxt set_flags;do
+    check_remotes || continue
+    run_rclone_w_flags
+    . msg fin_sync
+    clean_remotes
+  done <<<"$set_clean" > >(tee "$STD_LOG") 2> >(tee "$ERR_LOG" >&2); }

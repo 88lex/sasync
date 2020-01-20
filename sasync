@@ -1,31 +1,7 @@
 #!/usr/bin/env bash
 
-export_js ()
-{ export "RCLONE_CONFIG_"$1"_SERVICE_ACCOUNT_FILE="$JSDIR"/"$COUNT.json; }
-
-next_sa ()
-{ COUNT=$(<$JSCOUNT)
-  echo $(( $COUNT>=$MAXJS?$MINJS:$COUNT+1 ))>$JSCOUNT
-  [ -f "$JSDIR"/"$COUNT".json ] || next_sa
-  if $SRC_SAS && $DEST_SAS && $CRYPT;then sa_flag="$dsaf=$JSDIR/$COUNT.json "
-  else
-    if $SRC_SAS;then export_js "$SRC";fi
-    if $DEST_SAS;then export_js "$DEST";else SAs=1;fi
-  fi; ((SAs--)); }
-
-run_rclone_w_flags ()
-{ while [[ $ret =~ ^(7|8)$ ]] && (($SAs));do . msg run_rc
-    if [ $sync != "move" ];then next_sa;fi
-    set -x;$TMOUT rclone $sync "$src" "$dest" $sa_flag $FLAGS\
-    $set_flags $maxt_flag $bak $cmd_flags;ret=$?;set +x;done; }
-
-run_pairs ()
-{ while IFS=$IFS1 read -r sync src dest maxt set_flags;do
-    . rccheck || continue
-    run_rclone_w_flags
-    . msg fin_sync
-    . cleantds
-  done <<<"$set_clean" > >(tee "$STD_LOG") 2> >(tee "$ERR_LOG" >&2); }
-
-. sainit $@
-run_pairs && . msg complete
+. msg start
+. safunctions
+process_cmd_args_and_clean_set_files "$@"
+check_remotes_and_run_rclone
+. msg complete

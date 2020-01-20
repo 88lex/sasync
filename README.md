@@ -1,7 +1,13 @@
-## **SASYNC 2.8**
+## **SASYNC 3.0**
 
 **>Uses rclone and Google Service Accounts (SAs) to sync, copy or move files between rclone remotes.
 <br>Usage: &emsp; `./sasync set.file ` &emsp; &emsp; [[enable execution with `chmod +x sasync`]]**
+
+- Alt Usage: `./sasync -t set.file` to run sasync inside tmux
+- Alt Usage: `./sasync -p 3 set.file` to run sasync sets in 3 parallel tmux windows. `3` can be any number
+- Alt Usage: `./sasync -c my.conf set.file` to run sasync with your custom config file
+- Alt Usage: `./sasync set.file1 set.file2` to run multiple sets in sasync.
+- Above flags/options may be combined.
 
 ### **How does it work?**
 `sasync` will run rclone copy or sync for each source-destination pair in your set file using a service account (SA) then move to the next SA until done.
@@ -33,7 +39,44 @@ sync,teamdrive:docs,my_td:docs,350G,--max-age=3d
 
 <br>
 
-###  Changelog  V2.6 - 2.8
+###  Changelog  V3.0
+
+- [NEW] Added `-p number` option to run 'number' of parallel instances of sasync. Usage: For 3 parallel instances `./sasync -p 3 set.file`
+  - Requires tmux and parallel apps. Install with command: `sudo apt install parallel tmux`
+  - Sends sasync to n tmux windows. App will provide a link to open tmux
+  - Can run a single instance of sasync in tmux with `./sasync -p 1 set.file`
+  - When one set pair finishes next one auto loads
+  - sasync works as usual without tmux or parallel when running `./sasync set.file`
+
+- [NEW] Added -t option to run sasync in tmux. `./sasync -t set.file`
+
+- [NEW-AGAIN] Added back ability to run with multiple set files
+  - `./sasync -p n set.file1 set.file2 set.file3`
+  - Will merge set files then run in n tmux windows
+  - When one set pair finishes next one auto loads
+  - Works without `-p` running in main terminal one set pair at a time
+
+- [UNCHANGED] sasync still supports custom config files as well as infinite rclone flags at the end, along with new -p options.
+  - `./sasync -c my.conf set.file1 --flag1--flag2 -v --dry-run`
+
+- [NEW] Allows making missing directories in the destination remote with MAKE_DESTDIR [Deault: false]
+  - Be careful with this option. If your remote does not exist it could create directories on your local disk
+
+- [NEW] Changed remote check from `rclone lsd` to `rclone about`. Should make it much quicker
+
+- [NEW] Added `--drive-service-account-file` to READ/WRITE/DELETE checks. Should make check more reliable
+
+- [ADDED] Added `csl` to alias shortcuts to navigate to logs directory
+  - To access aliases run `cd /opt/sasync/utils;chmod +x add_aliases;./add_aliases`. Works on next boot
+  - sas='/opt/sasync/sasync'
+  - csa='cd /opt/sasync'
+  - cse='cd /opt/sasync/sasets'
+  - csl='cd /opt/sasync/logs'
+  - csu='cd /opt/sasync/utils'
+  - c..='cd ..'
+  - t0='tmux a -t 0'
+
+###  Changelog  V2.8
 
 - [NEW] Added RW Read/Write check for destination when you enable rccheck [default=true]
 
