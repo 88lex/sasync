@@ -104,7 +104,6 @@ sacalc()
   SRC_LIMIT=${SRC_LIMIT%%[A-Za-z]*}
   LIM=${SRC_LIMIT:-$diffGB}
   LIM=$((diffGB>LIM?LIM:diffGB))
-  #MAXT=${maxt%%[A-Za-z]*}
   MAXT=750
   SAs=$(( ($MAXT+${LIM#-})/$MAXT ))
   . msg diff_size; }
@@ -145,8 +144,7 @@ run_rclone_w_flags ()
 # Process each line in set file. Check remotes, run rclone then *option* clean the remotes
 #*****************************************************************************************
 check_remotes_and_run_rclone ()
-{ #while IFS=$IFS1 read -r sync src dest maxt set_flags;do
-  while IFS=$IFS1 read -r sync src dest set_flags;do
+{ while IFS="$IFS1" read sync src dest set_flags;do
     check_remotes || continue
     run_rclone_w_flags
     . msg fin_sync
