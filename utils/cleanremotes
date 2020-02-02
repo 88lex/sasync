@@ -3,7 +3,8 @@
 # only clean remotes that have `tv` in them
 
 filter=$1
-rclone listremotes | grep "$filter"
+rclone listremotes | gawk "$filter"
+#rclone listremotes | grep "$filter"
 
 readarray mounts < <( rclone listremotes | grep "$filter" )
 for i in ${mounts[@]}; do
