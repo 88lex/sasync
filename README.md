@@ -21,7 +21,7 @@ flag to the sasync.conf, then changing your set file --max-transfer settings to 
   - `cd /opt/sasync/sets && chmod +x remove_maxt` then `./remove_maxt set.*`
 - [REMOVED] IFS auto sense. Forces user to choose separator in sasync.conf file. e.g. IFS1=' ' or IFS1=','
 - [REMOVED] TMOUT (timeout) flag and code
-- [ADDED] Link for new instructions for manually checking rclone remote permissions that impact successful running of sasync. ==> [ MANUAL DIAGNOSTIC FOR CHECKING PERMISSIONS ON RCLONE REMOTES WITH SAs ](https://gitlab.com/88lex/sa-guide/-/blob/master/rclone_remote_permissions.md#manual-diagnostic-for-checking-permissions-on-a-rclone-remote)
+- [ADDED] Link for new instructions for manually checking rclone remote permissions that impact successful running of sasync. ==> [ MANUAL DIAGNOSTIC FOR CHECKING PERMISSIONS ON RCLONE REMOTES WITH SAs ](https://github.com/88lex/sa-guide/-/blob/master/rclone_remote_permissions.md#manual-diagnostic-for-checking-permissions-on-a-rclone-remote)
 
 
 **>Uses rclone and Google Service Accounts (SAs) to sync, copy or move files between rclone remotes.
