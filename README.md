@@ -1,4 +1,4 @@
-## **SASYNC 3.1 alpha**
+## **SASYNC 3.1 **
 
 NOTE: This version of sasync requires the most recent rclone beta (  v1.50.2-131 or later )
 
@@ -11,7 +11,7 @@ For now it's a good idea to keep the old set files (until the new rclone flag is
 NOTE: You can get a similar result with sasync 3.0 (master) by adding the --drive-stop-on-upload-limit to sasync.conf
 flag to the sasync.conf, then changing your set file --max-transfer settings to be > 750G
 
-###  Changelog V3.1 alpha
+###  Changelog V3.1
 
 - [NEW] Added --drive-stop-on-upload-limit to sasync.conf
 - [REMOVED] --max-transfer logic and set.file requirement
@@ -21,6 +21,7 @@ flag to the sasync.conf, then changing your set file --max-transfer settings to 
   - `cd /opt/sasync/sets && chmod +x remove_maxt` then `./remove_maxt set.*`
 - [REMOVED] IFS auto sense. Forces user to choose separator in sasync.conf file. e.g. IFS1=' ' or IFS1=','
 - [REMOVED] TMOUT (timeout) flag and code
+- [ADDED] Link for new instructions for manually checking rclone remote permissions that impact successful running of sasync. ==> [ MANUAL DIAGNOSTIC FOR CHECKING PERMISSIONS ON RCLONE REMOTES WITH SAs ](https://gitlab.com/88lex/sa-guide/-/blob/master/rclone_remote_permissions.md#manual-diagnostic-for-checking-permissions-on-a-rclone-remote)
 
 
 **>Uses rclone and Google Service Accounts (SAs) to sync, copy or move files between rclone remotes.
@@ -350,6 +351,9 @@ FLAGS="
 <br>
 
 ###  Tips and Notes
+
+- [ MANUAL DIAGNOSTIC FOR CHECKING PERMISSIONS ON RCLONE REMOTES WITH SAs ](https://gitlab.com/88lex/sa-guide/-/blob/master/rclone_remote_permissions.md#manual-diagnostic-for-checking-permissions-on-a-rclone-remote)
+
 
 - sasync can be run with crontab or as a task in windows
 
