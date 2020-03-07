@@ -59,7 +59,7 @@ check_remotes()
 
   if ${PRE_CLEAN_TDS,,};then clean_remotes;fi
 
-  if ${BAK_FILES,,} && [ ! -z "${dest#*:}" ];then
+  if ${BAK_FILES,,} && [ ! -z "${dest#*:}" ] && [ "$sync" != "move" ];then
     bak="--backup-dir="$(sed "s/:/:$BAK_DIR\//g"<<<$dest);else unset bak;fi
 
   if ${CALC_SIZE,,};then
