@@ -1,15 +1,36 @@
-## **SASYNC 3.1 **
+## **SASYNC 3.2 **
 
-NOTE: This version of sasync requires the most recent rclone beta (  v1.50.2-131 or later )
+NOTE: This version of sasync requires a recent rclone beta (  v1.50.2-131 or later )
 
-Major change: To run the new version of sasync correctly you MUST remove the max transfer field
-(e.g. 600G) from your old set files.
+Major change: If your prior version is 3.0 or lower then to run this new version of sasync correctly
+you MUST remove the max transfer field (e.g. 600G) from your old set files.\
 Suggested method is to copy your set files from /opt/sasync/sasets to /opt/sasync/sets,
-then run the ./remove_maxt script for set.* files in the /sets folder.
+then run the ./remove_maxt script for set.* files in the /sets folder.\
 For now it's a good idea to keep the old set files (until the new rclone flag is fully tested).
 
 NOTE: You can get a similar result with sasync 3.0 (master) by adding the --drive-stop-on-upload-limit to sasync.conf
 flag to the sasync.conf, then changing your set file --max-transfer settings to be > 750G
+
+###  Changelog V3.2
+- [NEW] If SOURCE is empty will skip that pair and create an error in a file `*_bad_remote.log`
+- [NEW] Added a variable called `DIFF_LIMIT` in sasync.conf.default (be sure to copy to your sasync.conf file)
+  - `DIFF_LIMIT` is an INTEGER representing the ratio % of SOURCE / DESTINATION remote size.
+  - IMPORTANT: `DIFF_LIMIT` only works if `CALC_SIZE=true`. You cannot calculate a ratio without sizes.
+  - Examples:
+    - If source remote is 20GB and destination remote is 10GB then the ratio would be 200 (200%, but we leave out the %).
+    - If source remote is 5GB and destination remote is 10GB then the ratio would be 50 (50%, omitting %).
+    - If you set `DIFF_LIMIT=70` then the first example would pass, but the second would fail.
+    - On failure of the DIFF_LIMIT test sasync will write an error to `*_bad_remote.log`
+- [NEW] Added a file called `*_bad_remote.log`. This file will be printed at the end of each sasync run. You can tail or monitor these files, or you can periodically send them to your email, bots, discord, etc.
+- [NEW] Added a variable called `NEXTJS` in sasync.conf.default (be sure to copy to your sasync.conf file)
+  - `NEXTJS` is the amount by which JSCOUNT (your SAs) will be increased with each cycle.
+  - In most cases leaving `NEXTJS` at a default of 1 is fine.
+  - In cases where you may have errors from too many api calls and/or are running multiple parallel instances of sasync,
+  it is possible that setting `NEXTJS=101` can help reduce errors.
+  - Each GSuite project has its own api quota. Incrementing by 101 forces parallel sasync instances to use a different project's quota.
+  - Note that setting `NEXTJS=101` only works well if you have multiple projects and many SAs.
+- [CHANGED-TEMP] For `CLEAN_DEST` and `CLEAN_SRC` temporarily replaced `rclone delete remote: --drive-trashed-only` with `rclone cleanup remote:`.
+  - The delete remote with --drive-trashed-only has been hanging sometimes with recent rclone releases. And in principle rclone cleanup should work, even if not immediately. Will monitor and change back in future if needed.
 
 ###  Changelog V3.1
 

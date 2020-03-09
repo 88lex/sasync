@@ -50,6 +50,9 @@ init_log_n_bak()
 { STD_LOG="$SASDIR"/logs/$(date +%F)_stdout.log
   ERR_LOG="$SASDIR"/logs/$(date +%F)_stderr.log
   FAIL_LOG="$SASDIR"/logs/$(date +%F)_fail.log
+  BAD_REMOTE_LOG="$SASDIR"/logs/$(date +%F)_"$file"_bad_remote.log
+  > $BAD_REMOTE_LOG
+
   if [ ! -f $SASDIR/json.count ];then echo $MINJS >$SASDIR/json.count;fi
   mkdir -p $SASDIR/backup $SASDIR/logs
   cp $SASDIR/sasync.conf "$SASDIR/backup/$(date +%F)_sasync.conf"
@@ -66,7 +69,8 @@ cleanup ()
 { . msg dedupe $1
   rclone dedupe skip $1 -v --drive-use-trash=false --tpslimit=5
   . msg perm_del $1
-  rclone delete $2: -vv --drive-trashed-only --drive-use-trash=false --tpslimit=5
+  #rclone delete $2: -vv --drive-trashed-only --drive-use-trash=false --tpslimit=4 --tpslimit-burst=40 --no-traverse
+  rclone cleanup $1 -v
   rclone rmdirs $1 -v --drive-use-trash=false --fast-list --tpslimit=5 --leave-root
 }
 
@@ -94,6 +98,7 @@ parallel_sasync()
 sacalc()
 { . msg ck_size
   srcsize=`eval rclone size "$src" --json | cut -d ":" -f3 | cut -d "}" -f1`
+  if [[ $srcsize -eq 0 ]];then $CON_EX;fi
   srcsizeGB=$(( $srcsize/1024**3 ))
 
   destsize=`eval rclone size "$dest" --json | cut -d ":" -f3 | cut -d "}" -f1`

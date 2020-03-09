@@ -12,7 +12,8 @@ IFS1=$' \t\n'                     # Field separator for set file. Use ',' or '|'
 
 # Flags to control which checks and what cleaning is done. All = false works in standard case
 CHECK_REMOTES=true                # Check if remotes are configured in rclone. Faster if set to false
-CALC_SIZE=false                   # Runs check size and estimates number of SAs required
+CALC_SIZE=false                   # Runs check size ; MUST set to true if using DIFF_LIMIT
+DIFF_LIMIT=0                      # If source/dest size < or = DIFFLIMIT % then skip pair (def=0, use integers)
 FILE_COMPARE=false                # Runs hash check against files
 CLEAN_DEST=false                  # Set to true if you want to clean the destination
 CLEAN_SRC=false                   # Set to true if you want to clean the source
