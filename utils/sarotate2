@@ -2,7 +2,6 @@
 # Written by visorask and 88lex :-)
 # Usage: ./sarotate2 set.remotes  <= set.remotes is a text file with remote names, no ':'
 
-## Variables
 REMOTES=`cat $1`    # REMOTES taken from the set.remotes file.
 #REMOTES="$@"       # OR Use "$@" below if you prefer to specify remotes in the command line
 MINJS=1             # First json file number in your JSON directory.
