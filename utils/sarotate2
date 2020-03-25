@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Written by visorask and 88lex :-)
+# Written by visorask and 88lex :-)  Input from randyjc ;-)
 # Usage: ./sarotate2 set.remotes  <= set.remotes is a text file with remote names, no ':'
 
 REMOTES=`cat $1`    # REMOTES taken from the set.remotes file.
