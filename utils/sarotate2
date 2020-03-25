@@ -14,7 +14,7 @@ while :
 do
   echo SA Rotate is running.
   for remote in $REMOTES;do
-    echo rclone config update $remote: service_account_file $JSONDIR/$COUNT.json
+    rclone config update $remote: service_account_file $JSONDIR/$COUNT.json
     #systemctl restart teamdrive@"$remote".service
     COUNT=$(( $COUNT>=$MAXJS?MINJS:$COUNT+1 ))
   done
