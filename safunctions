@@ -69,7 +69,7 @@ cleanup ()
 { . msg dedupe $1
   rclone dedupe skip $1 -v --drive-use-trash=false --tpslimit=5
   . msg perm_del $1
-  #rclone delete $2: -vv --drive-trashed-only --drive-use-trash=false --tpslimit=4 --tpslimit-burst=40 --no-traverse
+  rclone delete $2: -vv --drive-trashed-only --drive-use-trash=false --tpslimit=4 --tpslimit-burst=40 --no-traverse
   rclone cleanup $1 -v
   rclone rmdirs $1 -v --drive-use-trash=false --fast-list --tpslimit=5 --leave-root
 }
@@ -123,11 +123,12 @@ add_to_counter ()
   [ -f "$JSDIR"/"$COUNT".json ] || next_sa; }
 
 export_js ()
-{ export "RCLONE_CONFIG_"$1"_SERVICE_ACCOUNT_FILE="$JSDIR"/"$COUNT.json; }
+{ set -x;export "RCLONE_CONFIG_"$1"_SERVICE_ACCOUNT_FILE="$JSDIR"/"$COUNT.json;set +x; }
 
 next_sa ()
 { add_to_counter
-  if "${rem_sa[0]}" && "${rem_sa[1]}" && "${CRYPT[1]}";then sa_flag="$dsaf$COUNT.json "
+  if "${rem_sa[0]}" && "${rem_sa[1]}" && "${CRYPT[1]}";then
+    set -x;sa_flag="$dsaf$COUNT.json ";set +x
   else if "${rem_sa[0]}";then export_js "$SRC";fi
        if "${rem_sa[1]}";then export_js "$DEST";fi
   fi; ((SAs--))
