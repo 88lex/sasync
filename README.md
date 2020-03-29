@@ -1,4 +1,49 @@
-## **SASYNC 3.0**
+## **SASYNC 3.2 **
+
+NOTE: This version of sasync requires a recent rclone beta (  v1.50.2-131 or later )
+
+Major change: If your prior version is 3.0 or lower then to run this new version of sasync correctly
+you MUST remove the max transfer field (e.g. 600G) from your old set files.\
+Suggested method is to copy your set files from /opt/sasync/sasets to /opt/sasync/sets,
+then run the ./remove_maxt script for set.* files in the /sets folder.\
+For now it's a good idea to keep the old set files (until the new rclone flag is fully tested).
+
+NOTE: You can get a similar result with sasync 3.0 (master) by adding the --drive-stop-on-upload-limit to sasync.conf
+flag to the sasync.conf, then changing your set file --max-transfer settings to be > 750G
+
+###  Changelog V3.2
+- [NEW] If SOURCE is empty will skip that pair and create an error in a file `*_bad_remote.log`
+- [NEW] Added a variable called `DIFF_LIMIT` in sasync.conf.default (be sure to copy to your sasync.conf file)
+  - `DIFF_LIMIT` is an INTEGER representing the ratio % of SOURCE / DESTINATION remote size.
+  - IMPORTANT: `DIFF_LIMIT` only works if `CALC_SIZE=true`. You cannot calculate a ratio without sizes.
+  - Examples:
+    - If source remote is 20GB and destination remote is 10GB then the ratio would be 200 (200%, but we leave out the %).
+    - If source remote is 5GB and destination remote is 10GB then the ratio would be 50 (50%, omitting %).
+    - If you set `DIFF_LIMIT=70` then the first example would pass, but the second would fail.
+    - On failure of the DIFF_LIMIT test sasync will write an error to `*_bad_remote.log`
+- [NEW] Added a file called `*_bad_remote.log`. This file will be printed at the end of each sasync run. You can tail or monitor these files, or you can periodically send them to your email, bots, discord, etc.
+- [NEW] Added a variable called `NEXTJS` in sasync.conf.default (be sure to copy to your sasync.conf file)
+  - `NEXTJS` is the amount by which JSCOUNT (your SAs) will be increased with each cycle.
+  - In most cases leaving `NEXTJS` at a default of 1 is fine.
+  - In cases where you may have errors from too many api calls and/or are running multiple parallel instances of sasync,
+  it is possible that setting `NEXTJS=101` can help reduce errors.
+  - Each GSuite project has its own api quota. Incrementing by 101 forces parallel sasync instances to use a different project's quota.
+  - Note that setting `NEXTJS=101` only works well if you have multiple projects and many SAs.
+- [CHANGED-TEMP] For `CLEAN_DEST` and `CLEAN_SRC` temporarily replaced `rclone delete remote: --drive-trashed-only` with `rclone cleanup remote:`.
+  - The delete remote with --drive-trashed-only has been hanging sometimes with recent rclone releases. And in principle rclone cleanup should work, even if not immediately. Will monitor and change back in future if needed.
+
+###  Changelog V3.1
+
+- [NEW] Added --drive-stop-on-upload-limit to sasync.conf
+- [REMOVED] --max-transfer logic and set.file requirement
+- [CHANGED] Default location of set files from /sasets to /sets
+- [NEW] Added a script (remove_maxt) in /sets folder to remove max_transfer variable from set files
+  - Best way to do this is `cp -r /opt/sasync/sasets /opt/sasync/sets` then
+  - `cd /opt/sasync/sets && chmod +x remove_maxt` then `./remove_maxt set.*`
+- [REMOVED] IFS auto sense. Forces user to choose separator in sasync.conf file. e.g. IFS1=' ' or IFS1=','
+- [REMOVED] TMOUT (timeout) flag and code
+- [ADDED] Link for new instructions for manually checking rclone remote permissions that impact successful running of sasync. ==> [ MANUAL DIAGNOSTIC FOR CHECKING PERMISSIONS ON RCLONE REMOTES WITH SAs ](https://github.com/88lex/sa-guide/blob/master/rclone_remote_permissions.md)
+
 
 **>Uses rclone and Google Service Accounts (SAs) to sync, copy or move files between rclone remotes.
 <br>Usage: &emsp; `./sasync set.file ` &emsp; &emsp; [[enable execution with `chmod +x sasync`]]**
@@ -18,23 +63,14 @@ Sets must have an rclone action (sync, copy, move) , a source and destination an
 [[Avoid using commas or bars in remote/folder names. This can confuse sasync.]]
 - The sample set file has column labels for reference. They are entirely unnecessary for sasync to run.
 <pre>
-#0action  1source            2destination   3maxtransfer   4rcloneflags
-sync      teamdrive:docs     my_td:docs     350G           --max-age=3d
+#0action  1source            2destination   3rcloneflags
+sync      teamdrive:docs     my_td:docs     --max-age=3d
 </pre>
-OR
-<pre>
-sync,teamdrive:docs,my_td:docs,350G,--max-age=3d
-</pre>
-OR
-<pre>
-sync,teamdrive:docs,my_td:docs,350G,--max-age=3d
-</pre>
-
 
 #### SASYNC reads from a **set file**. Each line in the set file describes
 - An action that rclone will execute (`sync`, `copy` or `move`)
 - A source and destination remote folder
-- A breakpoint (--max-transfer) which tells sasync to move to the next SA
+- REMOVED ~~A breakpoint (--max-transfer) which tells sasync to move to the next SA~~
 - Any additional rclone flags which you would like to apply to individual source/destination pairs
 
 <br>
@@ -50,7 +86,7 @@ sync,teamdrive:docs,my_td:docs,350G,--max-age=3d
 
 - [NEW] Added -t option to run sasync in tmux. `./sasync -t set.file`
 
-- [NEW-AGAIN] Added back ability to run with multiple set files
+- [NEW-AGAIN] Added ability to run with multiple set files
   - `./sasync -p n set.file1 set.file2 set.file3`
   - Will merge set files then run in n tmux windows
   - When one set pair finishes next one auto loads
@@ -59,10 +95,10 @@ sync,teamdrive:docs,my_td:docs,350G,--max-age=3d
 - [UNCHANGED] sasync still supports custom config files as well as infinite rclone flags at the end, along with new -p options.
   - `./sasync -c my.conf set.file1 --flag1--flag2 -v --dry-run`
 
-- [NEW] Allows making missing directories in the destination remote with MAKE_DESTDIR [Deault: false]
+- [NEW] Allows creating missing directories in the destination remote with MAKE_DESTDIR [Deault: false]
   - Be careful with this option. If your remote does not exist it could create directories on your local disk
 
-- [NEW] Changed remote check from `rclone lsd` to `rclone about`. Should make it much quicker
+- ~~[NEW] Changed remote check from `rclone lsd` to `rclone about`. Should make it much quicker~~
 
 - [NEW] Added `--drive-service-account-file` to READ/WRITE/DELETE checks. Should make check more reliable
 
@@ -88,10 +124,9 @@ sync,teamdrive:docs,my_td:docs,350G,--max-age=3d
   - `c..` = cd ..
   - `t0`  = tmux a -t 0
 
-- [NEW] Trying to accommodate set files with various formats. At the moment you should be able to separate your fields with
-spaces, tabs, commas[,] or vertical bars[|].
-  - Use only one type of field separator. Do not mix separators in the same file - results may be unpredictable.
-  - One method to change space separators to ',' in your set file is to run `sed -r 's/\s+/,/g' set.file > set.file.new` in a bash terminal.
+- [NEW] ~~Trying to accommodate set files with various formats. At the moment you should be able to separate your fields with spaces, tabs, commas[,] or vertical bars[|].~~
+  - ~~Use only one type of field separator. Do not mix separators in the same file - results may be unpredictable.~~
+  - ~~One method to change space separators to ',' in your set file is to run `sed -r 's/\s+/,/g' set.file > set.file.new` in a bash terminal.~~
 
 - [NEW] sasync can now do sync/copy without SAs in source or destination.
   - This is not the primary use-case, but if you want to include syncs to destinations where you do not have SA
@@ -337,6 +372,9 @@ FLAGS="
 <br>
 
 ###  Tips and Notes
+
+- [ MANUAL DIAGNOSTIC FOR CHECKING PERMISSIONS ON RCLONE REMOTES WITH SAs ](https://gitlab.com/88lex/sa-guide/-/blob/master/rclone_remote_permissions.md#manual-diagnostic-for-checking-permissions-on-a-rclone-remote)
+
 
 - sasync can be run with crontab or as a task in windows
 

@@ -7,11 +7,12 @@ process_cmd_args_and_clean_set_files()
 { . sasync.conf.default
   . sasync.conf
   . rccheck
+  saconf="sasync.conf"
   par=false
   args="$@"
   while getopts ':c:p:P:n:t' o;do
     case "$o" in
-      c) source "${OPTARG:-sasync.conf}" ;;
+      c) saconf="${OPTARG:-sasync.conf}";source $saconf ;;
       p|P|n) par=true;n=${OPTARG} ;;
       t) tmux new "$SASDIR/sasync ${args/-t/}"
     esac
@@ -35,8 +36,8 @@ clean_set_files()
     else . msg no_file;exit;fi
   done
 
-  set_clean=$(echo "$set_file" | sed '/#/d; /^$/d; s/[\t\r]/ /g; s/\"//g')
-  if echo "$set_clean" | grep -E '\||,' &>/dev/null;then IFS1=',|';fi
+  set_clean=$(echo "$set_file" | sed $'/^#/d; /^$/d; s/[\t\r]/ /g; s/\"//g')
+  #if echo "$set_clean" | grep -E '\||,' &>/dev/null;then IFS1=',|';fi
   echo -e "$set_clean" | column -s"$IFS1" -t
   if [ ${par,,} == "true" ];then parallel_sasync;exit;fi
   init_log_n_bak
@@ -49,6 +50,9 @@ init_log_n_bak()
 { STD_LOG="$SASDIR"/logs/$(date +%F)_stdout.log
   ERR_LOG="$SASDIR"/logs/$(date +%F)_stderr.log
   FAIL_LOG="$SASDIR"/logs/$(date +%F)_fail.log
+  BAD_REMOTE_LOG="$SASDIR"/logs/$(date +%F)_"$file"_bad_remote.log
+  > $BAD_REMOTE_LOG
+
   if [ ! -f $SASDIR/json.count ];then echo $MINJS >$SASDIR/json.count;fi
   mkdir -p $SASDIR/backup $SASDIR/logs
   cp $SASDIR/sasync.conf "$SASDIR/backup/$(date +%F)_sasync.conf"
@@ -65,7 +69,8 @@ cleanup ()
 { . msg dedupe $1
   rclone dedupe skip $1 -v --drive-use-trash=false --tpslimit=5
   . msg perm_del $1
-  rclone delete $2: -vv --drive-trashed-only --drive-use-trash=false --tpslimit=5
+  rclone delete $2: -vv --drive-trashed-only --drive-use-trash=false --tpslimit=4 --tpslimit-burst=40 --no-traverse
+  rclone cleanup $1 -v
   rclone rmdirs $1 -v --drive-use-trash=false --fast-list --tpslimit=5 --leave-root
 }
 
@@ -82,7 +87,7 @@ parallel_sasync()
   rm -f $tmp_files*
   echo "$set_clean">"$tmp_files"
   split -l 1 "$tmp_files" "$tmp_files"
-  basename -a $tmp_files[a-z]* | parallel -j $n --tmux ./sasync {} $cmd_flags
+  basename -a $tmp_files[a-z]* | parallel -j $n --tmux ./sasync -c $saconf {} $cmd_flags
   rm -f $tmp_files*
   . msg fin_par
   }
@@ -93,6 +98,7 @@ parallel_sasync()
 sacalc()
 { . msg ck_size
   srcsize=`eval rclone size "$src" --json | cut -d ":" -f3 | cut -d "}" -f1`
+  if [[ $srcsize -eq 0 ]];then $CON_EX;fi
   srcsizeGB=$(( $srcsize/1024**3 ))
 
   destsize=`eval rclone size "$dest" --json | cut -d ":" -f3 | cut -d "}" -f1`
@@ -104,24 +110,25 @@ sacalc()
   SRC_LIMIT=${SRC_LIMIT%%[A-Za-z]*}
   LIM=${SRC_LIMIT:-$diffGB}
   LIM=$((diffGB>LIM?LIM:diffGB))
-  MAXT=${maxt%%[A-Za-z]*}
+  MAXT=750
   SAs=$(( ($MAXT+${LIM#-})/$MAXT ))
   . msg diff_size; }
 
 #*****************************************************************************************
 # Add 1 to counter, then use next service account in rclone remote ENV or config
 #*****************************************************************************************
-add_1_to_counter ()
+add_to_counter ()
 { COUNT=$(<$JSCOUNT)
-  echo $(( $COUNT>=$MAXJS?$MINJS:$COUNT+1 ))>$JSCOUNT
+  echo $(( $COUNT>=$MAXJS?$MINJS:$COUNT+$NEXTJS ))>$JSCOUNT
   [ -f "$JSDIR"/"$COUNT".json ] || next_sa; }
 
 export_js ()
-{ export "RCLONE_CONFIG_"$1"_SERVICE_ACCOUNT_FILE="$JSDIR"/"$COUNT.json; }
+{ set -x;export "RCLONE_CONFIG_"$1"_SERVICE_ACCOUNT_FILE="$JSDIR"/"$COUNT.json;set +x; }
 
 next_sa ()
-{ add_1_to_counter
-  if "${rem_sa[0]}" && "${rem_sa[1]}" && "${CRYPT[1]}";then sa_flag="$dsaf$COUNT.json "
+{ add_to_counter
+  if "${rem_sa[0]}" && "${rem_sa[1]}" && "${CRYPT[1]}";then
+    set -x;sa_flag="$dsaf$COUNT.json ";set +x
   else if "${rem_sa[0]}";then export_js "$SRC";fi
        if "${rem_sa[1]}";then export_js "$DEST";fi
   fi; ((SAs--))
@@ -134,7 +141,7 @@ run_rclone_w_flags ()
 { while [[ $ret =~ ^(7|8)$ ]] && (($SAs));do . msg run_rc
     next_sa
     set -x
-    $TMOUT rclone $sync "$src" "$dest" $sa_flag $FLAGS $set_flags $bak $cmd_flags
+    rclone $sync "$src" "$dest" $sa_flag $FLAGS $bak $set_flags $cmd_flags
     ret=$?
     set +x
     done
@@ -144,7 +151,7 @@ run_rclone_w_flags ()
 # Process each line in set file. Check remotes, run rclone then *option* clean the remotes
 #*****************************************************************************************
 check_remotes_and_run_rclone ()
-{ while IFS=$IFS1 read -r sync src dest maxt set_flags;do
+{ while IFS="$IFS1" read sync src dest set_flags;do
     check_remotes || continue
     run_rclone_w_flags
     . msg fin_sync

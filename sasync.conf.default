@@ -1,22 +1,23 @@
 #!/usr/bin/env bash
 # Double check that these flags point to your files/folders
 SASDIR="/opt/sasync"              # Location of the sasync script
-SETDIR="$SASDIR/sasets"           # Location of your set files
+SETDIR="$SASDIR/sets"             # Location of your set files
 JSDIR="/opt/sa"                   # Location of DIR with SA .json files. No trailing slash
 MINJS=1                           # First json file number in your JSON directory (JSDIR)
 MAXJS=1200                        # Hughest/max json file number in your JSON directory (JSDIR)
 JSCOUNT="$SASDIR/json.count"      # Location of json.count file (NOT the jsons themselves)
+NEXTJS=1                          # Cycle json by NEXTJS. Default 1. Using 101 may help avoid api issues
 FILTER="$SASDIR/filter"           # Location of your default filter file
-IFS1=' ,|'                        # Field separator for set file. Use ',' or '|' if you do not use space
+IFS1=$' \t\n'                     # Field separator for set file. Use ',' or '|' if you do not use space
 
 # Flags to control which checks and what cleaning is done. All = false works in standard case
 CHECK_REMOTES=true                # Check if remotes are configured in rclone. Faster if set to false
-CALC_SIZE=false                   # Runs check size and estimates number of SAs required
+CALC_SIZE=false                   # Runs check size ; MUST set to true if using DIFF_LIMIT
+DIFF_LIMIT=0                      # If source/dest size < or = DIFFLIMIT % then skip pair (def=0, use integers)
 FILE_COMPARE=false                # Runs hash check against files
 CLEAN_DEST=false                  # Set to true if you want to clean the destination
 CLEAN_SRC=false                   # Set to true if you want to clean the source
-PRE_CLEAN_TDS=false               # Set to true to clean remotes fore running rclone
-TMOUT=""                          # Syntax is TMOUT="timeout 30m". Use only if rclone hangs
+PRE_CLEAN_TDS=false               # Set to true to clean remotes before running rclone
 EXIT_ON_BAD_PAIR=false            # Exit (true) or continue (false) if set pair is bad
 SRC_LIMIT=                        # Daily limit in GB. Blank if none. To use, CALC_SIZE must be true
 BAK_FILES=false                   # (true/false)Send files to backup dir rather than delete them
@@ -26,7 +27,8 @@ MAKE_DESTDIR=false                # To make missing directories set to true.
 # These flags are applied to all sets. Tweak them as you like
 FLAGS="
   --fast-list
-  -P
+  -vP
+  --tpslimit-burst=50
   --stats=10s
   --max-backlog=2000000
   --ignore-case
@@ -37,4 +39,5 @@ FLAGS="
   --track-renames
   --use-mmap
   --drive-server-side-across-configs=true
+  --drive-stop-on-upload-limit
   "

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #set -a
 
-VER=3.0
+VER=3.2
 case ${1,,} in
   start)
     printf '%.0s*' {1..80};echo
@@ -79,12 +79,26 @@ case ${1,,} in
   ck_size)
     echo -e "\nCHECKING SIZE of $src and $dest BE PATIENT" ;;
 
+  src_zero)
+    (printf '%.0s*' {1..80};echo;printf '%.0s*' {1..80};echo ) | tee -a $BAD_REMOTE_LOG
+    echo -e "\nSOURCE $src is EMPTY, SIZE=0. CHECK REMOTE!\n" | tee -a $BAD_REMOTE_LOG
+    (printf '%.0s*' {1..80};echo;printf '%.0s*' {1..80};echo) | tee -a $BAD_REMOTE_LOG ;;
+
+  srcdest_ratio_bad)
+    (printf '%.0s*' {1..80};echo;printf '%.0s*' {1..80};echo) | tee -a $BAD_REMOTE_LOG
+    echo -e "\nSOURCE $src is below $DIFF_LIMIT % src/dest ratio. CHECK REMOTE!\n" | tee -a $BAD_REMOTE_LOG
+    echo -e "\nDIFF_LIMIT = $DIFF_LIMIT %\nSRC/DEST ratio = $sd_ratio %\nsrcsize = $srcsize \ndestsize = $destsize"
+    (printf '%.0s*' {1..80};echo;printf '%.0s*' {1..80};echo) | tee -a $BAD_REMOTE_LOG ;;
+
+  srcdest_ratio_ok)
+    echo -e "\nDIFF_LIMIT = $DIFF_LIMIT %\nSRC/DEST ratio $sd_ratio % is OKAY\n" ;;
+
   diff_size)
     echo "SIZE is $srcsizeGB GB in SOURCE $src  ( $srcsize bytes )"
     echo "SIZE is $destsizeGB GB in DEST $dest  ( $destsize bytes )"
     echo "DIFF is $diffGB GB  ( $diff bytes )"
     [[ $SRC_LIMIT ]] && echo -e "DAILY SRC transfer limit is $SRC_LIMIT GB"
-    [[ $diff != 0 ]] && echo -e "EST NUM OF SAs is $SAs \nMax Transfer per SA is $maxt"
+    [[ $diff != 0 ]] && echo -e "EST NUM OF SAs is $SAs \n" #Max Transfer per SA is $maxt"
     : ;;
 
   dedupe)
@@ -101,7 +115,7 @@ case ${1,,} in
 
   run_rc)
     echo -e "\nBEGIN $sync of $src to $dest w $COUNT/$MAXJS.json from $files\n"
-    echo -e "FLAGS= $FLAGS\nset_flags= $set_flags\ncmd_flags= $cmd_flags\nTIMEOUT= $TMOUT\n"
+    echo -e "FLAGS= $FLAGS\nset_flags= $set_flags\ncmd_flags= $cmd_flags\n"
     echo -e "Max SAs for this set = $SAs ( = MAXJS if no size calculated )\n" ;;
 
   sa_js)
@@ -111,7 +125,11 @@ case ${1,,} in
     echo -e "\nFINISHED $sync FROM $src TO $dest" ;;
 
   complete)
-    echo -e "\nSASYNC COMPLETED FOR SET FILE $files. NOW EXITING\n" ;;
+    echo -e "\nSASYNC COMPLETED FOR SET FILE $files. NOW EXITING\n"
+    if [[ -s $BAD_REMOTE_LOG ]];then
+      echo -e "BAD REMOTES LISTED BELOW\nFile = $BAD_REMOTE_LOG\n"
+      cat $BAD_REMOTE_LOG;echo;echo
+    fi ;;
 
   *)
     echo !! MISSING MESSAGE!! You forgot to add a message for this command $0 $1 $2!! ;;

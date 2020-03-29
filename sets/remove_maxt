@@ -9,7 +9,8 @@ IFS1=$' \t\n'
 process_sets () {
   for set_file in $@; do
     echo Set file=$set_file
-    column -s"$IFS1" -t $set_file > tmp
+    #column -s"$IFS1" -t $set_file  | sed 's/[ 0-9][ 0-9][ 0-9][0-9]G//g' > tmp
+    column -s"$IFS1" -t $set_file  | sed '/#/d; /^$/d; s/[\t\r]/ /g; s/\"//g; s/[ 0-9][ 0-9][ 0-9][0-9]G//g' > tmp
     mv tmp $set_file
     cat $set_file
   done

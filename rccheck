@@ -9,9 +9,9 @@ vars_for_check() {
   SAs=$MAXJS
   bak=
   dsaf="--drive-service-account-file=$JSDIR/"
-  set_flags="$set_flags --max-transfer=$maxt"
+  dutf="--drive-use-trash=false"
 
-  srcdest=($src $dest)
+  srcdest=("$src" "$dest")
   rem=(${src%:*} ${dest%:*})
   rem_sa=(true true)
   rem_td=(true true)
@@ -20,7 +20,7 @@ vars_for_check() {
   DEST=`sed 's/-/_/g' <<<${rem[1]^^}`
 
   if "$EXIT_ON_BAD_PAIR";then CON_EX="exit";else CON_EX="return 1";fi
-  if ${MAKE_DESTDIR,,};then rclone mkdir $dest; fi
+  if ${MAKE_DESTDIR,,};then rclone mkdir "$dest"; fi
 }
 
 check_remotes()
@@ -36,13 +36,10 @@ check_remotes()
         then . msg ok_td "${rem[$i]}"
       else rem_td[$i]=false;. msg not_td "${rem[$i]}";fi
 
-      # Below, testing if rclone about gives same result as rclone lsd
-      #if `rclone about "${srcdest[$i]}" "$dsaf$COUNT.json" &>/dev/null` && ${rem_td[$i]}
       if `rclone lsd "${srcdest[$i]}" "$dsaf$COUNT.json" &>/dev/null` && ${rem_td[$i]}
         then . msg ok_sa "${srcdest[$i]}";dsaff="$dsaf$COUNT.json"
       else rem_sa[$i]=false;unset dsaff;. msg no_sa "${srcdest[$i]}";fi
 
-      #if `rclone about "${srcdest[$i]}" $dsaff &>/dev/null`
       if `rclone lsd "${srcdest[$i]}" $dsaff &>/dev/null`
         then . msg ok_read "${srcdest[$i]}"
       else . msg fail_read "${srcdest[$i]}";$CON_EX;fi
@@ -54,17 +51,23 @@ check_remotes()
     if rclone touch "${rem[1]}:/sasync.bin" $dsaff &>/dev/null
       then . msg ok_write "${rem[1]}";else . msg fail_write "${rem[1]}";$CON_EX;fi
 
-    if rclone deletefile -q "${rem[1]}:/sasync.bin" $dsaff &>/dev/null
+    if rclone deletefile -q "${rem[1]}:/sasync.bin" $dsaff $dutf &>/dev/null
       then . msg ok_del "${rem[1]}";else . msg fail_del "${rem[1]}";fi
   fi
 
   if ${PRE_CLEAN_TDS,,};then clean_remotes;fi
 
-  if ${BAK_FILES,,} && [ ! -z "${dest#*:}" ];then
+  if ${BAK_FILES,,} && [ ! -z "${dest#*:}" ] && [ ! $sync == "move" ];then
     bak="--backup-dir="$(sed "s/:/:$BAK_DIR\//g"<<<$dest);else unset bak;fi
 
-  if ${CALC_SIZE,,};then
-    sacalc && [ $srcsize == $destsize ] && . msg skip2next && return 1;fi
+  if ${CALC_SIZE,,};then sacalc
+    if [[ $srcsize -eq 0 ]];then . msg src_zero && return 1;fi
+    if [[ $srcsize == $destsize ]];then . msg skip2next && return 1;fi
+    if [[ $destsize != 0 ]];then sd_ratio=$(( 100 * $srcsize / $destsize  ))
+      if [[ $sd_ratio -le $DIFF_LIMIT ]];then . msg srcdest_ratio_bad;return 1
+        else . msg srcdest_ratio_ok;fi
+    fi
+  fi
 
   if ${FILE_COMPARE,,};then . msg file_cmp
     if rclone check "$src" "$dest" --one-way --fast-list &> >(grep '0 differences')

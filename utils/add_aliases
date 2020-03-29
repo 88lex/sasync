@@ -6,7 +6,7 @@
 
 echo "alias sas='/opt/sasync/sasync'" >> ~/.bashrc
 echo "alias csa='cd /opt/sasync'" >> ~/.bashrc
-echo "alias cse='cd /opt/sasync/sasets'" >> ~/.bashrc
+echo "alias cse='cd /opt/sasync/sets'" >> ~/.bashrc
 echo "alias csl='cd /opt/sasync/logs'" >> ~/.bashrc
 echo "alias csu='cd /opt/sasync/utils'" >> ~/.bashrc
 echo "alias c..='cd ..'" >> ~/.bashrc

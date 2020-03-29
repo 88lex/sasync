@@ -1,0 +1,6 @@
+# set.video.sample
+# Note: rclone_flags are optional and will override global flags
+#synccopymove 1source        2destination   3rclone_flags
+sync          td_video:      my_video:      --dry-run
+copy          td_video_4k:   my_video_4k:   --no-traverse --dry-run
+#end-of-file

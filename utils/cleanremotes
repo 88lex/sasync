@@ -2,7 +2,8 @@
 # cleanremotes accepts a command line filter now.  e.g. `./cleanremotes tv` will
 # only clean remotes that have `tv` in them
 
-filter=$1
+filter="$1"
+#rclone listremotes | gawk "$filter"
 rclone listremotes | grep "$filter"
 
 readarray mounts < <( rclone listremotes | grep "$filter" )
@@ -13,5 +14,5 @@ for i in ${mounts[@]}; do
   rclone rmdirs $i -v --drive-use-trash=false --fast-list --transfers=50
   echo; echo PERMANENTLY DELETING TRASH from $i; echo
   rclone delete $i --fast-list --drive-trashed-only --drive-use-trash=false -v --transfers 50
-  #rclone cleanup $i -v
+  rclone cleanup $i -v
 done
