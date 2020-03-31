@@ -1,17 +1,23 @@
-## **SASYNC 3.2 **
-
+## **SASYNC 3.3 **
 NOTE: This version of sasync requires a recent rclone beta (  v1.50.2-131 or later )
 
+###  Changelog V3.3
+- [NEW] Added notifications using `apprise`. <= This is an Alpha feature.
+  - NOTE: You need to install and configure apprise for this to work.
+  - There are two levels of notifications. ALL and KEY. These can be toggled (true/false) in `sasync.conf`.
+  - The default command is simply `apprise`, using whatever default you have configured for apprise. Other apprise commands may work.
+  - Notification apps other than apprise may work but have not been tested.
+
+NOTE: You can get a similar result with sasync 3.0 (master) by adding the --drive-stop-on-upload-limit to sasync.conf
+flag to the sasync.conf, then changing your set file --max-transfer settings to be > 750G
+
+###  Changelog V3.2
 Major change: If your prior version is 3.0 or lower then to run this new version of sasync correctly
 you MUST remove the max transfer field (e.g. 600G) from your old set files.\
 Suggested method is to copy your set files from /opt/sasync/sasets to /opt/sasync/sets,
 then run the ./remove_maxt script for set.* files in the /sets folder.\
 For now it's a good idea to keep the old set files (until the new rclone flag is fully tested).
 
-NOTE: You can get a similar result with sasync 3.0 (master) by adding the --drive-stop-on-upload-limit to sasync.conf
-flag to the sasync.conf, then changing your set file --max-transfer settings to be > 750G
-
-###  Changelog V3.2
 - [NEW] If SOURCE is empty will skip that pair and create an error in a file `*_bad_remote.log`
 - [NEW] Added a variable called `DIFF_LIMIT` in sasync.conf.default (be sure to copy to your sasync.conf file)
   - `DIFF_LIMIT` is an INTEGER representing the ratio % of SOURCE / DESTINATION remote size.

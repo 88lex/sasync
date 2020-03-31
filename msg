@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-#set -a
 
-VER=3.2
+VER=3.3
 case ${1,,} in
   start)
     printf '%.0s*' {1..80};echo
@@ -24,16 +23,13 @@ case ${1,,} in
   ck_fin)
     echo -e "\nCHECK OF RCLONE REMOTES COMPLETED FOR $src and $dest" ;;
 
-  bad_src)
-    echo -e "\nSOURCE REMOTE $SRC IS EMPTY OR PERMISSIONS ARE BAD. CHECK SOURCE CONFIG & SA PERMISSIONS" ;;
-
   ok_cfg)
     echo -e "\nCHECKING         $2"
     echo -e "SUCCESS CONFIG   $2 EXISTS in rclone.conf file" ;;
 
   rc_bad)
     echo -e "\nCHECKING         $2"
-    echo -e "FAILURE          $2 DOES NOT EXIST IN YOUR RCLONE CONFIG"|tee -a $FAIL_LOG ;;
+    echo -e "FAILURE          $2 DOES NOT EXIST IN YOUR RCLONE CONFIG"|tee -a "$FAIL_LOG" ;;
 
   ok_td)
     echo -e "SUCCESS TD       $2 is a TEAM DRIVE" ;;
@@ -56,7 +52,7 @@ case ${1,,} in
     echo -e "REMOTE ENCRYPTED $2" ;;
 
   fail_read)
-    echo -e "***\nFAILURE READ     $2 : CHECK PERMISSIONS and rclone config\n"|tee -a $FAIL_LOG ;;
+    echo -e "***\nFAILURE READ     $2 : CHECK PERMISSIONS and rclone config\n"|tee -a "$FAIL_LOG" ;;
 
   ok_write)
     echo -e "SUCCESS WRITE    $2" ;;
@@ -80,15 +76,15 @@ case ${1,,} in
     echo -e "\nCHECKING SIZE of $src and $dest BE PATIENT" ;;
 
   src_zero)
-    (printf '%.0s*' {1..80};echo;printf '%.0s*' {1..80};echo ) | tee -a $BAD_REMOTE_LOG
-    echo -e "\nSOURCE $src is EMPTY, SIZE=0. CHECK REMOTE!\n" | tee -a $BAD_REMOTE_LOG
-    (printf '%.0s*' {1..80};echo;printf '%.0s*' {1..80};echo) | tee -a $BAD_REMOTE_LOG ;;
+    (printf '%.0s*' {1..80};echo;printf '%.0s*' {1..80};echo ) | tee -a "$FAIL_LOG"
+    echo -e "\nSOURCE $src is EMPTY, SIZE=0. CHECK REMOTE!\n" | tee -a "$FAIL_LOG"
+    (printf '%.0s*' {1..80};echo;printf '%.0s*' {1..80};echo) | tee -a "$FAIL_LOG" ;;
 
   srcdest_ratio_bad)
-    (printf '%.0s*' {1..80};echo;printf '%.0s*' {1..80};echo) | tee -a $BAD_REMOTE_LOG
-    echo -e "\nSOURCE $src is below $DIFF_LIMIT % src/dest ratio. CHECK REMOTE!\n" | tee -a $BAD_REMOTE_LOG
+    (printf '%.0s*' {1..80};echo;printf '%.0s*' {1..80};echo) | tee -a "$FAIL_LOG"
+    echo -e "\nSOURCE $src is below $DIFF_LIMIT % src/dest ratio. CHECK REMOTE!\n" | tee -a "$FAIL_LOG"
     echo -e "\nDIFF_LIMIT = $DIFF_LIMIT %\nSRC/DEST ratio = $sd_ratio %\nsrcsize = $srcsize \ndestsize = $destsize"
-    (printf '%.0s*' {1..80};echo;printf '%.0s*' {1..80};echo) | tee -a $BAD_REMOTE_LOG ;;
+    (printf '%.0s*' {1..80};echo;printf '%.0s*' {1..80};echo) | tee -a "$FAIL_LOG" ;;
 
   srcdest_ratio_ok)
     echo -e "\nDIFF_LIMIT = $DIFF_LIMIT %\nSRC/DEST ratio $sd_ratio % is OKAY\n" ;;
@@ -114,24 +110,25 @@ case ${1,,} in
       echo -e "Finished parallel instances of tmux" ;;
 
   run_rc)
-    echo -e "\nBEGIN $sync of $src to $dest w $COUNT/$MAXJS.json from $files\n"
+    eval echo -e "BEGIN $sync of $src to $dest from $files. SA= $COUNT/$MAXJS.json"$notif_key
     echo -e "FLAGS= $FLAGS\nset_flags= $set_flags\ncmd_flags= $cmd_flags\n"
     echo -e "Max SAs for this set = $SAs ( = MAXJS if no size calculated )\n" ;;
 
   sa_js)
     echo -e "$COUNT.json added to config for $2" ;;
 
-  fin_sync)
-    echo -e "\nFINISHED $sync FROM $src TO $dest" ;;
+  fin_rc)
+    echo
+    eval echo -e "FINISHED $sync of $src TO $dest from $files. Last SA = $COUNT.json"$notif_key ;;
 
   complete)
     echo -e "\nSASYNC COMPLETED FOR SET FILE $files. NOW EXITING\n"
-    if [[ -s $BAD_REMOTE_LOG ]];then
-      echo -e "BAD REMOTES LISTED BELOW\nFile = $BAD_REMOTE_LOG\n"
-      cat $BAD_REMOTE_LOG;echo;echo
+    if [[ -s "$FAIL_LOG" ]];then
+      echo -e "CRITICAL ERRORS LISTED BELOW\nFile = "$FAIL_LOG"\n"
+      cat "$FAIL_LOG";echo;echo
     fi ;;
 
   *)
     echo !! MISSING MESSAGE!! You forgot to add a message for this command $0 $1 $2!! ;;
 
-esac
+esac | eval tee "$notif_all"

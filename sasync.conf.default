@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# Double check that these flags point to your files/folders
 SASDIR="/opt/sasync"              # Location of the sasync script
 SETDIR="$SASDIR/sets"             # Location of your set files
 JSDIR="/opt/sa"                   # Location of DIR with SA .json files. No trailing slash
@@ -8,12 +7,15 @@ MAXJS=1200                        # Hughest/max json file number in your JSON di
 JSCOUNT="$SASDIR/json.count"      # Location of json.count file (NOT the jsons themselves)
 NEXTJS=1                          # Cycle json by NEXTJS. Default 1. Using 101 may help avoid api issues
 FILTER="$SASDIR/filter"           # Location of your default filter file
+NOTIF_ALL=false                   # Use apprise to send ALL messages (must install/config apprise separately)
+NOTIF_KEY=false                   # Use apprise to send only summary/key messages
+NOTIF_COMM="apprise"              # Adjust if you want a specific apprise command
 IFS1=$' \t\n'                     # Field separator for set file. Use ',' or '|' if you do not use space
 
 # Flags to control which checks and what cleaning is done. All = false works in standard case
 CHECK_REMOTES=true                # Check if remotes are configured in rclone. Faster if set to false
 CALC_SIZE=false                   # Runs check size ; MUST set to true if using DIFF_LIMIT
-DIFF_LIMIT=0                      # If source/dest size < or = DIFFLIMIT % then skip pair (def=0, use integers)
+DIFF_LIMIT=95                     # If source/dest size < or = DIFFLIMIT % then skip pair (def=0, use integers)
 FILE_COMPARE=false                # Runs hash check against files
 CLEAN_DEST=false                  # Set to true if you want to clean the destination
 CLEAN_SRC=false                   # Set to true if you want to clean the source
@@ -27,15 +29,18 @@ MAKE_DESTDIR=false                # To make missing directories set to true.
 # These flags are applied to all sets. Tweak them as you like
 FLAGS="
   --fast-list
+  --checkers=64
+  --tpslimit=4
+  --tpslimit-burst=20
   -vP
-  --tpslimit-burst=50
   --stats=10s
   --max-backlog=2000000
   --ignore-case
+  --size-only
   --no-update-modtime
   --drive-chunk-size=128M
   --drive-use-trash=false
-  --filter-from=$FILTER
+  --filter-from="$FILTER"
   --track-renames
   --use-mmap
   --drive-server-side-across-configs=true

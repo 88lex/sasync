@@ -6,6 +6,8 @@
 process_cmd_args_and_clean_set_files()
 { . sasync.conf.default
   . sasync.conf
+  if ${NOTIF_ALL,,};then notif_all='| tee >($NOTIF_COMM)';else notif_all="";fi
+  if ${NOTIF_KEY,,};then notif_key='| tee >($NOTIF_COMM)';else notif_key="";fi
   . rccheck
   saconf="sasync.conf"
   par=false
@@ -49,9 +51,7 @@ clean_set_files()
 init_log_n_bak()
 { STD_LOG="$SASDIR"/logs/$(date +%F)_stdout.log
   ERR_LOG="$SASDIR"/logs/$(date +%F)_stderr.log
-  FAIL_LOG="$SASDIR"/logs/$(date +%F)_fail.log
-  BAD_REMOTE_LOG="$SASDIR"/logs/$(date +%F)_"$file"_bad_remote.log
-  > $BAD_REMOTE_LOG
+  FAIL_LOG="$SASDIR"/logs/$(date +%F)_"$files"_fail.log;>"$FAIL_LOG"
 
   if [ ! -f $SASDIR/json.count ];then echo $MINJS >$SASDIR/json.count;fi
   mkdir -p $SASDIR/backup $SASDIR/logs
@@ -138,13 +138,15 @@ next_sa ()
 # Run rclone with flags from config file, set file and command line. Use SAs where authed
 #*****************************************************************************************
 run_rclone_w_flags ()
-{ while [[ $ret =~ ^(7|8)$ ]] && (($SAs));do . msg run_rc
+{ . msg run_rc
+  while [[ $ret =~ ^(7|8)$ ]] && (($SAs));do
     next_sa
     set -x
     rclone $sync "$src" "$dest" $sa_flag $FLAGS $bak $set_flags $cmd_flags
     ret=$?
     set +x
-    done
+  done
+  . msg fin_rc
 }
 
 #*****************************************************************************************
@@ -154,6 +156,5 @@ check_remotes_and_run_rclone ()
 { while IFS="$IFS1" read sync src dest set_flags;do
     check_remotes || continue
     run_rclone_w_flags
-    . msg fin_sync
     clean_remotes
   done <<<"$set_clean" > >(tee "$STD_LOG") 2> >(tee "$ERR_LOG" >&2); }
