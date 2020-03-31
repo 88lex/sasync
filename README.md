@@ -12,7 +12,7 @@ NOTE: You can get a similar result with sasync 3.0 (master) by adding the --driv
 flag to the sasync.conf, then changing your set file --max-transfer settings to be > 750G
 
 ###  Changelog V3.2
-- [NEW] If SOURCE is empty will skip that pair and create an error in a file `*_bad_remote.log`
+- [NEW] If SOURCE is empty will skip that pair and create an error in a file `*_fail.log`
 - [NEW] Added a variable called `DIFF_LIMIT` in sasync.conf.default (be sure to copy to your sasync.conf file)
   - `DIFF_LIMIT` is an INTEGER representing the ratio % of SOURCE / DESTINATION remote size.
   - IMPORTANT: `DIFF_LIMIT` only works if `CALC_SIZE=true`. You cannot calculate a ratio without sizes.
@@ -20,8 +20,8 @@ flag to the sasync.conf, then changing your set file --max-transfer settings to 
     - If source remote is 20GB and destination remote is 10GB then the ratio would be 200 (200%, but we leave out the %).
     - If source remote is 5GB and destination remote is 10GB then the ratio would be 50 (50%, omitting %).
     - If you set `DIFF_LIMIT=70` then the first example would pass, but the second would fail.
-    - On failure of the DIFF_LIMIT test sasync will write an error to `*_bad_remote.log`
-- [NEW] Added a file called `*_bad_remote.log`. This file will be printed at the end of each sasync run. You can tail or monitor these files, or you can periodically send them to your email, bots, discord, etc.
+    - On failure of the DIFF_LIMIT test sasync will write an error to `*_fail.log`
+- [NEW] Added a file called `*_fail.log`. This file will be printed at the end of each sasync run. You can tail or monitor these files, or you can periodically send them to your email, bots, discord, etc.
 - [NEW] Added a variable called `NEXTJS` in sasync.conf.default (be sure to copy to your sasync.conf file)
   - `NEXTJS` is the amount by which JSCOUNT (your SAs) will be increased with each cycle.
   - In most cases leaving `NEXTJS` at a default of 1 is fine.
