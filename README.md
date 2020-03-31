@@ -18,7 +18,7 @@ Suggested method is to copy your set files from /opt/sasync/sasets to /opt/sasyn
 then run the ./remove_maxt script for set.* files in the /sets folder.\
 For now it's a good idea to keep the old set files (until the new rclone flag is fully tested).
 
-- [NEW] If SOURCE is empty will skip that pair and create an error in a file `*_bad_remote.log`
+- [NEW] If SOURCE is empty will skip that pair and create an error in a file `*_fail.log`
 - [NEW] Added a variable called `DIFF_LIMIT` in sasync.conf.default (be sure to copy to your sasync.conf file)
   - `DIFF_LIMIT` is an INTEGER representing the ratio % of SOURCE / DESTINATION remote size.
   - IMPORTANT: `DIFF_LIMIT` only works if `CALC_SIZE=true`. You cannot calculate a ratio without sizes.
