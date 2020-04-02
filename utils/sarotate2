@@ -18,6 +18,8 @@ do
     #systemctl restart teamdrive@"$remote".service
     COUNT=$(( $COUNT>=$MAXJS?MINJS:$COUNT+1 ))
   done
+  # If you want to use the same SA for all remotes unhash the line below, hash the line above 'done'
+  #COUNT=$(( $COUNT>=$MAXJS?MINJS:$COUNT+1 ))
   echo SA rotate is now going to sleep for $SLEEPTIME
   sleep $SLEEPTIME
 done
