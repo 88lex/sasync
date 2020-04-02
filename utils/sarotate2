@@ -5,9 +5,9 @@
 REMOTES=`cat $1`    # REMOTES taken from the set.remotes file.
 #REMOTES="$@"       # OR Use "$@" below if you prefer to specify remotes in the command line
 MINJS=1             # First json file number in your JSON directory.
-MAXJS=12            # Max json file number you wish to use in your JSON directory.
+MAXJS=1200            # Max json file number you wish to use in your JSON directory.
 JSONDIR=/opt/sa     # Location of DIR with SA .json files.
-SLEEPTIME=5s        # Sleep time before switching SA .json files.
+SLEEPTIME=15m        # Sleep time before switching SA .json files.
 COUNT=$MINJS        # COUNT needs to be initialized.
 
 while :
