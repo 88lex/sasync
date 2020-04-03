@@ -1,8 +1,8 @@
 #!/bin/bash
 # modified from original script from JoseP
 
-files_per_cycle=3
-cycle_time=20s
+files_per_cycle=50
+cycle_time=1m
 # Limit file_list by --max-age , --min-age , --min-size , etc. using cli arguments
 file_list=`rclone lsf "$@" -R --files-only`
 
@@ -14,4 +14,3 @@ for file in $file_list ;do
   echo -e "Count = $count"
   if [[ $count -ge $files_per_cycle ]];then count=0;sleep $cycle_time;fi
 done
-
