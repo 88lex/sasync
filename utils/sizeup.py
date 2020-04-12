@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
@@ -15,7 +17,7 @@ scope = ['https://spreadsheets.google.com/feeds',
 credentials = ServiceAccountCredentials.from_json_keyfile_name('/opt/sa/1.json', scope)
 gc = gspread.authorize(credentials)
 #print(gc)
-gsheet = 'RemoteSize'
+gsheet = 'RemoteSize1'
 sh = gc.open(gsheet)
 worksheet = sh.worksheet("Sheet1")
 remotes = worksheet.col_values(1)
@@ -51,7 +53,8 @@ for remote in remotes:
         remcount = int(parsed_json['count'])
         remsize = int(parsed_json['bytes'])
         remsizeGB = int(parsed_json['bytes'] / (1024**3))
-        nowtime = str(datetime.datetime.now())
+        nowtime = str(datetime.date.today())
+        #nowtime = str(datetime.datetime.now())
 
         print(f"Remote name          = {remote}")
         print(f"Remote file count    = {remcount}")
