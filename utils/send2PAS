@@ -2,12 +2,12 @@
 # modified from original script from JoseP
 
 files_per_cycle=50
-cycle_time=1m
-# Limit file_list by --max-age , --min-age , --min-size , etc. using cli arguments
+cycle_time=2m
+# Filter file_list by adding --max-age , --min-age , --min-size , etc. below
 file_list=`rclone lsf "$@" -R --files-only`
 
 for file in $file_list ;do
-  #curl -s -d "eventType=Manual&filepath=$file" http://PAS_URL > /dev/null
+  curl -s -d "eventType=Manual&filepath=$file" http://PAS_URL > /dev/null
   echo "$file added to your Plex_autoscan queue!"
   # Hash out or delete the above echo line if you don't want the noise.
   ((count++))
