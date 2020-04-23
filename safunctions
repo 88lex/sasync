@@ -66,17 +66,17 @@ init_log_n_bak()
 # Clean remotes - dedupe identical files, remove empty folders and permanently deletes trash
 #*****************************************************************************************
 cleanup ()
-{ . msg dedupe $1
-  rclone dedupe skip $1 -v --drive-use-trash=false --tpslimit=5
-  . msg perm_del $1
-  rclone delete $2: -vv --drive-trashed-only --drive-use-trash=false --tpslimit=4 --tpslimit-burst=40 --no-traverse
-  rclone cleanup $1 -v
-  rclone rmdirs $1 -v --drive-use-trash=false --fast-list --tpslimit=5 --leave-root
+{ . msg dedupe "$1"
+  rclone dedupe skip "$1" -v --drive-use-trash=false --tpslimit=5
+  . msg perm_del "$1"
+  rclone delete "$2": -vv --drive-trashed-only --drive-use-trash=false --tpslimit=4 --tpslimit-burst=40 --no-traverse
+  rclone cleanup "$1" -v
+  rclone rmdirs "$1" -v --drive-use-trash=false --fast-list --tpslimit=5 --leave-root
 }
 
 clean_remotes()
-{ ${CLEAN_DEST,,} && cleanup $dest ${dest%:*}
-  ${CLEAN_SRC,,} && cleanup $src ${src%:*}
+{ ${CLEAN_DEST,,} && cleanup "$dest" "${dest%:*}"
+  ${CLEAN_SRC,,} && cleanup "$src" "${src%:*}"
 }
 
 #*****************************************************************************************
