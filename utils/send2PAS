@@ -3,7 +3,7 @@
 
 files_per_cycle=50
 cycle_time=2m
-# Filter file_list by adding --max-age , --min-age , --min-size , etc. below
+# Filter file_list by adding --max-age --min-age --min-size --include --exclude etc. below
 file_list=`rclone lsf "$@" -R --files-only`
 
 for file in $file_list ;do
