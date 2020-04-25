@@ -11,10 +11,10 @@ rclone listremotes | grep "$filter"
 readarray mounts < <( rclone listremotes | grep "$filter" )
 for i in ${mounts[@]}; do
   echo; echo STARTING DEDUPE of identical files from $i; echo
-  rclone dedupe skip $i -v --drive-use-trash=false --no-traverse --transfers=50 "$rc_flags"
+  rclone dedupe skip $i -v --drive-use-trash=false --no-traverse --transfers=50 $rc_flags
   echo; echo REMOVING EMPTY DIRECTORIES from $i; echo
-  rclone rmdirs $i -v --drive-use-trash=false --fast-list --transfers=50 "$rc_flags"
+  rclone rmdirs $i -v --drive-use-trash=false --fast-list --transfers=50 $rc_flags
   echo; echo PERMANENTLY DELETING TRASH from $i; echo
-  rclone delete $i --fast-list --drive-trashed-only --drive-use-trash=false -v --transfers 50 "$rc_flags"
+  rclone delete $i --fast-list --drive-trashed-only --drive-use-trash=false -v --transfers 50 $rc_flags
   rclone cleanup $i -v
 done
