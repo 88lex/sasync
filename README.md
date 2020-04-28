@@ -1,55 +1,14 @@
-## **SASYNC 3.3 **
-NOTE: This version of sasync requires a recent rclone beta (  v1.50.2-131 or later )
+## **SASYNC 3.4 **
 
-###  Changelog V3.3
+## Need to update flag info and changelog
+
+###  Changelog V3.3 & 3.4
 - [NEW] Added notifications using `apprise`. <= This is an Alpha feature.
   - NOTE: You need to install and configure apprise for this to work.
   - There are two levels of notifications. ALL and KEY. These can be toggled (true/false) in `sasync.conf`.
   - The default command is simply `apprise`, using whatever default you have configured for apprise. Other apprise commands may work.
   - Notification apps other than apprise may work but have not been tested.
-
-NOTE: You can get a similar result with sasync 3.0 (master) by adding the --drive-stop-on-upload-limit to sasync.conf
-flag to the sasync.conf, then changing your set file --max-transfer settings to be > 750G
-
-###  Changelog V3.2
-Major change: If your prior version is 3.0 or lower then to run this new version of sasync correctly
-you MUST remove the max transfer field (e.g. 600G) from your old set files.\
-Suggested method is to copy your set files from /opt/sasync/sasets to /opt/sasync/sets,
-then run the ./remove_maxt script for set.* files in the /sets folder.\
-For now it's a good idea to keep the old set files (until the new rclone flag is fully tested).
-
-- [NEW] If SOURCE is empty will skip that pair and create an error in a file `*_fail.log`
-- [NEW] Added a variable called `DIFF_LIMIT` in sasync.conf.default (be sure to copy to your sasync.conf file)
-  - `DIFF_LIMIT` is an INTEGER representing the ratio % of SOURCE / DESTINATION remote size.
-  - IMPORTANT: `DIFF_LIMIT` only works if `CALC_SIZE=true`. You cannot calculate a ratio without sizes.
-  - Examples:
-    - If source remote is 20GB and destination remote is 10GB then the ratio would be 200 (200%, but we leave out the %).
-    - If source remote is 5GB and destination remote is 10GB then the ratio would be 50 (50%, omitting %).
-    - If you set `DIFF_LIMIT=70` then the first example would pass, but the second would fail.
-    - On failure of the DIFF_LIMIT test sasync will write an error to `*_fail.log`
-- [NEW] Added a file called `*_fail.log`. This file will be printed at the end of each sasync run. You can tail or monitor these files, or you can periodically send them to your email, bots, discord, etc.
-- [NEW] Added a variable called `NEXTJS` in sasync.conf.default (be sure to copy to your sasync.conf file)
-  - `NEXTJS` is the amount by which JSCOUNT (your SAs) will be increased with each cycle.
-  - In most cases leaving `NEXTJS` at a default of 1 is fine.
-  - In cases where you may have errors from too many api calls and/or are running multiple parallel instances of sasync,
-  it is possible that setting `NEXTJS=101` can help reduce errors.
-  - Each GSuite project has its own api quota. Incrementing by 101 forces parallel sasync instances to use a different project's quota.
-  - Note that setting `NEXTJS=101` only works well if you have multiple projects and many SAs.
-- [CHANGED-TEMP] For `CLEAN_DEST` and `CLEAN_SRC` temporarily replaced `rclone delete remote: --drive-trashed-only` with `rclone cleanup remote:`.
-  - The delete remote with --drive-trashed-only has been hanging sometimes with recent rclone releases. And in principle rclone cleanup should work, even if not immediately. Will monitor and change back in future if needed.
-
-###  Changelog V3.1
-
-- [NEW] Added --drive-stop-on-upload-limit to sasync.conf
-- [REMOVED] --max-transfer logic and set.file requirement
-- [CHANGED] Default location of set files from /sasets to /sets
-- [NEW] Added a script (remove_maxt) in /sets folder to remove max_transfer variable from set files
-  - Best way to do this is `cp -r /opt/sasync/sasets /opt/sasync/sets` then
-  - `cd /opt/sasync/sets && chmod +x remove_maxt` then `./remove_maxt set.*`
-- [REMOVED] IFS auto sense. Forces user to choose separator in sasync.conf file. e.g. IFS1=' ' or IFS1=','
-- [REMOVED] TMOUT (timeout) flag and code
-- [ADDED] Link for new instructions for manually checking rclone remote permissions that impact successful running of sasync. ==> [ MANUAL DIAGNOSTIC FOR CHECKING PERMISSIONS ON RCLONE REMOTES WITH SAs ](https://github.com/88lex/sa-guide/blob/master/rclone_remote_permissions.md)
-
+- [FIXED] COUNT fixed to work properly with NEXTJS other than 1. Use 101 to jump between projects.
 
 **>Uses rclone and Google Service Accounts (SAs) to sync, copy or move files between rclone remotes.
 <br>Usage: &emsp; `./sasync set.file ` &emsp; &emsp; [[enable execution with `chmod +x sasync`]]**
@@ -81,101 +40,6 @@ sync      teamdrive:docs     my_td:docs     --max-age=3d
 
 <br>
 
-###  Changelog  V3.0
-
-- [NEW] Added `-p number` option to run 'number' of parallel instances of sasync. Usage: For 3 parallel instances `./sasync -p 3 set.file`
-  - Requires tmux and parallel apps. Install with command: `sudo apt install parallel tmux`
-  - Sends sasync to n tmux windows. App will provide a link to open tmux
-  - Can run a single instance of sasync in tmux with `./sasync -p 1 set.file`
-  - When one set pair finishes next one auto loads
-  - sasync works as usual without tmux or parallel when running `./sasync set.file`
-
-- [NEW] Added -t option to run sasync in tmux. `./sasync -t set.file`
-
-- [NEW-AGAIN] Added ability to run with multiple set files
-  - `./sasync -p n set.file1 set.file2 set.file3`
-  - Will merge set files then run in n tmux windows
-  - When one set pair finishes next one auto loads
-  - Works without `-p` running in main terminal one set pair at a time
-
-- [UNCHANGED] sasync still supports custom config files as well as infinite rclone flags at the end, along with new -p options.
-  - `./sasync -c my.conf set.file1 --flag1--flag2 -v --dry-run`
-
-- [NEW] Allows creating missing directories in the destination remote with MAKE_DESTDIR [Deault: false]
-  - Be careful with this option. If your remote does not exist it could create directories on your local disk
-
-- ~~[NEW] Changed remote check from `rclone lsd` to `rclone about`. Should make it much quicker~~
-
-- [NEW] Added `--drive-service-account-file` to READ/WRITE/DELETE checks. Should make check more reliable
-
-- [ADDED] Added `csl` to alias shortcuts to navigate to logs directory
-  - To access aliases run `cd /opt/sasync/utils;chmod +x add_aliases;./add_aliases`. Works on next boot
-  - sas='/opt/sasync/sasync'
-  - csa='cd /opt/sasync'
-  - cse='cd /opt/sasync/sasets'
-  - csl='cd /opt/sasync/logs'
-  - csu='cd /opt/sasync/utils'
-  - c..='cd ..'
-  - t0='tmux a -t 0'
-
-###  Changelog  V2.8
-
-- [NEW] Added RW Read/Write check for destination when you enable rccheck [default=true]
-
-- [NEW] New script `add_aliases` which will add shortcuts to move around sasync folders easily.
-  - `csa` = cd /opt/sasync
-  - `cse` = cd /opt/sasync/sasets
-  - `csu` = cd /opt/sasync/utils
-  - `sas` = will run sasync. So `sas set.bak` rather than `./sasync set.bak`
-  - `c..` = cd ..
-  - `t0`  = tmux a -t 0
-
-- [NEW] ~~Trying to accommodate set files with various formats. At the moment you should be able to separate your fields with spaces, tabs, commas[,] or vertical bars[|].~~
-  - ~~Use only one type of field separator. Do not mix separators in the same file - results may be unpredictable.~~
-  - ~~One method to change space separators to ',' in your set file is to run `sed -r 's/\s+/,/g' set.file > set.file.new` in a bash terminal.~~
-
-- [NEW] sasync can now do sync/copy without SAs in source or destination.
-  - This is not the primary use-case, but if you want to include syncs to destinations where you do not have SA
-  access or where SAs do not work (like My Drive) you can include that pair in your set file.
-  - NOTE: Without SAs the sync cannot exceed whatever quota your single source or destination account has.
-
-- [NEW] Optional backup of old files to separate directory, rather than deletion [default=false]. Uses --backup-dir rclone flag.
-  - If source is root of remote `:` then no backup is made. rclone does not allow backups from root level.
-
-- [NEW] Handles missing jsons, skips to next existing json
-
-- [IMPROVED] Better checking of remote configs, service accounts and read/write status of destination
-
-- [UPDATED] sasync should work with encrypted remotes now, but only when both source and destination have service accounts/SAs. [You MUST turn rccheck and sacalc to `false` to allow encrypted sync to work with SAs.]
-
-- [NEW] Added a couple of utilities in /utils folder. These are very similar to the rcgen.sh script that Max includes in his TD mount script.
-  - `rc_add_remotes remotes.test` will create/update rclone TD remotes using a text file (remotes.test which includes a list
-  of remote names and TD IDs.
-  - `rc_add_remotes1 remotes.test existingremote` will pull client_id, client_secret and the token from an existing remote.
-  - `rc_add_remote2 remotes.test` is interactive, and will let you choose if you want SAs, tokens or both.
-
-v2.3 CHANGES:
-- [NEW] rclone flag pass through in the command line ==> `sasync set1 --flag1 --flag2 --etc`
-  - To enable flag pass through multi-sets in the command line were removed (`sasync set1 set2` no longer works).
-
-- [NEW] Choose which config file to use with -c flag and filename (` -c file.conf `)
-
-- [NEW] Option to use csv set files - sasync now handles commas and tabs in set files. This allows easy editing with excel/gsheets
-
-- [NEW] Flag in config file to exit or continue when source-destination remotes are bad
-
-- [NEW] `rccheck` checks if the source and destination are TDs, MDs, shared folders or local. This then determines if SAs are used for the source and adjusts flags accordingly (optional)
-
-- [NEW] FILE_COMPARE compares individual files and file sizes, skips to next set pair if identical (optional)
-
-- [NEW] SRC_LIMIT allows limiting a sasync copy to a fixed TB/GB for situations where you do not have SA access (thus using quota from a single account on source side)
-  - Limit applies to EACH set pair. Be careful how you use it if you have multiple folders pulling from the same root source
-
-- [CHANGED] The sasync/config_backup folder is changed to sasync/backup to allow for other backups in future
-
-- [REMOVED] SWEEPER. No longer needed
-
-- [REMOVED] SASYNC-DEST. sasync should now copy destination-only SA files correctly
 
 <br>
 
@@ -445,3 +309,139 @@ sequence from the jsons without wasting or duplicating usage.
 
 ---
 <br>
+
+
+###  Changelog V3.2
+Major change: If your prior version is 3.0 or lower then to run this new version of sasync correctly
+you MUST remove the max transfer field (e.g. 600G) from your old set files.\
+Suggested method is to copy your set files from /opt/sasync/sasets to /opt/sasync/sets,
+then run the ./remove_maxt script for set.* files in the /sets folder.\
+For now it's a good idea to keep the old set files (until the new rclone flag is fully tested).
+
+- [NEW] If SOURCE is empty will skip that pair and create an error in a file `*_fail.log`
+- [NEW] Added a variable called `DIFF_LIMIT` in sasync.conf.default (be sure to copy to your sasync.conf file)
+  - `DIFF_LIMIT` is an INTEGER representing the ratio % of SOURCE / DESTINATION remote size.
+  - IMPORTANT: `DIFF_LIMIT` only works if `CALC_SIZE=true`. You cannot calculate a ratio without sizes.
+  - Examples:
+    - If source remote is 20GB and destination remote is 10GB then the ratio would be 200 (200%, but we leave out the %).
+    - If source remote is 5GB and destination remote is 10GB then the ratio would be 50 (50%, omitting %).
+    - If you set `DIFF_LIMIT=70` then the first example would pass, but the second would fail.
+    - On failure of the DIFF_LIMIT test sasync will write an error to `*_fail.log`
+- [NEW] Added a file called `*_fail.log`. This file will be printed at the end of each sasync run. You can tail or monitor these files, or you can periodically send them to your email, bots, discord, etc.
+- [NEW] Added a variable called `NEXTJS` in sasync.conf.default (be sure to copy to your sasync.conf file)
+  - `NEXTJS` is the amount by which JSCOUNT (your SAs) will be increased with each cycle.
+  - In most cases leaving `NEXTJS` at a default of 1 is fine.
+  - In cases where you may have errors from too many api calls and/or are running multiple parallel instances of sasync,
+  it is possible that setting `NEXTJS=101` can help reduce errors.
+  - Each GSuite project has its own api quota. Incrementing by 101 forces parallel sasync instances to use a different project's quota.
+  - Note that setting `NEXTJS=101` only works well if you have multiple projects and many SAs.
+- [CHANGED-TEMP] For `CLEAN_DEST` and `CLEAN_SRC` temporarily replaced `rclone delete remote: --drive-trashed-only` with `rclone cleanup remote:`.
+  - The delete remote with --drive-trashed-only has been hanging sometimes with recent rclone releases. And in principle rclone cleanup should work, even if not immediately. Will monitor and change back in future if needed.
+
+###  Changelog V3.1
+
+- [NEW] Added --drive-stop-on-upload-limit to sasync.conf
+- [REMOVED] --max-transfer logic and set.file requirement
+- [CHANGED] Default location of set files from /sasets to /sets
+- [NEW] Added a script (remove_maxt) in /sets folder to remove max_transfer variable from set files
+  - Best way to do this is `cp -r /opt/sasync/sasets /opt/sasync/sets` then
+  - `cd /opt/sasync/sets && chmod +x remove_maxt` then `./remove_maxt set.*`
+- [REMOVED] IFS auto sense. Forces user to choose separator in sasync.conf file. e.g. IFS1=' ' or IFS1=','
+- [REMOVED] TMOUT (timeout) flag and code
+- [ADDED] Link for new instructions for manually checking rclone remote permissions that impact successful running of sasync. ==> [ MANUAL DIAGNOSTIC FOR CHECKING PERMISSIONS ON RCLONE REMOTES WITH SAs ](https://github.com/88lex/sa-guide/blob/master/rclone_remote_permissions.md)
+
+###  Changelog  V3.0
+
+- [NEW] Added `-p number` option to run 'number' of parallel instances of sasync. Usage: For 3 parallel instances `./sasync -p 3 set.file`
+  - Requires tmux and parallel apps. Install with command: `sudo apt install parallel tmux`
+  - Sends sasync to n tmux windows. App will provide a link to open tmux
+  - Can run a single instance of sasync in tmux with `./sasync -p 1 set.file`
+  - When one set pair finishes next one auto loads
+  - sasync works as usual without tmux or parallel when running `./sasync set.file`
+
+- [NEW] Added -t option to run sasync in tmux. `./sasync -t set.file`
+
+- [NEW-AGAIN] Added ability to run with multiple set files
+  - `./sasync -p n set.file1 set.file2 set.file3`
+  - Will merge set files then run in n tmux windows
+  - When one set pair finishes next one auto loads
+  - Works without `-p` running in main terminal one set pair at a time
+
+- [UNCHANGED] sasync still supports custom config files as well as infinite rclone flags at the end, along with new -p options.
+  - `./sasync -c my.conf set.file1 --flag1--flag2 -v --dry-run`
+
+- [NEW] Allows creating missing directories in the destination remote with MAKE_DESTDIR [Deault: false]
+  - Be careful with this option. If your remote does not exist it could create directories on your local disk
+
+- ~~[NEW] Changed remote check from `rclone lsd` to `rclone about`. Should make it much quicker~~
+
+- [NEW] Added `--drive-service-account-file` to READ/WRITE/DELETE checks. Should make check more reliable
+
+- [ADDED] Added `csl` to alias shortcuts to navigate to logs directory
+  - To access aliases run `cd /opt/sasync/utils;chmod +x add_aliases;./add_aliases`. Works on next boot
+  - sas='/opt/sasync/sasync'
+  - csa='cd /opt/sasync'
+  - cse='cd /opt/sasync/sasets'
+  - csl='cd /opt/sasync/logs'
+  - csu='cd /opt/sasync/utils'
+  - c..='cd ..'
+  - t0='tmux a -t 0'
+
+###  Changelog  V2.8
+
+- [NEW] Added RW Read/Write check for destination when you enable rccheck [default=true]
+
+- [NEW] New script `add_aliases` which will add shortcuts to move around sasync folders easily.
+  - `csa` = cd /opt/sasync
+  - `cse` = cd /opt/sasync/sasets
+  - `csu` = cd /opt/sasync/utils
+  - `sas` = will run sasync. So `sas set.bak` rather than `./sasync set.bak`
+  - `c..` = cd ..
+  - `t0`  = tmux a -t 0
+
+- [NEW] ~~Trying to accommodate set files with various formats. At the moment you should be able to separate your fields with spaces, tabs, commas[,] or vertical bars[|].~~
+  - ~~Use only one type of field separator. Do not mix separators in the same file - results may be unpredictable.~~
+  - ~~One method to change space separators to ',' in your set file is to run `sed -r 's/\s+/,/g' set.file > set.file.new` in a bash terminal.~~
+
+- [NEW] sasync can now do sync/copy without SAs in source or destination.
+  - This is not the primary use-case, but if you want to include syncs to destinations where you do not have SA
+  access or where SAs do not work (like My Drive) you can include that pair in your set file.
+  - NOTE: Without SAs the sync cannot exceed whatever quota your single source or destination account has.
+
+- [NEW] Optional backup of old files to separate directory, rather than deletion [default=false]. Uses --backup-dir rclone flag.
+  - If source is root of remote `:` then no backup is made. rclone does not allow backups from root level.
+
+- [NEW] Handles missing jsons, skips to next existing json
+
+- [IMPROVED] Better checking of remote configs, service accounts and read/write status of destination
+
+- [UPDATED] sasync should work with encrypted remotes now, but only when both source and destination have service accounts/SAs. [You MUST turn rccheck and sacalc to `false` to allow encrypted sync to work with SAs.]
+
+- [NEW] Added a couple of utilities in /utils folder. These are very similar to the rcgen.sh script that Max includes in his TD mount script.
+  - `rc_add_remotes remotes.test` will create/update rclone TD remotes using a text file (remotes.test which includes a list
+  of remote names and TD IDs.
+  - `rc_add_remotes1 remotes.test existingremote` will pull client_id, client_secret and the token from an existing remote.
+  - `rc_add_remote2 remotes.test` is interactive, and will let you choose if you want SAs, tokens or both.
+
+v2.3 CHANGES:
+- [NEW] rclone flag pass through in the command line ==> `sasync set1 --flag1 --flag2 --etc`
+  - To enable flag pass through multi-sets in the command line were removed (`sasync set1 set2` no longer works).
+
+- [NEW] Choose which config file to use with -c flag and filename (` -c file.conf `)
+
+- [NEW] Option to use csv set files - sasync now handles commas and tabs in set files. This allows easy editing with excel/gsheets
+
+- [NEW] Flag in config file to exit or continue when source-destination remotes are bad
+
+- [NEW] `rccheck` checks if the source and destination are TDs, MDs, shared folders or local. This then determines if SAs are used for the source and adjusts flags accordingly (optional)
+
+- [NEW] FILE_COMPARE compares individual files and file sizes, skips to next set pair if identical (optional)
+
+- [NEW] SRC_LIMIT allows limiting a sasync copy to a fixed TB/GB for situations where you do not have SA access (thus using quota from a single account on source side)
+  - Limit applies to EACH set pair. Be careful how you use it if you have multiple folders pulling from the same root source
+
+- [CHANGED] The sasync/config_backup folder is changed to sasync/backup to allow for other backups in future
+
+- [REMOVED] SWEEPER. No longer needed
+
+- [REMOVED] SASYNC-DEST. sasync should now copy destination-only SA files correctly

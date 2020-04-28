@@ -23,6 +23,7 @@ process_cmd_args_and_clean_set_files()
   args="$@"
   files="${args%% -*}"
   if [ -z "$files" ];then . msg no_files;exit;fi
+  . msg start
   tmp_files=$SETDIR/tmp_"${files// /_}"_
   cmd_flags="${args/$files/}"
   clean_set_files
@@ -66,17 +67,24 @@ init_log_n_bak()
 # Clean remotes - dedupe identical files, remove empty folders and permanently deletes trash
 #*****************************************************************************************
 cleanup ()
-{ . msg dedupe $1
-  rclone dedupe skip $1 -v --drive-use-trash=false --tpslimit=5
-  . msg perm_del $1
-  rclone delete $2: -vv --drive-trashed-only --drive-use-trash=false --tpslimit=4 --tpslimit-burst=40 --no-traverse
-  rclone cleanup $1 -v
-  rclone rmdirs $1 -v --drive-use-trash=false --fast-list --tpslimit=5 --leave-root
+{ . msg dedupe "$1"
+  rclone dedupe skip "$1" $3 -v --drive-use-trash=false --tpslimit=5
+  . msg perm_del "$1"
+  rclone delete "$2": $3 -v --fast-list --drive-trashed-only --drive-use-trash=false
+  rclone cleanup "$1" -v $3
+  rclone rmdirs "$1" $3 -v --drive-use-trash=false --fast-list --leave-root
+  exit
 }
 
 clean_remotes()
-{ ${CLEAN_DEST,,} && cleanup $dest ${dest%:*}
-  ${CLEAN_SRC,,} && cleanup $src ${src%:*}
+{ if ${CLEAN_DEST,,};then
+    if "${rem_sa[1]}";then sa_dest="$dsaff";else unset sa_dest;fi
+    cleanup "$dest" "${dest%:*}" "$sa_dest"
+  fi
+  if ${CLEAN_SRC,,};then
+    if "${rem_sa[0]}";then sa_src="$dsaff";else unset sa_src;fi
+    cleanup "$src" "${src%:*}" "$sa_src"
+  fi
 }
 
 #*****************************************************************************************
@@ -90,7 +98,7 @@ parallel_sasync()
   basename -a $tmp_files[a-z]* | parallel -j $n --tmux ./sasync -c $saconf {} $cmd_flags
   rm -f $tmp_files*
   . msg fin_par
-  }
+}
 
 #*****************************************************************************************
 # sacalc calculates the size and difference of source and destination remotes
@@ -112,15 +120,19 @@ sacalc()
   LIM=$((diffGB>LIM?LIM:diffGB))
   MAXT=750
   SAs=$(( ($MAXT+${LIM#-})/$MAXT ))
-  . msg diff_size; }
+  . msg diff_size
+}
 
 #*****************************************************************************************
 # Add 1 to counter, then use next service account in rclone remote ENV or config
 #*****************************************************************************************
 add_to_counter ()
 { COUNT=$(<$JSCOUNT)
-  echo $(( $COUNT>=$MAXJS?$MINJS:$COUNT+$NEXTJS ))>$JSCOUNT
-  [ -f "$JSDIR"/"$COUNT".json ] || next_sa; }
+  MOD=$(( $MAXJS - $MINJS + 1 ))
+  #echo $(( $COUNT>=$MAXJS?$MINJS:$COUNT+$NEXTJS ))>$JSCOUNT
+  echo $(( (($COUNT - $MINJS + $NEXTJS) % $MOD) + $MINJS ))>$JSCOUNT
+  [ -f "$JSDIR"/"$COUNT".json ] || next_sa
+}
 
 export_js ()
 { set -x;export "RCLONE_CONFIG_"$1"_SERVICE_ACCOUNT_FILE="$JSDIR"/"$COUNT.json;set +x; }
@@ -157,4 +169,5 @@ check_remotes_and_run_rclone ()
     check_remotes || continue
     run_rclone_w_flags
     clean_remotes
-  done <<<"$set_clean" > >(tee "$STD_LOG") 2> >(tee "$ERR_LOG" >&2); }
+  done <<<"$set_clean" > >(tee "$STD_LOG") 2> >(tee "$ERR_LOG" >&2)
+}

@@ -15,7 +15,7 @@ IFS1=$' \t\n'                     # Field separator for set file. Use ',' or '|'
 # Flags to control which checks and what cleaning is done. All = false works in standard case
 CHECK_REMOTES=true                # Check if remotes are configured in rclone. Faster if set to false
 CALC_SIZE=false                   # Runs check size ; MUST set to true if using DIFF_LIMIT
-DIFF_LIMIT=95                     # If source/dest size < or = DIFFLIMIT % then skip pair (def=0, use integers)
+DIFF_LIMIT=95                     # Needs CALC_SIZE=true. If src/dest size -le DIFF_LIMIT % then skip pair (def=0, int)
 FILE_COMPARE=false                # Runs hash check against files
 CLEAN_DEST=false                  # Set to true if you want to clean the destination
 CLEAN_SRC=false                   # Set to true if you want to clean the source
@@ -29,7 +29,7 @@ MAKE_DESTDIR=false                # To make missing directories set to true.
 # These flags are applied to all sets. Tweak them as you like
 FLAGS="
   --fast-list
-  --checkers=64
+  --checkers=32
   --tpslimit=4
   --tpslimit-burst=20
   -vP

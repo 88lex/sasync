@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
-VER=3.3
+VER=3.4
 case ${1,,} in
   start)
     printf '%.0s*' {1..80};echo
-    echo -e "STARTING SASYNC $VER"
+    echo -e "START SASYNC $VER"
+    eval echo -e "First SA = $(<$JSCOUNT)/$MAXJS.json"$notif_key
     printf '%.0s*' {1..80};echo ;;
 
   init_complete)
@@ -110,7 +111,7 @@ case ${1,,} in
       echo -e "Finished parallel instances of tmux" ;;
 
   run_rc)
-    eval echo -e "BEGIN $sync of $src to $dest from $files. SA= $COUNT/$MAXJS.json"$notif_key
+    eval echo -e "BEGIN $sync of $src to $dest from $files"$notif_key
     echo -e "FLAGS= $FLAGS\nset_flags= $set_flags\ncmd_flags= $cmd_flags\n"
     echo -e "Max SAs for this set = $SAs ( = MAXJS if no size calculated )\n" ;;
 
@@ -119,10 +120,10 @@ case ${1,,} in
 
   fin_rc)
     echo
-    eval echo -e "FINISHED $sync of $src TO $dest from $files. Last SA = $COUNT.json"$notif_key ;;
+    eval echo -e "FINISHED $sync of $src to $dest from $files. Last SA = $COUNT/$MAXJS.json"$notif_key ;;
 
   complete)
-    echo -e "\nSASYNC COMPLETED FOR SET FILE $files. NOW EXITING\n"
+    echo -e "\nCOMPLETED SASYNC SET FILE $files  NOW EXITING\n"
     if [[ -s "$FAIL_LOG" ]];then
       echo -e "CRITICAL ERRORS LISTED BELOW\nFile = "$FAIL_LOG"\n"
       cat "$FAIL_LOG";echo;echo
