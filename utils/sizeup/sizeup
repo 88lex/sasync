@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
+# Simple python script for grabbing rclone size for remotes and pushing to a google sheet
+# Syntax = `./sizeup` or `./sizeup string` to only update remotes with `string` in the name`
 
 import sys
 import gspread
 from google.oauth2.service_account import Credentials
-from oauth2client.service_account import ServiceAccountCredentials
+#from oauth2client.service_account import ServiceAccountCredentials
 import httplib2
 from httplib2 import Http
 import os
@@ -22,22 +24,21 @@ scopes = ['https://spreadsheets.google.com/feeds',
 config = confuse.Configuration('config')
 config.set_file('config.yaml')
 
-#Load auth credentials for google sheets.
-credentials = ServiceAccountCredentials.from_json_keyfile_name(config['credentials']['service_account'].get(str), scopes)
-gc = gspread.authorize(credentials)
-
-#Load service account for needed credentials for google sheets. GSheets API needs to be enabled.
-#gc = gspread.authorize(Credentials.from_service_account_file(config['credentials']['service_account'].get(str), scopes=scopes))
+#Load service account for needed credentials for google sheets. Drive and GSheets API needs to be enabled.
+gc = gspread.authorize(Credentials.from_service_account_file(config['credentials']['service_account'].get(str), scopes=scopes))
 
 #gspread vars for loading up the google sheet and editing it.
 gsheet = config['sheet']['gsheet'].get()
+wsheet = config['sheet']['wsheet'].get()
+
 sh = gc.open(config['sheet']['gsheet'].get())
 worksheet = sh.worksheet(config['sheet']['wsheet'].get())
 remotes = worksheet.col_values(1)
 
 try:
     remotes = [rem for rem in remotes if sys.argv[1] in rem]
-    print(f"Updating size for these remotes in {gsheet}")
+    #print(f"Updating size for these remotes in {gsheet}")
+    print(f"Updating size for remotes in {wsheet}, file {gsheet}")
     for i in remotes:
         print(f"\t{i}")
 except:
