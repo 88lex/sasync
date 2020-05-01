@@ -73,7 +73,6 @@ cleanup ()
   rclone delete "$2": $3 -v --fast-list --drive-trashed-only --drive-use-trash=false
   rclone cleanup "$1" -v $3
   rclone rmdirs "$1" $3 -v --drive-use-trash=false --fast-list --leave-root
-  exit
 }
 
 clean_remotes()
