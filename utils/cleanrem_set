@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# cleanrem_set processes remotes in a set file
+# set.file is a text file with remote: or remote:folder on separate lines
+# USAGE: `./cleanrem_set set.file`
+# USAGE: `./cleanrem_set set.file --flag1 --flag2` 
+
+cat $1
+setfile=$1
+shift
+rc_flags="$@"
+
+cleanrem () {
+  sed '/^\s*#.*$/d' $setfile|\
+  while read remote;do
+  echo; echo STARTING DEDUPE of identical files from $remote; echo
+  rclone dedupe skip $remote -v --drive-use-trash=false --no-traverse --transfers=50 $rc_flags
+  echo; echo REMOVING EMPTY DIRECTORIES from $remote; echo
+  rclone rmdirs $remote -v --drive-use-trash=false --fast-list --transfers=50 $rc_flags
+  echo; echo PERMANENTLY DELETING TRASH from $remote; echo
+  rclone delete $remote --fast-list --drive-trashed-only --drive-use-trash=false -v --transfers 50 $rc_flags
+  rclone cleanup $remote -v $rc_flags
+  done; }
+
+cleanrem
