@@ -14,9 +14,9 @@ set -x
 while :
 do
   echo SA Rotate is running.
-  for remote in "$REMOTES";do
+  for remote in $REMOTES;do
     rclone config update "$remote" service_account_file "$JSONDIR"/"$COUNT".json
-    #systemctl restart teamdrive@"$remote".service
+    systemctl restart teamdrive@"$remote".service
     COUNT=$(( $COUNT>=$MAXJS?MINJS:$COUNT+1 ))
   done
   # If you want to use the same SA for all remotes unhash the line below, hash the line above 'done'
