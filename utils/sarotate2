@@ -7,14 +7,15 @@ REMOTES=`cat $1`    # REMOTES taken from the set.remotes file.
 MINJS=1             # First json file number in your JSON directory.
 MAXJS=1200            # Max json file number you wish to use in your JSON directory.
 JSONDIR=/opt/sa     # Location of DIR with SA .json files.
-SLEEPTIME=15m        # Sleep time before switching SA .json files.
+SLEEPTIME=10s        # Sleep time before switching SA .json files.
 COUNT=$MINJS        # COUNT needs to be initialized.
 
+set -x
 while :
 do
   echo SA Rotate is running.
   for remote in "$REMOTES";do
-    rclone config update "$remote": service_account_file "$JSONDIR"/"$COUNT".json
+    rclone config update "$remote" service_account_file "$JSONDIR"/"$COUNT".json
     #systemctl restart teamdrive@"$remote".service
     COUNT=$(( $COUNT>=$MAXJS?MINJS:$COUNT+1 ))
   done
