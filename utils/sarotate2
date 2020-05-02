@@ -13,8 +13,8 @@ COUNT=$MINJS        # COUNT needs to be initialized.
 while :
 do
   echo SA Rotate is running.
-  for remote in $REMOTES;do
-    rclone config update $remote: service_account_file $JSONDIR/$COUNT.json
+  for remote in "$REMOTES";do
+    rclone config update "$remote": service_account_file "$JSONDIR"/"$COUNT".json
     #systemctl restart teamdrive@"$remote".service
     COUNT=$(( $COUNT>=$MAXJS?MINJS:$COUNT+1 ))
   done
