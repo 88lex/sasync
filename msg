@@ -3,10 +3,9 @@
 VER=3.4
 case ${1,,} in
   start)
-    printf '%.0s*' {1..80};echo
-    echo -e "START SASYNC $VER"
-    eval echo -e "First SA = $(<$JSCOUNT)/$MAXJS.json"$notif_key
-    printf '%.0s*' {1..80};echo ;;
+    printf '%.0s=' {1..80};echo
+    echo -e "START SASYNC $VER        First SA = $(<$JSCOUNT)/$MAXJS.json"
+    printf '%.0s=' {1..80};echo ;;
 
   init_complete)
     echo -e "\nSASYNC STARTUP CONFIG COMPLETED" ;;
@@ -18,8 +17,8 @@ case ${1,,} in
     echo -e "\nThe file [ $file ] DOES NOT EXIST. CHECK YOUR FILES AND SASYNC COMMAND" ;;
 
   ck_rem)
-    echo -e "\nBEGIN CHECK OF RCLONE REMOTES";printf '%.0s*' {1..60};echo
-    echo -e "ACTION = $sync\nSOURCE = $src\nDEST   = $dest";printf '%.0s*' {1..60};echo ;;
+    echo -e "\nBEGIN CHECK OF RCLONE REMOTES";printf '%.0s=' {1..60};echo
+    echo -e "ACTION = $sync\nSOURCE = $src\nDEST   = $dest";printf '%.0s=' {1..60};echo ;;
 
   ck_fin)
     echo -e "\nCHECK OF RCLONE REMOTES COMPLETED FOR $src and $dest" ;;
@@ -77,15 +76,15 @@ case ${1,,} in
     echo -e "\nCHECKING SIZE of $src and $dest BE PATIENT" ;;
 
   src_zero)
-    (printf '%.0s*' {1..80};echo;printf '%.0s*' {1..80};echo ) | tee -a "$FAIL_LOG"
+    (printf '%.0s=' {1..80};echo;printf '%.0s=' {1..80};echo ) | tee -a "$FAIL_LOG"
     echo -e "\nSOURCE $src is EMPTY, SIZE=0. CHECK REMOTE!\n" | tee -a "$FAIL_LOG"
-    (printf '%.0s*' {1..80};echo;printf '%.0s*' {1..80};echo) | tee -a "$FAIL_LOG" ;;
+    (printf '%.0s=' {1..80};echo;printf '%.0s=' {1..80};echo) | tee -a "$FAIL_LOG" ;;
 
   srcdest_ratio_bad)
-    (printf '%.0s*' {1..80};echo;printf '%.0s*' {1..80};echo) | tee -a "$FAIL_LOG"
+    (printf '%.0s=' {1..80};echo;printf '%.0s=' {1..80};echo) | tee -a "$FAIL_LOG"
     echo -e "\nSOURCE $src is below $DIFF_LIMIT % src/dest ratio. CHECK REMOTE!\n" | tee -a "$FAIL_LOG"
     echo -e "\nDIFF_LIMIT = $DIFF_LIMIT %\nSRC/DEST ratio = $sd_ratio %\nsrcsize = $srcsize \ndestsize = $destsize"
-    (printf '%.0s*' {1..80};echo;printf '%.0s*' {1..80};echo) | tee -a "$FAIL_LOG" ;;
+    (printf '%.0s=' {1..80};echo;printf '%.0s=' {1..80};echo) | tee -a "$FAIL_LOG" ;;
 
   srcdest_ratio_ok)
     echo -e "\nDIFF_LIMIT = $DIFF_LIMIT %\nSRC/DEST ratio $sd_ratio % is OKAY\n" ;;
@@ -111,16 +110,21 @@ case ${1,,} in
       echo -e "Finished parallel instances of tmux" ;;
 
   run_rc)
-    eval echo -e "BEGIN $sync of $src to $dest from $files"$notif_key
+    echo -e "BEGIN $sync of $src to $dest from $files"
+    ;;
+
+  print_flags)
     echo -e "FLAGS= $FLAGS\nset_flags= $set_flags\ncmd_flags= $cmd_flags\n"
-    echo -e "Max SAs for this set = $SAs ( = MAXJS if no size calculated )\n" ;;
+    ;;
 
   sa_js)
     echo -e "$COUNT.json added to config for $2" ;;
 
   fin_rc)
     echo
-    eval echo -e "FINISHED $sync of $src to $dest from $files. Last SA = $COUNT/$MAXJS.json"$notif_key ;;
+    echo -e "FINISHED $sync of $src to $dest from $files"
+    echo -e "Last SA = $COUNT/$MAXJS.json"
+    ;;
 
   complete)
     echo -e "\nCOMPLETED SASYNC SET FILE $files  NOW EXITING\n"

@@ -23,7 +23,7 @@ process_cmd_args_and_clean_set_files()
   args="$@"
   files="${args%% -*}"
   if [ -z "$files" ];then . msg no_files;exit;fi
-  . msg start
+  eval . msg start $notif_key
   tmp_files=$SETDIR/tmp_"${files// /_}"_
   cmd_flags="${args/$files/}"
   clean_set_files
@@ -149,7 +149,8 @@ next_sa ()
 # Run rclone with flags from config file, set file and command line. Use SAs where authed
 #*****************************************************************************************
 run_rclone_w_flags ()
-{ . msg run_rc
+{ eval . msg run_rc $notif_key
+  . msg print_flags
   while [[ $ret =~ ^(7|8)$ ]] && (($SAs));do
     next_sa
     set -x
@@ -157,7 +158,7 @@ run_rclone_w_flags ()
     ret=$?
     set +x
   done
-  . msg fin_rc
+  eval . msg fin_rc $notif_key
 }
 
 #*****************************************************************************************
