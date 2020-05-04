@@ -1,76 +1,69 @@
 ## **SASYNC 3.4 **
 
-## Need to update flag info and changelog
-
-###  Changelog V3.3 & 3.4
-- [NEW] Added notifications using `apprise`. <= This is an Alpha feature.
-  - NOTE: You need to install and configure apprise for this to work.
-  - There are two levels of notifications. ALL and KEY. These can be toggled (true/false) in `sasync.conf`.
-  - The default command is simply `apprise`, using whatever default you have configured for apprise. Other apprise commands may work.
+###  Changelog V3.4
+- [NEW] Added notifications using `apprise`.
+  - NOTE: Must install and configure `apprise` for this to work.
+  - There are two levels of notification. KEY sends start, stop and error messages. ALL pushes more detail. 
+  - Toogle in `sasync.conf`. NOTIF_KEY=true/false. NOTIF_ALL=true/false.
+  - The default command is `apprise`, which sends to your default apprise destination.
   - Notification apps other than apprise may work but have not been tested.
-- [FIXED] COUNT fixed to work properly with NEXTJS other than 1. Use 101 to jump between projects.
+- [FIXED] COUNT fixed to work properly with NEXTJS other than 1. Use 101 to jump between projects with each SA cycle.
 
-**>Uses rclone and Google Service Accounts (SAs) to sync, copy or move files between rclone remotes.
-<br>Usage: &emsp; `./sasync set.file ` &emsp; &emsp; [[enable execution with `chmod +x sasync`]]**
+SASYNC uses rclone and Google Service Accounts (SAs) to sync, copy or move files between rclone remotes.
 
-- Alt Usage: `./sasync -t set.file` to run sasync inside tmux
-- Alt Usage: `./sasync -p 3 set.file` to run sasync sets in 3 parallel tmux windows. `3` can be any number
-- Alt Usage: `./sasync -c my.conf set.file` to run sasync with your custom config file
-- Alt Usage: `./sasync set.file1 set.file2` to run multiple sets in sasync.
+#### <br>Usage: &emsp; `./sasync set.file ` &emsp; &emsp; 
+- `./sasync -t set.file` to run sasync inside tmux
+- `./sasync -p 3 set.file` to run sasync sets in 3 parallel tmux windows. `3` can be any number
+- `./sasync -c my.conf set.file` to run sasync with your custom config file
+- `./sasync set.file1 set.file2` to run multiple sets in sasync.
 - Above flags/options may be combined.
+- Enable sasync execution with `chmod +x sasync`
+
 
 ### **How does it work?**
-`sasync` will run rclone copy or sync for each source-destination pair in your set file using a service account (SA) then move to the next SA until done.
-
-Sets must have an rclone action (sync, copy, move) , a source and destination and a maxtransfer value to work with sasync.
-- Fields in the set can be separated by spaces, tabs, commas `,` or a bar `|`. But each set can only use one of these.
-- If you have remote or folder names with spaces then you MUST use , or | as field separators. Otherwise sasync cannot differentiate.
-[[Avoid using commas or bars in remote/folder names. This can confuse sasync.]]
-- The sample set file has column labels for reference. They are entirely unnecessary for sasync to run.
+`sasync` reads from a **set file**. Each line in the set file describes 
+- An action (sync, copy, move) that rclone will run 
+- A source and destination
+- Any additional rclone flags which you would like to apply to source/destination pairs
 <pre>
 #0action  1source            2destination   3rcloneflags
 sync      teamdrive:docs     my_td:docs     --max-age=3d
 </pre>
 
-#### SASYNC reads from a **set file**. Each line in the set file describes
-- An action that rclone will execute (`sync`, `copy` or `move`)
-- A source and destination remote folder
-- REMOVED ~~A breakpoint (--max-transfer) which tells sasync to move to the next SA~~
-- Any additional rclone flags which you would like to apply to individual source/destination pairs
-
-<br>
-
+- Spaces or tabs as field separators are the easiest for sasync to parse.
+- If you have remote or folder names with spaces then you MUST use , or | as field separators. You need to change IFS1 in `sasync.conf` if using `,` or `|` .
+- The sample set file has column labels for reference. Omit headers in your actual set files.
 
 <br>
 
 ###  Destination requirements
 
-- Must be a Team Drive (TD) to work with Service Accounts (SA)
-- Must have read/write/delete (RWD) permissions on the destination
-- You can use `sasync` with destinations that do not have service accounts, but quotas may limit what you can copy/sync
+- Service Accounts (SAs) can be used to write to a Shared/Team Drive. Otherwise sasync will run, but will not use SAs and quotas may be limited by the single account.
+- read/write/delete (RWD) permissions are necessary
 
 ###  Source requirements
 
 - Must have read permission
 - Best case if the source is a TD
-- If source is not a TD then you MUST use `CHECK_REMOTES=true` in the config file. Otherwise will not work
-- If source does not have SA read permissions then you MUST use `CHECK_REMOTES=true`
+- If source is not a TD then you MUST use `CHECK_REMOTES=true` in the config file. Otherwise sasync will not work
 - If all of the above are true then SAs will rotate with both source and destination, and sync/copy limits can be higher. Each SA has a 750GB upload/inbound quota and a 10TB download/outbound quota
-- If Source does not have SA read access then you need to consider your outbound quotas (e.g. 10 TB for GDrive, ? for others)
+- If you see permission/access errors, it is a good idea to run `checkremotes` in /sasync/utils. Also see the following guide to manually checking permissions. https://github.com/88lex/sa-guide/blob/master/rclone_remote_permissions.md
 
-<br>
 
-### Features
+### Optional Features toggled in sasync.conf
+- Add `-p N` to run sasync in tmux with N parallel instances
 
 - Add `-c file.conf` before the set file to use a different config file
 
-- Add rcloneflag(s) to the command line after the set file.
+- Add `-t` to force a single instance of sasync to run in a tmux window
+
+- Add rcloneflag(s) to the command line after the set file
 
 - Check if each source and destination remote exists in the rclone.conf file and if they are Team Drives (now called Shared Drives)
 
 - Check if each remote has read and service account permissions
 
-- Clean Source and Destination remotes of duplicates and trash. Can be done before and/or after the sync
+- Clean Source and Destination remotes of duplicates and trash. Can be done before and/or after the sasync runs rclone copy/sync/move
 
 - Check if file count in Source and Destination are equal
 
@@ -129,10 +122,30 @@ JSCOUNT="$SASDIR/json.count"
   - This file keeps track of which json has been last used. sasync uses a file rather than a variable to keep count
   in order to allow multiple/parallel instances of sasync to run while using the same range of jsons
 
+NEXTJS=1
+  - Cycle json count by NEXTJS. Default increment is 1
+  - Using NEXTJS=101 pushes each cycle into a new project and may help avoid api issues 
+
 FILTER="$SASDIR/filter"
   - Location of the default filter file
   - You can leave this file blank, but do not delete it as rclone looks for it
   - Filter files work a bit  differently than --include/--exclude. See https://rclone.org/filtering/#filter-from-read-filtering-patterns-from-a-file
+
+NOTIF_ALL=false or true
+  - Use apprise to send ALL messages
+  - Must install/config apprise separately)
+
+NOTIF_KEY=false or true
+  - Use apprise to send only summary/key messages
+  - Must install/config apprise separately)
+
+NOTIF_COMM="apprise"   
+  - "apprise" sends messages to the default service           
+  - Adjust the apprise command if you want to send to a non-default service or to use options
+
+IFS1=$' \t\n'
+  - Field separator for set file
+  - Use ',' or '|' if you do not use space
 
 
 <br>
@@ -148,6 +161,11 @@ CALC_SIZE=false
   - Using --maxtransfer from the set file, estimates the number of service accounts (SAs) required to copy/sync the difference
   - The estimated number of SAs acts as an upper limit to the number that sasync will use before moving to the next pair in the set file
   - If source and destination size are identical then tells sasync to skip to the next pair in the set file
+
+DIFF_LIMIT=95  
+  - Use a number from 0 to 100, no % in the variable
+  - For DIFF_LIMIT to work it needs CALC_SIZE=true
+  - If src/dest size is less than or equal to the DIFF_LIMIT % then skip the current pair and move to the next pair
 
 FILE_COMPARE=false
   - Runs hash check against files using `rclone check` to identify if source and destination are identical
@@ -167,11 +185,6 @@ PRE_CLEAN_TDS=false
   - If you believe you may have a lot of duplicate files or overlapping duplicate folders then it can be useful
    to clean up before syncing
 
-TMOUT=""
-  - Syntax is TMOUT="timeout 30m". Use only if rclone hangs
-  - This uses the linux timeout command, NOT the rclone timeout command
-  - The timeout stops rclone for a single cycle, after which sasync continues to the next SA
-
 EXIT_ON_BAD_PAIR=false
   - Exit (true) or continue (false) if set pair is bad
   - When sasync runs rc_check and finds a source or destination that is 'bad' this flag determines if sasync
@@ -182,21 +195,50 @@ SRC_LIMIT=
   - This can be useful when your source is not a TD, thus you cannot use multiple SAs to gain quota
   - For a single google account the daily download quota is 10TB/day (bear in mind any quota you may use for streaming or other activities)
 
+BAK_FILES=false (true/false)
+  - Send files to backup dir rather than delete them
 
-**The flags below are applied to all sets when rclone runs. Tweak them as you like**
+BAK_DIR=backup
+  - Backup files sent to destination `backup`. Change if you prefer a different directory
+  - rclone can only move files to a backup directory in the same remote, not to a different remote
+
+MAKE_DESTDIR=false (true/false)
+  - If directories are missing in the destination remote, set MAKE_DESTDIR=true and it will create them
+  
+**These global flags are applied to all sets when rclone runs. Tweak them as you like.**
+  - Some flags and values may change from version to version
 
 FLAGS="
+FLAGS="
   --fast-list
+  --checkers=32
+  --tpslimit=4
+  --tpslimit-burst=20
   -vP
-  --stats=5s
+  --stats=10s
   --max-backlog=2000000
   --ignore-case
+  --size-only
   --no-update-modtime
   --drive-chunk-size=128M
   --drive-use-trash=false
-  --filter-from=$FILTER
+  --filter-from="$FILTER"
+  --track-renames
+  --use-mmap
   --drive-server-side-across-configs=true
+  --drive-stop-on-upload-limit
   "
+  "
+
+Check https://rclone.org/flags for detailed descriptions of flags
+
+"--drive-stop-on-upload-limit"
+  - this flag stops a single rclone cycle when Google signals that account or SA quota is reached
+
+"--drive-server-side-across-configs=true"
+  - To enable server side copying this flag must be true (for current versions of rclone; may change in future)
+  - set to false if you want to force rclone to download/upload files
+  - you can also add `--disable copy` to the flags here to disable all server side copying
 
 "--fast-list"
 
@@ -234,10 +276,8 @@ FLAGS="
   - Default tells rclone to use any +/- include/exclude filters in the filter file
   - You can safely delete this line and sasync will run without filters
 
-"--drive-server-side-across-configs=true"
-  - To enable server side copying this flag must be true (for current versions of rclone; may change in future)
-  - set to false if you want to force rclone to download/upload files
-  - you can also add `--disable copy` to the flags here to disable all server side copying
+"--use-mmap
+  - Helps with memory management on some systems
 
 <br>
 

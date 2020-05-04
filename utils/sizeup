@@ -22,7 +22,7 @@ scopes = ['https://spreadsheets.google.com/feeds',
 
 #Init config
 config = confuse.Configuration('config')
-config.set_file('config.yaml')
+config.set_file('sizeup.yaml')
 
 #Load service account for needed credentials for google sheets. Drive and GSheets API needs to be enabled.
 gc = gspread.authorize(Credentials.from_service_account_file(config['credentials']['service_account'].get(str), scopes=scopes))
