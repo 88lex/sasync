@@ -19,20 +19,19 @@ SASYNC uses rclone and Google Service Accounts (SAs) to sync, copy or move files
 - Above flags/options may be combined.
 - Enable sasync execution with `chmod +x sasync`
 
-
 ### **How does it work?**
 `sasync` reads from a **set file**. Each line in the set file describes 
 - An action (sync, copy, move) that rclone will run 
 - A source and destination
 - Any additional rclone flags which you would like to apply to source/destination pairs
 <pre>
-#0action  1source            2destination   3rcloneflags
 sync      teamdrive:docs     my_td:docs     --max-age=3d
+copy      teamdrive:photos   my_td:photos
+move      teamdrive:misc     my_td:misc     --min-size=1M
 </pre>
 
 - Spaces or tabs as field separators are the easiest for sasync to parse.
 - If you have remote or folder names with spaces then you MUST use , or | as field separators. You need to change IFS1 in `sasync.conf` if using `,` or `|` .
-- The sample set file has column labels for reference. Omit headers in your actual set files.
 
 <br>
 
