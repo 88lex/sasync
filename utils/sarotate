@@ -13,7 +13,7 @@ MINJS=1                        # Minimum json file that you want to use.
 MAXJS=16                       # Maximum json file that youw ant to use.
 NEXTJS=1                       # Use 1 or 101.  101 will split api usage to separate projects, but needs many SAs.
 JSONDIR=/opt/sa                # Location of the directory with your service account files.
-SLEEPTIME=3s                  # Time the script will sleep for until running again.
+SLEEPTIME=15m                  # Time the script will sleep for until running again.
 
 NOTIF=true                     # Set to true to receive apprise notifications. false to omit notifications.
 NOTIF_COMM="apprise"           # Adjust if you want a specific apprise command.
@@ -23,13 +23,13 @@ DEL_LOG_RESTART=true           # Clear sarotate log when system restarted.
 init ()
 { if ${NOTIF,,};then notif='| tee >($NOTIF_COMM)';else notif="";fi
   if ${DEL_LOG_RESTART,,};then rm $LOG_DIR/*;fi
-  eval echo "SA Rotate is initializing."$notif && sleep 1s
   COUNT=$MINJS
   MOD=$(( $MAXJS - $MINJS + 1 ))
 }
 
 rotate ()
-{ while : ;do
+{ eval echo "SA Rotate is initializing at `date`."$notif && sleep 1s
+  while : ;do
     while IFS= read remote port junk;do 
       rc_cmd="rclone rc --rc-user="$RCUSER" --rc-pass="$RCPASSWORD" --rc-addr $IP:$port backend/command command=set fs=${remote%:*}: -o service_account_file=$JSONDIR/$COUNT.json"
       eval echo -e "$rc_cmd"$notif | tee >(eval)
