@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Written by Visorak and 88lex
-# Usage: ./sarotate set.file <= set.remotes is a text file with remote names, no ':' and ports in two columns
+# Usage: ./sarotate set.sarotate <= set.sarotate is a text file with remote names, no ':' and ports in two columns
+# remotename  port
+# remote1     1111
+# remote2     2222
 
 RCUSER="user"                  # rclone rc user. If you use --no-auth then leave as default
 RCPASSWORD="pass"              # rclone rc password. If you use --no-auth then leave as default
