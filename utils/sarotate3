@@ -2,6 +2,8 @@
 # Written by Visorak and 88lex
 # Usage: ./sarotate set.file <= set.remotes is a text file with remote names, no ':' and ports in two columns
 
+RCUSER="user"                  # rclone rc user. If you use --no-auth then leave as default
+RCPASSWORD="pass"              # rclone rc password. If you use --no-auth then leave as default
 IP=127.0.0.1                   #Default is localhost/127.0.0.1 but you can change this to match your IP for RC.
 MINJS=1                        #Minimum json file that you want to use.
 MAXJS=800                        #Maximum json file that youw ant to use.
@@ -18,7 +20,7 @@ rotate ()
     MOD=$(( $MAXJS - $MINJS + 1 ))
     while read remote port junk;do 
       set -x
-      rclone rc --rc-no-auth --rc-addr $IP:$port backend/command command=set fs=${remote%:*}: -o service_account_file=$JSONDIR/$COUNT.json
+      rclone rc --rc-user="$RCUSER" --rc-pass="RCPASSWORD" --rc-addr $IP:$port backend/command command=set fs=${remote%:*}: -o service_account_file=$JSONDIR/$COUNT.json
       set +x
       COUNT=$(( (($COUNT - $MINJS + $NEXTJS) % $MOD) + $MINJS ))
     done < set.sarotate \
