@@ -10,14 +10,16 @@ JSONDIR=/opt/sa                # Location of the directory with your service acc
 SLEEPTIME=3s                   # Time the script will sleep for until running again.
 COUNT=$MINJS                   # Count needs to be initilized.
 STD_LOG_DIR=/opt/logs          # Directory for standard logs
-ERR_LOG_DIR=/opt/logs          # Directory for error logs
+ERR_LOG_DIR=/opt/logs          # Directory for error logs. If it does ot exist, create before running sarotate
 
 rotate ()
 { while : ;do
     echo "SA Rotate is initializing."  
     MOD=$(( $MAXJS - $MINJS + 1 ))
     while read remote port junk;do 
-      echo -e "rclone rc --rc-addr $IP:$port backend/command command=set fs=${remote%:*}: -o service_account_file=$JSONDIR/$COUNT.json"
+      set -x
+      rclone rc --rc-noauth --rc-addr $IP:$port backend/command command=set fs=${remote%:*}: -o service_account_file=$JSONDIR/$COUNT.json
+      set +x
       COUNT=$(( (($COUNT - $MINJS + $NEXTJS) % $MOD) + $MINJS ))
     done < set.sarotate \
     > >(tee -a "$STD_LOG_DIR"/sarotate_std.log) \
