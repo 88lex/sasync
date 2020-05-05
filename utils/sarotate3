@@ -20,7 +20,7 @@ rotate ()
     MOD=$(( $MAXJS - $MINJS + 1 ))
     while read remote port junk;do 
       set -x
-      rclone rc --rc-user="$RCUSER" --rc-pass="RCPASSWORD" --rc-addr $IP:$port backend/command command=set fs=${remote%:*}: -o service_account_file=$JSONDIR/$COUNT.json
+      rclone rc --rc-user="$RCUSER" --rc-pass="$RCPASSWORD" --rc-addr $IP:$port backend/command command=set fs=${remote%:*}: -o service_account_file=$JSONDIR/$COUNT.json
       set +x
       COUNT=$(( (($COUNT - $MINJS + $NEXTJS) % $MOD) + $MINJS ))
     done < set.sarotate \
