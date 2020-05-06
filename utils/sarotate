@@ -33,7 +33,7 @@ rotate ()
     while read remote port junk;do 
       rc_cmd="rclone rc --rc-user="$RCUSER" --rc-pass="$RCPASSWORD" --rc-addr $IP:$port backend/command command=set fs=${remote%:*}: -o service_account_file=$JSONDIR/$COUNT.json"
       eval echo -e "$rc_cmd"$notif
-      $rc_cmd
+      $rc_cmd >/dev/null
       COUNT=$(( (($COUNT - $MINJS + $NEXTJS) % $MOD) + $MINJS ))
     done < "$1" > >(tee -a "$LOG_DIR"/sarotate.log) 2>&1
     eval echo "SA Rotate is going to sleep for $SLEEPTIME."$notif
