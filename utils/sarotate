@@ -24,7 +24,7 @@ init ()
   unset $notif_key;unset $notif
   if [[ $NOTIF = "key" ]];then notif_key=' tee >($NOTIF_CMD)';fi
   if [[ $NOTIF = "all" ]];then notif=' tee >($NOTIF_CMD)' && notif_key=$notif;fi
-  if [[ -f $LOG_FILE ]];then tail -n 5 "$LOG_FILE" > tmp;mv tmp "$LOG_FILE";fi; }
+  if [[ -f $LOG_FILE ]];then tail -n 50 "$LOG_FILE" > tmp;mv tmp "$LOG_FILE";fi; }
 
 rotate ()
 { ( echo -e "SA Rotate is initializing these mounts at `date` starting with $JSONDIR/$COUNT.json with increment of $NEXTJS"
