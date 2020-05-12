@@ -1,4 +1,5 @@
 ## **SASYNC 3.4 **
+Ref: https://github.com/88lex/sa-guide For more info
 
 ###  Changelog V3.4
 - [NEW] Added notifications using `apprise`.
