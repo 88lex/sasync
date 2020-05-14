@@ -2,19 +2,10 @@
 # Simple python script for grabbing rclone size for remotes and pushing to a google sheet
 # Syntax = `./sizeup` or `./sizeup string` to only update remotes with `string` in the name`
 
-import sys
-import gspread
-from google.oauth2.service_account import Credentials
+import sys, gspread, os, subprocess, json, datetime, re, yaml, confuse, httplib2
 #from oauth2client.service_account import ServiceAccountCredentials
-import httplib2
+from google.oauth2.service_account import Credentials
 from httplib2 import Http
-import os
-import subprocess
-import json
-import datetime
-import re
-import yaml
-import confuse
 
 #Scopes that the script will need to utilize to auth and edit gsheets.
 scopes = ['https://spreadsheets.google.com/feeds',
@@ -34,11 +25,13 @@ wsheet = config['sheet']['wsheet'].get()
 sh = gc.open(config['sheet']['gsheet'].get())
 worksheet = sh.worksheet(config['sheet']['wsheet'].get())
 remotes = worksheet.col_values(1)
+remotes2 = remotes
 
 try:
     remotes = [rem for rem in remotes if sys.argv[1] in rem]
-    #print(f"Updating size for these remotes in {gsheet}")
-    print(f"Updating size for remotes in {wsheet}, file {gsheet}")
+    if not any(remotes):
+        remotes = [rem for rem in remotes2 if rem in sys.argv[1]]
+    print(f"Updating size of remotes in {wsheet}, file {gsheet}")
     for i in remotes:
         print(f"\t{i}")
 except:

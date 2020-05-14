@@ -87,6 +87,8 @@ clean_remotes()
     if "${rem_sa[0]}";then sa_src="$dsaff";else unset sa_src;fi
     cleanup "$src" "${src%:*}" "$sa_src"
   fi
+  if "${SIZEUP,,}";then cd $SASDIR/utils; python3 sizeup_2 "$dest";fi
+
 }
 
 #*****************************************************************************************
