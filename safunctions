@@ -10,16 +10,18 @@ process_cmd_args_and_clean_set_files()
   if ${NOTIF_KEY,,};then notif_key='| tee >($NOTIF_COMM)';else notif_key="";fi
   . rccheck
   saconf="sasync.conf"
+  rcmd="rclone"
   par=false
   args="$@"
-  while getopts ':c:p:P:n:t' o;do
+  while getopts ':c:p:P:n:t:g' o;do
     case "$o" in
       c) saconf="${OPTARG:-sasync.conf}";source $saconf ;;
       p|P|n) par=true;n=${OPTARG} ;;
-      t) tmux new "$SASDIR/sasync ${args/-t/}"
+      t) tmux new "$SASDIR/sasync ${args/-t/}" ;;
+      g) rcmd="gclone"
     esac
   done
-  shift $(($OPTIND - 1))
+  shift "$(($OPTIND - 1))"
   args="$@"
   files="${args%% -*}"
   if [ -z "$files" ];then . msg no_files;exit;fi
@@ -68,11 +70,11 @@ init_log_n_bak()
 #*****************************************************************************************
 cleanup ()
 { . msg dedupe "$1"
-  rclone dedupe skip "$1" $3 -v --drive-use-trash=false --tpslimit=5
+  rclone dedupe skip "$1" $3 -v --drive-use-trash=false --tpslimit=5 --max-duration=30m
   . msg perm_del "$1"
-  rclone delete "$2": $3 -v --fast-list --drive-trashed-only --drive-use-trash=false
+  rclone delete "$2": $3 -v --fast-list --drive-trashed-only --drive-use-trash=false --max-duration=10m
   rclone cleanup "$1" -v $3
-  rclone rmdirs "$1" $3 -v --drive-use-trash=false --fast-list --leave-root
+  rclone rmdirs "$1" $3 -v --drive-use-trash=false --fast-list --leave-root --max-duration=10m
 }
 
 clean_remotes()
@@ -128,7 +130,6 @@ sacalc()
 add_to_counter ()
 { COUNT=$(<$JSCOUNT)
   MOD=$(( $MAXJS - $MINJS + 1 ))
-  #echo $(( $COUNT>=$MAXJS?$MINJS:$COUNT+$NEXTJS ))>$JSCOUNT
   echo $(( (($COUNT - $MINJS + $NEXTJS) % $MOD) + $MINJS ))>$JSCOUNT
   [ -f "$JSDIR"/"$COUNT".json ] || next_sa
 }
@@ -154,7 +155,7 @@ run_rclone_w_flags ()
   while [[ $ret =~ ^(7|8)$ ]] && (($SAs));do
     next_sa
     set -x
-    rclone $sync "$src" "$dest" $sa_flag $FLAGS $bak $set_flags $cmd_flags
+    $rcmd $sync "$src" "$dest" $sa_flag $FLAGS $bak $set_flags $cmd_flags
     ret=$?
     set +x
   done
