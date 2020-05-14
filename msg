@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-VER=3.4
+VER=3.5
+
 case ${1,,} in
   start)
     printf '%.0s=' {1..80};echo

@@ -1,14 +1,10 @@
-## **SASYNC 3.4 **
+## **SASYNC 3.5 **
 Ref: https://github.com/88lex/sa-guide For more info
 
-###  Changelog V3.4
-- [NEW] Added notifications using `apprise`.
-  - NOTE: Must install and configure `apprise` for this to work.
-  - There are two levels of notification. KEY sends start, stop and error messages. ALL pushes more detail. 
-  - Toogle in `sasync.conf`. NOTIF_KEY=true/false. NOTIF_ALL=true/false.
-  - The default command is `apprise`, which sends to your default apprise destination.
-  - Notification apps other than apprise may work but have not been tested.
-- [FIXED] COUNT fixed to work properly with NEXTJS other than 1. Use 101 to jump between projects with each SA cycle.
+###  Changelog V3.5
+- [NEW] Added -g flag to run sync/copy with gclone.
+- [NEW] Added sizeup to push folder size and file count to gsheet (not yet documented)
+
 
 SASYNC uses rclone and Google Service Accounts (SAs) to sync, copy or move files between rclone remotes.
 
@@ -349,6 +345,15 @@ sequence from the jsons without wasting or duplicating usage.
 
 ---
 <br>
+
+###  Changelog V3.4
+- [NEW] Added notifications using `apprise`.
+  - NOTE: Must install and configure `apprise` for this to work.
+  - There are two levels of notification. KEY sends start, stop and error messages. ALL pushes more detail. 
+  - Toogle in `sasync.conf`. NOTIF_KEY=true/false. NOTIF_ALL=true/false.
+  - The default command is `apprise`, which sends to your default apprise destination.
+  - Notification apps other than apprise may work but have not been tested.
+- [FIXED] COUNT fixed to work properly with NEXTJS other than 1. Use 101 to jump between projects with each SA cycle.
 
 
 ###  Changelog V3.2
