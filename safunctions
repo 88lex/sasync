@@ -11,6 +11,7 @@ process_cmd_args_and_clean_set_files()
   . rccheck
   saconf="sasync.conf"
   rcmd="rclone"
+  unset gflag
   par=false
   args="$@"
   while getopts ':c:p:P:n:t:g' o;do
@@ -18,7 +19,7 @@ process_cmd_args_and_clean_set_files()
       c) saconf="${OPTARG:-sasync.conf}";source $saconf ;;
       p|P|n) par=true;n=${OPTARG} ;;
       t) tmux new "$SASDIR/sasync ${args/-t/}" ;;
-      g) rcmd="gclone"
+      g) rcmd="gclone";gflag="-g"
     esac
   done
   shift "$(($OPTIND - 1))"
@@ -96,7 +97,7 @@ parallel_sasync()
   rm -f $tmp_files*
   echo "$set_clean">"$tmp_files"
   split -l 1 "$tmp_files" "$tmp_files"
-  basename -a $tmp_files[a-z]* | parallel -j $n --tmux ./sasync -c $saconf {} $cmd_flags
+  basename -a $tmp_files[a-z]* | parallel -j $n --tmux ./sasync $gflag -c $saconf {} $cmd_flags
   rm -f $tmp_files*
   . msg fin_par
 }
