@@ -9,7 +9,11 @@ echo "alias csa='cd /opt/sasync'" >> ~/.bashrc
 echo "alias cse='cd /opt/sasync/sets'" >> ~/.bashrc
 echo "alias csl='cd /opt/sasync/logs'" >> ~/.bashrc
 echo "alias csu='cd /opt/sasync/utils'" >> ~/.bashrc
+echo "alias csd='cd /opt/diffmove'" >> ~/.bashrc
+echo "alias cset='cd /opt/sasets'" >> ~/.bashrc
 echo "alias c..='cd ..'" >> ~/.bashrc
 echo "alias t0='tmux a -t 0'" >> ~/.bashrc
+
+ln -s /opt/sasync /usr/local/bin
 
 source ~/.bashrc
