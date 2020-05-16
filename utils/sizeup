@@ -3,7 +3,6 @@
 # Syntax = `./sizeup` or `./sizeup string` to only update remotes with `string` in the name`
 
 import sys, gspread, os, subprocess, json, datetime, re, yaml, confuse, httplib2
-#from oauth2client.service_account import ServiceAccountCredentials
 from google.oauth2.service_account import Credentials
 from httplib2 import Http
 
@@ -25,10 +24,13 @@ wsheet = config['sheet']['wsheet'].get()
 sh = gc.open(config['sheet']['gsheet'].get())
 worksheet = sh.worksheet(config['sheet']['wsheet'].get())
 remotes = worksheet.col_values(1)
+remotes.pop(0)
 remotes2 = remotes
+arg_len = len(sys.argv)-1
 
 try:
-    remotes = [rem for rem in remotes if sys.argv[1] in rem]
+    for i in range(arg_len):
+        remotes = [rem for rem in remotes if sys.argv[i+1] in rem]
     if not any(remotes):
         remotes = [rem for rem in remotes2 if rem in sys.argv[1]]
     print(f"Updating size of remotes in {wsheet}, file {gsheet}")
