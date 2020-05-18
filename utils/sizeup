@@ -2,7 +2,7 @@
 # Simple python script for grabbing rclone size for remotes and pushing to a google sheet
 # Syntax = `./sizeup` or `./sizeup string` to only update remotes with `string` in the name`
 
-import sys, gspread, os, subprocess, json, datetime, re, yaml, confuse, httplib2
+import sys, gspread, os, subprocess, json, datetime, re, yaml, confuse, httplib2, pathlib
 from google.oauth2.service_account import Credentials
 from httplib2 import Http
 
@@ -11,8 +11,9 @@ scopes = ['https://spreadsheets.google.com/feeds',
          'https://www.googleapis.com/auth/drive']
 
 #Init config
+conf_yaml = str(pathlib.Path(__file__).parent) + "/sizeup.yaml"
 config = confuse.Configuration('config')
-config.set_file('sizeup.yaml')
+config.set_file(conf_yaml)
 
 #Load service account for needed credentials for google sheets. Drive and GSheets API needs to be enabled.
 gc = gspread.authorize(Credentials.from_service_account_file(config['credentials']['service_account'].get(str), scopes=scopes))
