@@ -11,7 +11,7 @@ FLAGS="
   --drive-use-trash=false 
   --drive-server-side-across-configs=true 
   --drive-stop-on-upload-limit
-  -vvP
+  -P
 "
 
 grep -v '^#' $1 | parallel -j 4 -r --colsep ' +' 'gclone {} $FLAGS'
