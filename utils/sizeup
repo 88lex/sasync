@@ -31,9 +31,9 @@ arg_len = len(sys.argv)-1
 
 try:
     for i in range(arg_len):
-        remotes = [rem for rem in remotes if sys.argv[i+1] in rem]
+        remotes = [rcrem for rcrem in remotes if sys.argv[i+1] in rcrem]
     if not any(remotes):
-        remotes = [rem for rem in remotes2 if rem in sys.argv[1]]
+        remotes = [rcrem for rcrem in remotes2 if rcrem in sys.argv[1]]
     print(f"Updating size of remotes in {wsheet}, file {gsheet}")
     for i in remotes:
         print(f"\t{i}")

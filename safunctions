@@ -87,7 +87,7 @@ clean_remotes()
     if "${rem_sa[0]}";then sa_src="$dsaff";else unset sa_src;fi
     cleanup "$src" "${src%:*}" "$sa_src"
   fi
-  if "${SIZEUP,,}";then cd $SASDIR/utils; python3 sizeup "$dest";fi
+  if "${SIZEUP,,}";then cd $SASDIR/utils; (python3 sizeup "$dest");fi
 
 }
 
@@ -172,6 +172,6 @@ check_remotes_and_run_rclone ()
 { while IFS="$IFS1" read sync src dest set_flags;do
     check_remotes || continue
     run_rclone_w_flags
-    clean_remotes
+    clean_remotes &
   done <<<"$set_clean" > >(tee "$STD_LOG") 2> >(tee "$ERR_LOG" >&2)
 }
