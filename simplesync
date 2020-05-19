@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+FLAGS="
+  --fast-list 
+  --track-renames 
+  --transfers=16 
+  --checkers=16 
+  --size-only 
+  --no-update-modtime 
+  --drive-use-trash=false 
+  --drive-server-side-across-configs=true 
+  --drive-stop-on-upload-limit
+  -vvP
+"
+
+grep -v '^#' $1 | parallel -j 4 -r --colsep ' +' 'gclone {} $FLAGS'
