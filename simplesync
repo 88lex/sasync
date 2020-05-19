@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# usage:  ./simplesync ./sets/set.file <= set file needs either full path of correct relative path
 
 FLAGS="
   --fast-list 

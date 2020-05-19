@@ -7,7 +7,7 @@ vars_for_check() {
   COUNT=$(<$JSCOUNT)
   ret=8
   SAs=$MAXJS
-  bak=
+  unset bak
   dsaf="--drive-service-account-file=$JSDIR/"
   dutf="--drive-use-trash=false"
 
@@ -58,7 +58,8 @@ check_remotes()
   if ${PRE_CLEAN_TDS,,};then clean_remotes;fi
 
   if ${BAK_FILES,,} && [ ! -z "${dest#*:}" ] && [ ! $sync == "move" ];then
-    bak="--backup-dir="$(sed "s/:/:$BAK_DIR\//g"<<<$dest);else unset bak;fi
+    bak=$( sed "s/:/:$BAK_DIR\//g"<<<"$dest" )
+    bak="--backup-dir="$bak;fi
 
   if ${CALC_SIZE,,};then sacalc
     if [[ $srcsize -eq 0 ]];then . msg src_zero && return 1;fi
