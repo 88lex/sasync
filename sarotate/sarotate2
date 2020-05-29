@@ -8,7 +8,7 @@
 
 set_config()
 { source sarotate.conf
-  while getopts ':c' o;do
+  while getopts 'c:' o;do
     case "$o" in
       c) sar_conf="${OPTARG:-sarotate.conf}";echo "Config file is $sar_conf";source $sar_conf;shift 2 ;;
     esac
