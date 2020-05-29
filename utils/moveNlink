@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Move files to a new location. Then create a link back to the original location
+# Usage:  ./moveNlink /origin/folder  /dest/folder 123.txt <= filename can also be a pattern e.g. "*.txt"
+# Result: /dest/folder/123.txt is a file and /origin/folder.123.txt is a link
+
+function moveNlink {
+    for f in `find "$1" -type f -name "$3"`
+    do
+        fname=`basename "$f"`
+        ln "$f" "$2/$fname" && ln -sf $2/$fname $1
+    done
+}
+
+moveNlink $@

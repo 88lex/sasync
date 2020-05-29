@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# usage:  ./simplesync ./sets/set.file <= set file needs either full path of correct relative path
+# usage:  ./simplesync ./sets/set.file <= set file needs either full path or correct relative path
 
 FLAGS="
   --fast-list 
@@ -14,4 +14,6 @@ FLAGS="
   -P
 "
 
-grep -v '^#' $1 | parallel -j 4 -r --colsep ' +' 'gclone {} $FLAGS'
+set -x
+grep -v -E '^$|^#' $1 | parallel -j 4 -r --colsep ' +' 'gclone {} $FLAGS'
+set +x

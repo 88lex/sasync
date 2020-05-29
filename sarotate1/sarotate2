@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# Written by Visorak and 88lex ; Use latest rclone beta for best result
+# Usage: ./sarotate sarotate.set
+# Option: ./sarotate -c other.conf sarotate.set
+# sarotate.set file has two columns, remote and port, and allows multiple remotes
+# remote1     1111
+# remote2     2222
+
+set_config()
+{ source sarotate.conf
+  while getopts ':c' o;do
+    case "$o" in
+      c) sar_conf="${OPTARG:-sarotate.conf}";echo "Config file is $sar_conf";source $sar_conf;shift 2 ;;
+    esac
+  done
+  args="$@"
+}
+
+init ()
+{ COUNT=$MINJS
+  MOD=$(( $MAXJS - $MINJS + 1 ))
+  unset $notif_key;unset $notif
+  if [[ $NOTIF = "key" ]];then notif_key=' tee >($NOTIF_CMD)';fi
+  if [[ $NOTIF = "all" ]];then notif=' tee >($NOTIF_CMD)' && notif_key=$notif;fi
+  if [[ -f $LOG_FILE ]];then tail -n 50 "$LOG_FILE" > tmp;mv tmp "$LOG_FILE";fi; }
+
+rotate ()
+{ ( echo -e "SA Rotate is initializing these mounts at `date` starting with $JSONDIR/$COUNT.json with increment of $NEXTJS"
+    cat $1 ; sleep 1s ) | eval tee $notif_key
+  while : ;do
+    while read remote port junk;do
+      case $remote in ''|\#*) continue ;;esac
+        eval echo -e "Switching remote $remote to use service account $COUNT.json for $SLEEPTIME" | eval tee $notif
+        rclone rc --rc-user="$RCUSER" --rc-pass="$RCPASSWORD" --rc-addr $IP:$port backend/command command=set fs=${remote%:*}: -o \
+        service_account_file=$JSONDIR/$COUNT.json --config="$RCONFIG" --log-level=ERROR |& eval tee $notif_key | tee -a "$LOG_FILE"
+        COUNT=$(( (($COUNT - $MINJS + $NEXTJS) % $MOD) + $MINJS ))
+    done < "$1" 
+   sleep $SLEEPTIME
+  done; }
+
+set_config $@
+init
+rotate "$args"
