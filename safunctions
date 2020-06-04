@@ -14,13 +14,13 @@ process_cmd_args_and_clean_set_files()
   unset gflag
   par=false
   args="$@"
-  while getopts ':c:p:P:n:t:g:l' o;do
+  while getopts 'c:p:P:n:tgl' o;do
     case "$o" in
       c) saconf="${OPTARG:-sasync.conf}";source $saconf ;;
       p|P|n) par=true;n=${OPTARG} ;;
       t) tmux new "$SASDIR/sasync ${args/-t/} $gflag" ;;
       g) rcmd="gclone";gflag="-g" ;;
-      l) rcmd="lclone";gflag="-l"
+      l) rcmd="lclone";gflag="-l" ;;
     esac
   done
   shift "$(($OPTIND - 1))"
