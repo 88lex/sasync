@@ -1,5 +1,5 @@
 sheet:
-  gsheet: RemoteSize1
-  wsheet: Sheet1
+  gsheet: RemoteSize
+  wsheet: Remotes
 credentials:
   service_account: '/opt/sa/1.json'

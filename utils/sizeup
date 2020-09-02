@@ -6,7 +6,6 @@ import sys, gspread, os, subprocess, json, datetime, re, yaml, confuse, httplib2
 from google.oauth2.service_account import Credentials
 from httplib2 import Http
 
-#Scopes that the script will need to utilize to auth and edit gsheets.
 scopes = ['https://spreadsheets.google.com/feeds',
          'https://www.googleapis.com/auth/drive']
 

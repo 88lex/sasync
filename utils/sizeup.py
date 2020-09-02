@@ -17,9 +17,9 @@ scope = ['https://spreadsheets.google.com/feeds',
 credentials = ServiceAccountCredentials.from_json_keyfile_name('/opt/sa/1.json', scope)
 gc = gspread.authorize(credentials)
 #print(gc)
-gsheet = 'RemoteSize1'
+gsheet = 'RemoteSize'
 sh = gc.open(gsheet)
-worksheet = sh.worksheet("Sheet1")
+worksheet = sh.worksheet("Remotes")
 remotes = worksheet.col_values(1)
 
 try:

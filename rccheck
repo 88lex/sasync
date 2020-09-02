@@ -64,7 +64,7 @@ check_remotes()
 
   if ${BAK_FILES,,} && [ ! -z "${dest#*:}" ] && [ ! $sync == "move" ];then
     bak=$( sed "s/:/:$BAK_DIR\//g"<<<"$dest" )
-    bak="--backup-dir="$bak;fi
+    bak="--backup-dir=""$bak";fi
 
   if ${CALC_SIZE,,};then sacalc
     if [[ $srcsize -eq 0 ]];then . msg src_zero && return 1;fi
