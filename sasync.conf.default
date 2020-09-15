@@ -26,17 +26,16 @@ NOTIF_ALL=false                   # Use apprise to send ALL messages (must insta
 NOTIF_KEY=false                   # Use apprise to send only summary/key messages
 NOTIF_COMM="apprise"              # Adjust if you want a specific apprise command
 SIZEUP="false"                    # Run sizeup after set runs. Requires separate setup
+TIMEOUT=0m                        # Set timeout if you want to limit run time for each src-dest pair. Default= 0m = no timeout
 
 # These flags are applied to all sets. Tweak them as you like
 FLAGS="
   --fast-list
-  --no-traverse
   --track-renames
-  --checkers=16
-  --tpslimit=4
+  --checkers=32
   --tpslimit-burst=16
   -vP
-  --stats=10s
+  --stats=30s
   --max-backlog=2000000
   --ignore-case
   --size-only
@@ -47,4 +46,7 @@ FLAGS="
   --use-mmap
   --drive-server-side-across-configs=true
   --drive-stop-on-upload-limit
+  --check-first
   "
+
+#  --tpslimit=4

@@ -2,7 +2,9 @@
 Ref: https://github.com/88lex/sa-guide For more info
 
 ###  Changelog V3.5
-- [NEW] Added -g flag to run sync/copy with gclone.
+- [NEW] Added -f flag to run sync/copy with mawaya's fclone.
+- [NEW] Added -l flag to run sync/copy with l3uddz's lclone.
+- [NEW] Added -g flag to run sync/copy with donwa's gclone.
 - [NEW] Added sizeup to push folder size and file count to gsheet (not yet documented)
 
 
@@ -460,7 +462,7 @@ For now it's a good idea to keep the old set files (until the new rclone flag is
 
 - [IMPROVED] Better checking of remote configs, service accounts and read/write status of destination
 
-- [UPDATED] sasync should work with encrypted remotes now, but only when both source and destination have service accounts/SAs. [You MUST turn rccheck and sacalc to `false` to allow encrypted sync to work with SAs.]
+- [UPDATED] sasync should work with encrypted remotes now, but only when both source and destination have service accounts/SAs. [You MUST turn rccheck and sacalc to `false` to allow encrypted sync to work with SAs. Also include `--disable copy` in the config flags, set file or the sasync command line.]
 
 - [NEW] Added a couple of utilities in /utils folder. These are very similar to the rcgen.sh script that Max includes in his TD mount script.
   - `rc_add_remotes remotes.test` will create/update rclone TD remotes using a text file (remotes.test which includes a list
