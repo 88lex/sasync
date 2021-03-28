@@ -6,21 +6,29 @@
 process_cmd_args_and_clean_set_files()
 { . sasync.conf.default
   . sasync.conf
+  if ${NOTIF_ALL,,};then notif_all='| tee >($NOTIF_COMM)';else notif_all="";fi
+  if ${NOTIF_KEY,,};then notif_key='| tee >($NOTIF_COMM)';else notif_key="";fi
   . rccheck
   saconf="sasync.conf"
+  rcmd="rclone"
+  unset gflag
   par=false
   args="$@"
-  while getopts ':c:p:P:n:t' o;do
+  while getopts 'c:p:P:n:tglf' o;do
     case "$o" in
-      c) saconf="${OPTARG:-sasync.conf}";source $saconf ;;
+      c) saconf="${OPTARG}";source $saconf ;;
       p|P|n) par=true;n=${OPTARG} ;;
-      t) tmux new "$SASDIR/sasync ${args/-t/}"
+      t) tmux new "$SASDIR/sasync ${args/-t/} $gflag" ;;
+      g) rcmd="gclone";gflag="-g" ;;
+      l) rcmd="lclone";gflag="-l" ;;
+      f) rcmd="fclone";gflag="-f" ;;
     esac
   done
-  shift $(($OPTIND - 1))
+  shift "$(($OPTIND - 1))"
   args="$@"
   files="${args%% -*}"
   if [ -z "$files" ];then . msg no_files;exit;fi
+  eval . msg start $notif_key
   tmp_files=$SETDIR/tmp_"${files// /_}"_
   cmd_flags="${args/$files/}"
   clean_set_files
@@ -39,7 +47,7 @@ clean_set_files()
   set_clean=$(echo "$set_file" | sed $'/^#/d; /^$/d; s/[\t\r]/ /g; s/\"//g')
   #if echo "$set_clean" | grep -E '\||,' &>/dev/null;then IFS1=',|';fi
   echo -e "$set_clean" | column -s"$IFS1" -t
-  if [ ${par,,} == "true" ];then parallel_sasync;exit;fi
+  if [ ${par,,} == "true" ];then cd $SASDIR;parallel_sasync;exit;fi
   init_log_n_bak
 }
 
@@ -49,9 +57,7 @@ clean_set_files()
 init_log_n_bak()
 { STD_LOG="$SASDIR"/logs/$(date +%F)_stdout.log
   ERR_LOG="$SASDIR"/logs/$(date +%F)_stderr.log
-  FAIL_LOG="$SASDIR"/logs/$(date +%F)_fail.log
-  BAD_REMOTE_LOG="$SASDIR"/logs/$(date +%F)_"$file"_bad_remote.log
-  > $BAD_REMOTE_LOG
+  FAIL_LOG="$SASDIR"/logs/$(date +%F)_"$files"_fail.log;>"$FAIL_LOG"
 
   if [ ! -f $SASDIR/json.count ];then echo $MINJS >$SASDIR/json.count;fi
   mkdir -p $SASDIR/backup $SASDIR/logs
@@ -60,23 +66,37 @@ init_log_n_bak()
   find $SASDIR/logs/* -type f -mtime +7 -exec rm {} \;
   mkdir -p ~/.parallel
   touch ~/.parallel/will-cite
+  tm_ck=`tmux --help &>/dev/null;echo $?`
 }
+
+#*****************************************************************************************
+# sizeup is a python app that check size and file count in remotes then uploads to a gsheet
+#*****************************************************************************************
+run_sizeup()
+{ if "${SIZEUP,,}";then cd $SASDIR/utils; python3 sizeup "$dest";fi ; }
 
 #*****************************************************************************************
 # Clean remotes - dedupe identical files, remove empty folders and permanently deletes trash
 #*****************************************************************************************
 cleanup ()
-{ . msg dedupe $1
-  rclone dedupe skip $1 -v --drive-use-trash=false --tpslimit=5
-  . msg perm_del $1
-  rclone delete $2: -vv --drive-trashed-only --drive-use-trash=false --tpslimit=4 --tpslimit-burst=40 --no-traverse
-  rclone cleanup $1 -v
-  rclone rmdirs $1 -v --drive-use-trash=false --fast-list --tpslimit=5 --leave-root
+{ . msg dedupe "$1"
+  rclone dedupe skip "$1" $3 -v --drive-use-trash=false --tpslimit=5 --max-duration=30m
+  . msg perm_del "$1"
+  rclone delete "$2": $3 -v --fast-list --drive-trashed-only --drive-use-trash=false --max-duration=10m
+  rclone cleanup "$1" -v $3
+  rclone rmdirs "$1" $3 -v --drive-use-trash=false --fast-list --leave-root --max-duration=10m
 }
 
 clean_remotes()
-{ ${CLEAN_DEST,,} && cleanup $dest ${dest%:*}
-  ${CLEAN_SRC,,} && cleanup $src ${src%:*}
+{ if ${CLEAN_DEST,,};then
+    if "${rem_sa[1]}";then sa_dest="$dsaff";else unset sa_dest;fi
+    cleanup "$dest" "${dest%:*}" "$sa_dest"
+  fi
+  if ${CLEAN_SRC,,};then
+    if "${rem_sa[0]}";then sa_src="$dsaff";else unset sa_src;fi
+    cleanup "$src" "${src%:*}" "$sa_src"
+  fi
+  # run_sizeup
 }
 
 #*****************************************************************************************
@@ -87,10 +107,10 @@ parallel_sasync()
   rm -f $tmp_files*
   echo "$set_clean">"$tmp_files"
   split -l 1 "$tmp_files" "$tmp_files"
-  basename -a $tmp_files[a-z]* | parallel -j $n --tmux ./sasync -c $saconf {} $cmd_flags
+  basename -a $tmp_files[a-z]* | parallel -j $n --tmux ./sasync $gflag -c $saconf {} $cmd_flags
   rm -f $tmp_files*
   . msg fin_par
-  }
+}
 
 #*****************************************************************************************
 # sacalc calculates the size and difference of source and destination remotes
@@ -112,15 +132,18 @@ sacalc()
   LIM=$((diffGB>LIM?LIM:diffGB))
   MAXT=750
   SAs=$(( ($MAXT+${LIM#-})/$MAXT ))
-  . msg diff_size; }
+  . msg diff_size
+}
 
 #*****************************************************************************************
 # Add 1 to counter, then use next service account in rclone remote ENV or config
 #*****************************************************************************************
 add_to_counter ()
 { COUNT=$(<$JSCOUNT)
-  echo $(( $COUNT>=$MAXJS?$MINJS:$COUNT+$NEXTJS ))>$JSCOUNT
-  [ -f "$JSDIR"/"$COUNT".json ] || next_sa; }
+  MOD=$(( $MAXJS - $MINJS + 1 ))
+  echo $(( (($COUNT - $MINJS + $NEXTJS) % $MOD) + $MINJS ))>$JSCOUNT
+  [ -f "$JSDIR"/"$COUNT".json ] || next_sa
+}
 
 export_js ()
 { set -x;export "RCLONE_CONFIG_"$1"_SERVICE_ACCOUNT_FILE="$JSDIR"/"$COUNT.json;set +x; }
@@ -138,13 +161,16 @@ next_sa ()
 # Run rclone with flags from config file, set file and command line. Use SAs where authed
 #*****************************************************************************************
 run_rclone_w_flags ()
-{ while [[ $ret =~ ^(7|8)$ ]] && (($SAs));do . msg run_rc
+{ eval . msg run_rc $notif_key
+  . msg print_flags
+  while [[ $ret =~ ^(7|8)$ ]] && (($SAs));do
     next_sa
     set -x
-    rclone $sync "$src" "$dest" $sa_flag $FLAGS $bak $set_flags $cmd_flags
+    timeout $TIMEOUT $rcmd $sync "$src" "$dest" $sa_flag $FLAGS $bak $set_flags $cmd_flags
     ret=$?
     set +x
-    done
+  done
+  eval . msg fin_rc $notif_key
 }
 
 #*****************************************************************************************
@@ -154,6 +180,7 @@ check_remotes_and_run_rclone ()
 { while IFS="$IFS1" read sync src dest set_flags;do
     check_remotes || continue
     run_rclone_w_flags
-    . msg fin_sync
-    clean_remotes
-  done <<<"$set_clean" > >(tee "$STD_LOG") 2> >(tee "$ERR_LOG" >&2); }
+    if [ ${#TMUX} -gt 3 ];then clean_remotes;else (clean_remotes &) ;fi
+    (run_sizeup &)
+  done <<<"$set_clean" > >(tee "$STD_LOG") 2> >(tee "$ERR_LOG" >&2)
+}

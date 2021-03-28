@@ -7,7 +7,7 @@ vars_for_check() {
   COUNT=$(<$JSCOUNT)
   ret=8
   SAs=$MAXJS
-  bak=
+  unset bak
   dsaf="--drive-service-account-file=$JSDIR/"
   dutf="--drive-use-trash=false"
 
@@ -32,9 +32,17 @@ check_remotes()
         then . msg ok_cfg "${rem[$i]}"
       else . msg rc_bad "${rem[$i]}";$CON_EX;fi
 
+      if `rclone config show "${rem[$i]}" | grep "type = crypt" &>/dev/null`
+        then CRYPT[$i]=true;. msg ok_crypt "${rem[$i]}";fi
+
       if [ `rclone config show "${rem[$i]}" | grep team_drive | wc -m` -gt 18 ]
         then . msg ok_td "${rem[$i]}"
-      else rem_td[$i]=false;. msg not_td "${rem[$i]}";fi
+      elif [ CRYPT[$i] ]
+        then cryp_rem=`rclone config show "${rem[$i]}" | grep remote | cut -f3 -d ' ' | cut -f1 -d ':'`
+        if [ `rclone config show "$cryp_rem" | grep team_drive | wc -m` -gt 18 ]
+          then . msg ok_td "${rem[$i]}";fi
+      else rem_td[$i]=false;. msg not_td "${rem[$i]}"
+      fi
 
       if `rclone lsd "${srcdest[$i]}" "$dsaf$COUNT.json" &>/dev/null` && ${rem_td[$i]}
         then . msg ok_sa "${srcdest[$i]}";dsaff="$dsaf$COUNT.json"
@@ -43,13 +51,10 @@ check_remotes()
       if `rclone lsd "${srcdest[$i]}" $dsaff &>/dev/null`
         then . msg ok_read "${srcdest[$i]}"
       else . msg fail_read "${srcdest[$i]}";$CON_EX;fi
-
-      if `rclone config show "${rem[$i]}" | grep "type = crypt" &>/dev/null`
-        then CRYPT[$i]=true;. msg ok_crypt "${rem[$i]}";fi
     done
 
     if rclone touch "${rem[1]}:/sasync.bin" $dsaff &>/dev/null
-      then . msg ok_write "${rem[1]}";else . msg fail_write "${rem[1]}";$CON_EX;fi
+      then . msg ok_write "${rem[1]}";sleep 3s;else . msg fail_write "${rem[1]}";$CON_EX;fi
 
     if rclone deletefile -q "${rem[1]}:/sasync.bin" $dsaff $dutf &>/dev/null
       then . msg ok_del "${rem[1]}";else . msg fail_del "${rem[1]}";fi
@@ -58,7 +63,8 @@ check_remotes()
   if ${PRE_CLEAN_TDS,,};then clean_remotes;fi
 
   if ${BAK_FILES,,} && [ ! -z "${dest#*:}" ] && [ ! $sync == "move" ];then
-    bak="--backup-dir="$(sed "s/:/:$BAK_DIR\//g"<<<$dest);else unset bak;fi
+    bak=$( sed "s/:/:$BAK_DIR\//g"<<<"$dest" )
+    bak="--backup-dir=""$bak";fi
 
   if ${CALC_SIZE,,};then sacalc
     if [[ $srcsize -eq 0 ]];then . msg src_zero && return 1;fi

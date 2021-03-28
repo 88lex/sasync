@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-. msg start
 . safunctions
 process_cmd_args_and_clean_set_files "$@"
 check_remotes_and_run_rclone
-. msg complete
+eval . msg complete "$notif_key"

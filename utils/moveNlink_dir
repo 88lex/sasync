@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Move files with full dir tree to a new location. Then create a link back to the original location
+# Usage:  ./moveNlink_dir /origin/folder  /dest/folder filename <= filename can also be a pattern e.g. "*.txt"
+# Result: /dest/folder/origin/folder/123.txt is a file and /origin/folder.123.txt is a link
+
+function moveNlink_dir {
+    for f in `find "$1" -type f -name "$3"`
+    do
+        dname=`dirname "$f"`
+        mkdir -p "$2/$dname"
+        ln "$f" "$2/$f" && ln -sf $2/$f $1
+    done
+}
+
+moveNlink_dir $@

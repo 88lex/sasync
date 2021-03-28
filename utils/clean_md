@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# clean_md 'cleans' a mydrive:folder by pushing files that are not in source:folder to mydrive:backup/folder
+# clean_md does not sync/copy files into mydrive:folder
+# USAGE: `./clean_md source:folder mydrive:folder`
+# USAGE: `./clean_md source:folder mydrive:folder --flag --flag`
+
+MAX_TRANSFER="1M"
+BAK_FOLDER="backup"
+
+BAK_FOLDER=${2%:*}:$BAK_FOLDER/${1#*:}
+
+
+#BAK_FOLDER=$( sed "s/:/:$BAK_FOLDER\//g"<<<"$1" )
+#BAK_FOLDER="--backup-dir="$BAK_FOLDER
+
+#echo $BAK_FOLDER;exit
+
+FLAGS="
+  --backup-dir=$BAK_FOLDER
+  --max-transfer=$MAX_TRANSFER
+  --delete-before
+  --transfers=16
+  --checkers=32
+  --delete-before
+  --fast-list
+  --size-only
+  --no-update-modtime
+  -vP
+  --stats=10s
+  --max-backlog=2000000
+  --drive-use-trash=false
+  --drive-server-side-across-configs=true
+  "
+
+FLAGS=${FLAGS//[$'\t\r\n']}
+
+#echo $FLAGS
+#exit
+
+set -x
+rclone sync "$1" "$2" $FLAGS
+set +x

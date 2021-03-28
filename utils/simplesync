@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# usage:  ./simplesync ./sets/set.file <= set file needs either full path or correct relative path
+
+FLAGS="
+  --fast-list 
+  --track-renames 
+  --transfers=16 
+  --checkers=16 
+  --size-only 
+  --no-update-modtime 
+  --drive-use-trash=false 
+  --drive-server-side-across-configs=true 
+  --drive-stop-on-upload-limit
+  -P
+"
+
+set -x
+grep -v -E '^$|^#' $1 | parallel -j 4 -r --colsep ' +' 'gclone {} $FLAGS'
+set +x
