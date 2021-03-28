@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+init ()
+{ source sasynx.conf
+  while getopts 's:r:a:et:cdz' o;do
+    case "$o" in
+      s) SETFILE="$SETDIR/${OPTARG}" ;;
+      r) MYCLONE="${OPTARG}" ;;
+      a) ACTION="${OPTARG}" ;;
+      e) ECH0="echo" ;;
+      t) TIMEOUT="timeout ${OPTARG}" ;;
+      c) CHAIN="true" ;;
+      d) DEDUPE="true" ;;
+      z) SIZEUP="true" ;;
+    esac
+  done
+  shift "$(($OPTIND - 1))"
+  args="$@"
+  syncsets=(${args%% -*})
+  FLAGS+=" ${args/${syncsets[@]}/}"
+}
+
+dedup_sizup ()
+{ if [[ $DEDUPE == "true" ]];then $ECH0 rclone dedupe -vP skip $1;fi
+  if [[ $SIZEUP == "true" ]];then $ECH0 $sizeup $1;fi 
+}
+
+groups ()
+{ for s in "${syncsets[@]}";do
+    source $SETFILE $s
+    [[ -v group ]] && tmpset+=(${group[@]}) || tmpset+=($s)
+    # if [[ -v group ]];then tmpset+=(${group[@]});else tmpset+=($s);fi
+  done
+  syncsets=("${tmpset[@]:-'zzemptyzz'}")
+}
+
+main ()
+{ for s in "${syncsets[@]}";do
+    source $SETFILE $s
+    for i in "${src[@]}"; do i=$i$src_dir;last_dest="$i"
+      dedup_sizup "$i"
+      for j in "${dest[@]}"; do j=$j$dest_dir
+        if [[ $CHAIN == "true" && ${#src[@]} -eq 1 ]];then i=$last_dest;last_dest=$j;fi
+        echo  $TIMEOUT $MYCLONE $ACTION $i $j $FLAGS
+        $ECH0 $TIMEOUT $MYCLONE $ACTION $i $j $FLAGS
+        dedup_sizup "$j"
+      done
+    done
+  done
+}
+
+init "$@"
+groups "$@"
+main
