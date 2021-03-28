@@ -32,9 +32,11 @@ TIMEOUT=0m                        # Set timeout if you want to limit run time fo
 FLAGS="
   --fast-list
   --track-renames
+  --transfers=16
   --checkers=32
   --tpslimit-burst=16
   -vP
+  --ignore-errors
   --stats=30s
   --max-backlog=2000000
   --ignore-case
@@ -46,7 +48,12 @@ FLAGS="
   --use-mmap
   --drive-server-side-across-configs=true
   --drive-stop-on-upload-limit
-  --check-first
+  --drive-skip-gdocs
+  --timeout=10s
+  --tpslimit=4
   "
 
-#  --tpslimit=4
+  # --drive-stop-on-download-limit
+  # --retries=1
+  # --low-level-retries=1
+  # --check-first

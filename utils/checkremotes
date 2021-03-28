@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #  #!/bin/bash
 > failedmounts
-readarray mounts < <( rclone listremotes )
+readarray mounts < <( rclone listremotes | grep "$1")
 for i in ${mounts[@]}; do
   echo For $i
   rclone lsd $i

@@ -13,6 +13,7 @@ echo "alias csd='cd /opt/diffmove'" >> ~/.bashrc
 echo "alias csf='cd /opt/safire'" >> ~/.bashrc
 echo "alias csg='cd /opt/sa-gen'" >> ~/.bashrc
 echo "alias cset='cd /opt/sasets'" >> ~/.bashrc
+echo "alias csets='cd /opt/sasets/sets'" >> ~/.bashrc
 echo "alias c..='cd ..'" >> ~/.bashrc
 echo "alias t0='tmux a -t 0'" >> ~/.bashrc
 
