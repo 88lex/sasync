@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# This is an interactive version of rc_add_remotes. You can choose to use SAs and/or tokens
+# run `rc_add_remotes remote.list` where remote.list is a text/csv file with two columns
+# that include `remote_name` and`teamdriveID`.
+# remote_name is what you want to call your rclone remote, without a colon ':'
+# teamdriveID can be copied from your browser url when at root of your teamdrive. Typically looks like `0APabc123def49PVA`
+
+SETDIR=/opt/sasets
+SADIR=/opt/sa
+
+echo -e "Use service account file? (y/n)";read -i n sa_yn
+echo -e "Use client id, secret and token? (y/n)";read -i n token_yn
+
+if [ "${sa_yn,,}" != "y" ] && [ "${token_yn,,}" != "y" ];then
+  echo -e "Cannot continue if you do not choose service accounts or tokens\n"
+  exit
+fi
+
+if [ "${token_yn,,}" != "y" ];then
+  id="";secret="";token=""
+else
+  echo -e "You must have at least one authed remote. Enter remote name.";read rem
+  if [ "${rem%:*}" ];then
+    id="client_id "`rclone config show $rem|grep client_id | awk -F' = ' '{print $2}'`
+    secret="client_secret "`rclone config show $rem|grep client_secret | awk -F' = ' '{print $2}'`
+    token="token "`rclone config show $rem|grep token | awk -F' = ' '{print $2}'`
+  else echo -e "No remote entered. Authorize a remote and start again.";exit
+  fi
+fi
+
+rc_update () {
+  sed '/^\s*#.*$/d' $SETDIR/$1|\
+  while IFS= read line;do set $line
+    let count+=1
+    [ "${sa_yn,,}" = "y" ] && sa_file="service_account_file $SADIR/$count.json" ||\
+    sa_file='service_account_file ""'
+    rclone config update "${1%:*}" type drive scope drive team_drive $2 $sa_file $id $secret $token
+  done
+}
+
+rc_update $1

@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# clean_bak accepts a command line filter now.  e.g. `./cleanremotes tv` will
+# only delete backup folder contents in remotes that have `tv` in them
+# clean_bak also passes through any rclone flags you add after the filter
+# usage: ./clean_bak filter --flag1 --flag2
+
+filter="$1"
+shift
+rc_flags="$@"
+timeout=999m
+#rclone listremotes | gawk "$filter"
+rclone listremotes | grep "$filter"
+
+readarray mounts < <( rclone listremotes | grep "$filter" )
+for i in ${mounts[@]}; do
+  echo; echo STARTING TRASH DELETE of $i; echo
+  rclone cleanup $i
+  # timeout "$timeout" rclone delete $i -vvP --drive-trashed-only=true --drive-use-trash=false --tpslimit=4 --tpslimit-burst=32 --transfers=16 $rc_flags
+
+  echo; echo STARTING DELETE of /backup folder from $i; echo
+  timeout "$timeout" rclone purge $i/backup -vP --drive-use-trash=false --tpslimit=4 --tpslimit-burst=32 --transfers=16 $rc_flags
+
+  # echo; echo STARTING RMDIRS of /backup folder from $i; echo
+  # timeout "$timeout" rclone rmdirs $i/backup -vvP --drive-use-trash=false --tpslimit=4 --tpslimit-burst=32 --transfers=16 $rc_flags
+
+  echo; echo STARTING DELETE of /diff folder from $i; echo
+  timeout "$timeout" rclone purge $i/diff -vP --drive-use-trash=false --tpslimit=4 --tpslimit-burst=32 --transfers=16 $rc_flags
+
+  # echo; echo STARTING RMDIRS of /diff folder from $i; echo
+  # timeout "$timeout" rclone rmdirs $i/diff -vvP --drive-use-trash=false --tpslimit=4 --tpslimit-burst=32 --transfers=16 $rc_flags
+
+  echo; echo FINISHED CLEAN_BAK of /diff folder from $i; echo
+done

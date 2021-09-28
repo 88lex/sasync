@@ -4,8 +4,8 @@ unset src dest src_dir dest_dir group
 
 ### Example1: Your set file can be as simple as this
 #################################################################
-src=("acct1:")
-dest=("acct2:" "acct3:")
+src=("acct1")
+dest=("acct2" "acct3")
 #################################################################
 
 
@@ -17,11 +17,9 @@ case $1 in
   # Sets
   movies)
     src_dir=("-movies:movies")
-    dest_dir=("-movies:movies")
     ;;
   tv)
     src_dir=("-tv-20s:television/20s")
-    dest_dir=("_tv2:television/20s")
     ;;
   *) printf "\nArgument missing or set \"$1\" is invalid.\n\n";continue
     ;;

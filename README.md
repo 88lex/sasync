@@ -1,6 +1,9 @@
-## **SASYNC 4.0 ~= SASYNX 1.0**
+## **SASYNC 4.1 ~= SASYNX 1.1**
+- [NOTE] `sasync` works as usual, with messages, notifications, etc. 
+
 - [NEW] Introducing `sasynx`, rewrite of sasync with ~90% reduction in lines of code
-- `sasynx` retains many features of sasync, while adding tree-sync, chain-sync and group syncs
+  - `sasynx` is more simple but also more flexible than `sasync`
+  - `sasynx` retains many features of sasync, while adding tree-sync, chain-sync and group syncs
 - The only files required are `sasynx`, `sasynx.conf` and a set file e.g. `sasynx.set`
 - The sasynx.config file uses many of the same variables as the old sasync.conf
 - Supports multiple sets in a single line 

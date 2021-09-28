@@ -2,14 +2,16 @@
 
 init ()
 { source sasynx.conf
-  while getopts 's:r:a:et:cdz' o;do
+  while getopts 's:r:a:T:bectdz' o;do
     case "$o" in
       s) SETFILE="$SETDIR/${OPTARG}" ;;
       r) MYCLONE="${OPTARG}" ;;
       a) ACTION="${OPTARG}" ;;
+      T) TIMEOUT="timeout ${OPTARG}" ;;
+      b) BAK_FILES="true" ;;
       e) ECH0="echo" ;;
-      t) TIMEOUT="timeout ${OPTARG}" ;;
       c) CHAIN="true" ;;
+      t) CHAIN="false" ;;
       d) DEDUPE="true" ;;
       z) SIZEUP="true" ;;
     esac
@@ -17,32 +19,37 @@ init ()
   shift "$(($OPTIND - 1))"
   args="$@"
   syncsets=(${args%% -*})
-  FLAGS+=" ${args/${syncsets[@]}/}"
+  ARGS=" ${args/${syncsets[@]}/}"
+}
+
+backup ()
+{ if ${BAK_FILES,,} && [ ! -z "${j#*:}" ] && [ ! $ACTION == "move" ];then
+  BAK="--backup-dir="$( sed "s/:/:$BAK_DIR\//g"<<<"$j" );else unset BAK;fi
 }
 
 dedup_sizup ()
-{ if [[ $DEDUPE == "true" ]];then $ECH0 rclone dedupe -vP skip $1;fi
-  if [[ $SIZEUP == "true" ]];then $ECH0 $sizeup $1;fi 
+{ (if [[ $DEDUPE == "true" ]];then $ECH0 rclone dedupe -vP newest $1;fi)&
+  (if [[ $SIZEUP == "true" ]];then $ECH0 $sizeup $1;fi)& 
 }
 
 groups ()
 { for s in "${syncsets[@]}";do
     source $SETFILE $s
     [[ -v group ]] && tmpset+=(${group[@]}) || tmpset+=($s)
-    # if [[ -v group ]];then tmpset+=(${group[@]});else tmpset+=($s);fi
   done
-  syncsets=("${tmpset[@]:-'zzemptyzz'}")
+  syncsets=("${tmpset[@]:-'No set specified'}")
 }
 
 main ()
-{ for s in "${syncsets[@]}";do
+{ > sasynx.tmp
+  for s in "${syncsets[@]}";do
     source $SETFILE $s
     for i in "${src[@]}"; do i=$i$src_dir;last_dest="$i"
       dedup_sizup "$i"
-      for j in "${dest[@]}"; do j=$j$dest_dir
-        if [[ $CHAIN == "true" && ${#src[@]} -eq 1 ]];then i=$last_dest;last_dest=$j;fi
-        echo  $TIMEOUT $MYCLONE $ACTION $i $j $FLAGS
-        $ECH0 $TIMEOUT $MYCLONE $ACTION $i $j $FLAGS
+      for j in "${dest[@]}"; do j=$j${dest_dir:-$src_dir}
+        if [[ $CHAIN == "true" && ${#src[@]} -eq 1 ]];then i=$last_dest;last_dest=$j;backup;fi
+        echo  $TIMEOUT $MYCLONE $ACTION $i $j $BAK $FLAGS $flags $ARGS
+        $ECH0 $TIMEOUT $MYCLONE $ACTION $i $j $BAK $FLAGS $flags $ARGS
         dedup_sizup "$j"
       done
     done
