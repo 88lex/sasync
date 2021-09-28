@@ -13,7 +13,7 @@ sizeup="/opt/sasync/utils/sizeup"
 # rclone flags
 FLAGS="
   -vP 
-  --transfers=32
+  --transfers=16
   --size-only 
   --ignore-checksum 
   --no-update-modtime 
