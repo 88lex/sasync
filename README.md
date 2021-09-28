@@ -4,6 +4,7 @@
 - [NEW] Introducing `sasynx`, rewrite of sasync with ~90% reduction in lines of code
   - `sasynx` is more simple but also more flexible than `sasync`
   - `sasynx` retains many features of sasync, while adding tree-sync, chain-sync and group syncs
+  - Before running `sasynx` copy sasynx.conf-sample to sasynx.conf and edit as needed
 - The only files required are `sasynx`, `sasynx.conf` and a set file e.g. `sasynx.set`
 - The sasynx.config file uses many of the same variables as the old sasync.conf
 - Supports multiple sets in a single line 

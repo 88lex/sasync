@@ -29,7 +29,6 @@ FLAGS="
   # --drive-service-account-file-path=$JSDIR
   # --check-first
   # --track-renames 
-  # --user-agent="bbbggg8"
   # --multi-thread-streams=1 
   # --user-agent="Mozilla/5.0"
   # --drive-chunk-size=256M 
