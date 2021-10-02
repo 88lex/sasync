@@ -47,7 +47,8 @@ main ()
     for i in "${src[@]}"; do i=$i$src_dir;last_dest="$i"
       dedup_sizup "$i"
       for j in "${dest[@]}"; do j=$j${dest_dir:-$src_dir}
-        if [[ $CHAIN == "true" && ${#src[@]} -eq 1 ]];then i=$last_dest;last_dest=$j;backup;fi
+        if [[ $CHAIN == "true" && ${#src[@]} -eq 1 ]];then i=$last_dest;last_dest=$j;fi;
+        backup
         echo  $TIMEOUT $MYCLONE $ACTION $i $j $BAK $FLAGS $flags $ARGS
         $ECH0 $TIMEOUT $MYCLONE $ACTION $i $j $BAK $FLAGS $flags $ARGS
         dedup_sizup "$j"
