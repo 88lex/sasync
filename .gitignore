@@ -7,6 +7,6 @@
 **/test
 **/.vscode
 .vscode/settings.json
-sasyn*.conf
+#sasyn*.conf
 json.count
 sasync[0-9]

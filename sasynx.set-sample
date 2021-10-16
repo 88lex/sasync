@@ -1,0 +1,80 @@
+unset src dest src_dir dest_dir group
+################## DO NOT CHANGE ABOVE LINE #####################
+
+
+### Example1: Your set file can be as simple as this
+#################################################################
+src=("acct1")
+dest=("acct2" "acct3")
+#################################################################
+
+
+
+### Example2: You can add multiple sets like this for movies and tv
+#################################################################
+
+case $1 in
+  # Sets
+  movies)
+    src_dir=("-movies:movies")
+    ;;
+  tv)
+    src_dir=("-tv-20s:television/20s")
+    ;;
+  *) printf "\nArgument missing or set \"$1\" is invalid.\n\n";continue
+    ;;
+esac
+
+#################################################################
+
+
+
+### Example3: You can add groups of sets like this
+#################################################################
+
+case $1 in
+  # Sets
+  movies)
+    src_dir=("-movies:movies")
+    dest_dir=("-movies:movies")
+    ;;
+  movies-4k)
+    src_dir=("-movies-4k:movies/4k")
+    dest_dir=("-movies-4k:movies/4k")
+    ;;
+  tv)
+    src_dir=("-tv-20s:television/20s")
+    dest_dir=("_tv2:television/20s")
+    ;;
+  ebooks)
+    src_dir=("-ebooks:ebooks")
+    dest_dir=("-ebooks:ebooks")
+    ;;
+  photos)
+    src_dir=("-photos:photos")
+    dest_dir=("-photos:photos")
+    ;;
+
+  # Group section
+  all-movies)
+    group=("movies" "movies-4k")
+    ;;
+  other)
+    group=("ebooks" "photos")
+    ;;
+
+  *) printf "\nArgument missing or set \"$1\" is invalid.\n\n";continue
+    ;;
+esac
+#################################################################
+
+
+#################################################################
+### NOTES:
+### NAME THE SET FILE AS YOU LIKE, BUT SPECIFY IT IN CONFIG FILE OR WITH THE -s FLAG
+
+### THE SYNTAX ABOVE IS BASH CASE SYNTAX. https://linuxize.com/post/bash-case-statement/
+
+### IN STATEMENTS LIKE src=("acct1:") or dest=("acct2:" "acct3:")  PARENTHESES ARE
+### ONLY REQUIRED FOR MULTIPLE SRC/DEST DIRS. SO src="acct1:" IS EQUIVALENT
+#################################################################

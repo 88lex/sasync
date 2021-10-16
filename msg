@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VER=3.5
+VER=4.1
 
 case ${1,,} in
   start)

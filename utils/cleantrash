@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# cleanremotes accepts a command line filter now.  e.g. `./cleanremotes tv` will
+# only clean remotes that have `tv` in them
+# cleanremotes also passes through any rclone flags you add after the filter
+# usage: ./cleanremotes filter --flag1 --flag2
+
+filter="$1"
+shift
+rc_flags="$@"
+timeout=5m
+#rclone listremotes | gawk "$filter"
+rclone listremotes | grep "$filter"
+
+readarray mounts < <( rclone listremotes | grep "$filter" )
+for i in ${mounts[@]}; do
+  echo; echo PERMANENTLY DELETING TRASH from $i; echo
+  rclone cleanup $i -v $rc_flags
+  timeout "$timeout" rclone delete $i -v --drive-trashed-only=true --drive-use-trash=false --tpslimit=4 --tpslimit-burst=32 --transfers=16 $rc_flags
+  echo; echo REMOVING EMPTY DIRECTORIES from $i; echo
+  timeout "$timeout" rclone rmdirs $i -v --drive-trashed-only=true --drive-use-trash=false --tpslimit=4 --tpslimit-burst=32 --transfers=16 $rc_flags
+done
+

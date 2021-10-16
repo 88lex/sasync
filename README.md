@@ -1,3 +1,44 @@
+## **SASYNC 4.1 ~= SASYNX 1.1**
+- [NOTE] `sasync` works as usual, with messages, notifications, etc. 
+
+- [NEW] Introducing `sasynx`, rewrite of sasync with ~90% reduction in lines of code
+  - `sasynx` is more simple but also more flexible than `sasync`
+  - `sasynx` retains many features of sasync, while adding tree-sync, chain-sync and group syncs
+  - Before running `sasynx` copy sasynx.conf-sample to sasynx.conf and edit as needed
+- The only files required are `sasynx`, `sasynx.conf` and a set file e.g. `sasynx.set`
+- The sasynx.config file uses many of the same variables as the old sasync.conf
+- Supports multiple sets in a single line 
+  - `./sasynx tv movies` will run both the tv and movies sets
+- `sasynx` depends on fclone, lclone or gclone to auto rotate service accounts
+  - choose your *clone in the config file or via the -r flag
+  - `./sasynx -r fclone tv` will use fclone
+- Default action `sync`, `copy` `move` can be set in config file or via `-a flag`
+  - `./sasynx -a copy tv` will copy files
+- Dedupe both source and destination folders via `-d` flag
+- Send remote stats to gsheet via `-z` flag
+- Default sync from source to single or multiple destinations (a `tree` sync)
+- Can be changed to a `chain` sync with `-c` flag. This will copy source to dest1, then dest1 to dest2 and so on
+- Sets can be literal or multi-layered
+  - Literal, single layered e.g. 
+    ```
+      src=("td1:movies")
+      dest=("td2:movies")```
+  - Multi-layered e.g.
+      ```
+    movies)
+        src=("td1:")
+        src_dir=("movies")
+        dest=("td2:" "td3:")
+        dest_dir=("Media/movies")
+      ```
+- Multiple source-dest sets can be grouped together
+      ```
+      media) group=("tv" "movies")
+      ```
+  - `./sasynx media` will run both the tv and movies sets
+- All commands can be tested without running using `-e` flag
+- OPTIONAL: As with sasync, `sizeup` feature requires some python dependencies
+
 ## **SASYNC 3.5 **
 Ref: https://github.com/88lex/sa-guide For more info
 

@@ -1,0 +1,35 @@
+MYCLONE="fclone"
+ACTION="sync"
+SETFILE="sasynx.set"
+SETDIR="/opt/sasync"
+JSDIR="/opt/sa"
+CHAIN=true
+BAK_FILES=false
+BAK_DIR=backup
+DEDUP=false
+SIZEUP=false
+sizeup="/opt/sasync/utils/sizeup"
+
+# rclone flags
+FLAGS="
+  -vP 
+  --transfers=16
+  --size-only 
+  --ignore-checksum 
+  --no-update-modtime 
+  --max-backlog=0
+  --fast-list
+  --drive-use-trash=false
+  --tpslimit=4
+  --drive-disable-http2
+  "
+
+  # --ignore-case 
+  # --drive-stop-on-upload-limit
+  # --drive-service-account-file-path=$JSDIR
+  # --check-first
+  # --track-renames 
+  # --multi-thread-streams=1 
+  # --user-agent="Mozilla/5.0"
+  # --drive-chunk-size=256M 
+  # --drive-stop-on-download-limit

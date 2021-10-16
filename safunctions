@@ -73,7 +73,8 @@ init_log_n_bak()
 # sizeup is a python app that check size and file count in remotes then uploads to a gsheet
 #*****************************************************************************************
 run_sizeup()
-{ if "${SIZEUP,,}";then cd $SASDIR/utils; python3 sizeup "$dest";fi ; }
+{ if "${SIZEUP,,}";then cd $SASDIR/utils; python3 sizeup "$1";fi ; }
+# { if "${SIZEUP,,}";then cd $SASDIR/utils; python3 sizeup "$dest";fi ; }
 
 #*****************************************************************************************
 # Clean remotes - dedupe identical files, remove empty folders and permanently deletes trash
@@ -181,6 +182,6 @@ check_remotes_and_run_rclone ()
     check_remotes || continue
     run_rclone_w_flags
     if [ ${#TMUX} -gt 3 ];then clean_remotes;else (clean_remotes &) ;fi
-    (run_sizeup &)
+    ((run_sizeup "$src" && run_sizeup "$dest") &)
   done <<<"$set_clean" > >(tee "$STD_LOG") 2> >(tee "$ERR_LOG" >&2)
 }
