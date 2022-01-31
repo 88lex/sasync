@@ -34,16 +34,17 @@ dedup_sizup ()
 
 groups ()
 { for s in "${syncsets[@]}";do
-    source $SETFILE $s
+    source $SETDIR/$SETFILE $s
     [[ -v group ]] && tmpset+=(${group[@]}) || tmpset+=($s)
   done
   syncsets=("${tmpset[@]:-'No set specified'}")
 }
 
 main ()
-{ > sasynx.tmp
+{ 
+  #> sasynx.tmp
   for s in "${syncsets[@]}";do
-    source $SETFILE $s
+    source $SETDIR/$SETFILE $s
     for i in "${src[@]}"; do i=$i$src_dir;last_dest="$i"
       dedup_sizup "$i"
       for j in "${dest[@]}"; do j=$j${dest_dir:-$src_dir}

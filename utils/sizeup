@@ -53,34 +53,39 @@ for remote in remotes:
     try:
         print(f"Remote is {remote}")
         rem_size = subprocess.check_output(f"rclone size --json {remote} --fast-list --exclude /backup/**", shell=True)
+        fnf_count = int(subprocess.check_output(f"rclone lsjson {remote} -R --no-modtime --fast-list --exclude /backup/** 2>&1 | wc -l", shell=True))
         parsed_json = json.loads(rem_size)
         print(json.dumps(parsed_json, indent=4, sort_keys=True))
 
         remcount = int(parsed_json['count'])
+        foldercount = (( fnf_count - remcount ))
         remsize = int(parsed_json['bytes'])
         remsizeGB = int(parsed_json['bytes'] / (1024**3))
         nowtime = str(datetime.date.today())
 
         print(f"Remote name          = {remote}")
         print(f"Remote file count    = {remcount}")
+        print(f"Remote folder count  = {foldercount}")
+        print(f"Remote f+f count     = {fnf_count}")
         print(f"Remote size in GB    = {remsizeGB}")
         print(f"Remote size in bytes = {remsize}")
 
         try:
             cell = worksheet.find(remote)
             print(f"Found string {remote} in Row {cell.row}, Column {cell.col}")
-            range_build = 'A' + str(cell.row) + ':E' + str(cell.row)
+            range_build = 'A' + str(cell.row) + ':F' + str(cell.row)
             print(range_build)
             cell_list = worksheet.range(range_build)
-            cell_values = [remote, remcount, remsizeGB, remsize, nowtime]
+            cell_values = [remote, remcount, fnf_count, remsizeGB, remsize, nowtime]
             for i, val in enumerate(cell_values):
                 cell_list[i].value = val
             print(cell_list[2].value)
             worksheet.update_cells(cell_list)
         except:
-            print(f"Remote {remote} not found, add line")
-            cell_values = [remote, remcount, remsizeGB, remsize, nowtime]
-            worksheet.append_row(cell_values)
+            pass
+            #     print(f"Remote {remote} not found, add line")
+            #     cell_values = [remote, remcount, fnf_count, remsizeGB, remsize, nowtime]
+            #     worksheet.append_row(cell_values)
     except:
         pass
 
