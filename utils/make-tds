@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+gdrive="my-google-account:"
+members="my-td:"
+prefix="goober"
+declare -a td=("001" "002" "003" "004" "005" "006" "007" "008" "009" "010")
+
+for i in "${td[@]}"; do
+  fclone backend add-drive $gdrive $prefix-$i -o copy-members=$members
+done
+
+fclone backend lsdrives $gdrive | grep $prefix
