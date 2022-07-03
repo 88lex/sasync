@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Usage: Run `./balsort unionremote:` from /sasync/utils folder 
+# where unionremote is the name of ... your rclone union remote
+
 clone="rclone"
 tmout="6h"
 declare -a remotelist=$( $clone listremotes | grep "$@" )
