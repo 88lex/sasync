@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+clone="rclone"
+tmout="6h"
+declare -a remotelist=$( $clone listremotes | grep "$@" )
+echo Remotes are $remotelist
+for rem in $remotelist;do
+  if [ !$( $clone config show $rem | grep "type = union" ) ];then
+    echo Remote "$rem" is not a union remote
+  else 
+    echo Remote $rem is a union remote
+    >"bal-unionfiles-$rem.txt";>"bal-files2move-$rem.txt";>"bal-tmp-$rem.txt"
+    upstreams=$( $clone config show "$rem" | grep upstreams | cut -d= -f2 )
+    num_upstreams=`wc -w <<< "$upstreams"`
+    echo There are "$num_upstreams" Upstreams in "$rem" = "$upstreams"
+    $clone lsf -R --files-only --fast-list $rem --exclude="backup/**" >> "bal-unionfiles-$rem.txt"
+    sort -u -o "bal-unionfiles-$rem.txt" "bal-unionfiles-$rem.txt"
+    union_filecount=$( wc -l < "bal-unionfiles-$rem.txt" )
+    echo File count in $rem = $union_filecount
+    avg_union_filecount=$(( union_filecount/num_upstreams ))
+    echo -e "File count in $rem = $union_filecount"
+    echo -e "Avg union filecount = $avg_union_filecount"
+    for i in $upstreams;do 
+      head -n $avg_union_filecount "bal-unionfiles-$rem.txt" > "bal-files2move-$rem.txt"
+      for j in $upstreams;do
+        if [ "$i" != "$j" ]; then
+          echo Moving sorted files from remote $j to remote $i
+          timeout $tmout $clone move $j $i --files-from-raw "bal-files2move-$rem.txt" -vP --drive-use-trash=false \
+          --transfers=16 --max-backlog=0 --no-update-modtime --delete-empty-src-dirs --drive-server-side-across-configs
+        fi
+      done
+      tail -n +$avg_union_filecount "bal-unionfiles-$rem.txt" > bal-tmp-$rem.txt
+      mv "bal-tmp-$rem.txt" "bal-unionfiles-$rem.txt"
+    done
+    for i in $upstreams;do ((./sizeup "$i" ) &);done
+    rm -f bal-*-$rem.txt
+    echo -e "\nBalancer+Sort for remote $rem has finished\n"
+  fi
+done
