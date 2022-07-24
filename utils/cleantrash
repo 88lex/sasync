@@ -7,7 +7,7 @@
 filter="$1"
 shift
 rc_flags="$@"
-timeout=5m
+timeout=60m
 #rclone listremotes | gawk "$filter"
 rclone listremotes | grep "$filter"
 
@@ -15,8 +15,7 @@ readarray mounts < <( rclone listremotes | grep "$filter" )
 for i in ${mounts[@]}; do
   echo; echo PERMANENTLY DELETING TRASH from $i; echo
   rclone cleanup $i -v $rc_flags
-  timeout "$timeout" rclone delete $i -v --drive-trashed-only=true --drive-use-trash=false --tpslimit=4 --tpslimit-burst=32 --transfers=16 $rc_flags
-  echo; echo REMOVING EMPTY DIRECTORIES from $i; echo
-  timeout "$timeout" rclone rmdirs $i -v --drive-trashed-only=true --drive-use-trash=false --tpslimit=4 --tpslimit-burst=32 --transfers=16 $rc_flags
+  timeout "$timeout" rclone delete $i -v --drive-trashed-only=true --drive-use-trash=false --rmdirs --fast-list --tpslimit=4 --tpslimit-burst=16 --fast-list --transfers=16 $rc_flags
+  timeout "$timeout" rclone rmdirs $i -v --drive-trashed-only=true --drive-use-trash=false --tpslimit=4 --tpslimit-burst=16 --fast-list --transfers=16 $rc_flags
 done
 
