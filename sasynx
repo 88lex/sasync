@@ -4,7 +4,7 @@ init ()
 { source sasynx.conf
   while getopts 's:r:a:T:bectdz' o;do
     case "$o" in
-      s) SETFILE="$SETDIR/${OPTARG}" ;;
+      s) SETFILE="${OPTARG}" ;;
       r) MYCLONE="${OPTARG}" ;;
       a) ACTION="${OPTARG}" ;;
       T) TIMEOUT="timeout ${OPTARG}" ;;
@@ -56,6 +56,8 @@ main ()
       done
     done
   done
+  # [ -z "$exe" ] && $exe
+  $exe
 }
 
 init "$@"

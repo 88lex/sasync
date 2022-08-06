@@ -10,7 +10,7 @@ process_cmd_args_and_clean_set_files()
   if ${NOTIF_KEY,,};then notif_key='| tee >($NOTIF_COMM)';else notif_key="";fi
   . rccheck
   saconf="sasync.conf"
-  rcmd="rclone"
+  rcmd="gclone"
   unset gflag
   par=false
   args="$@"
@@ -62,8 +62,8 @@ init_log_n_bak()
   if [ ! -f $SASDIR/json.count ];then echo $MINJS >$SASDIR/json.count;fi
   mkdir -p $SASDIR/backup $SASDIR/logs
   cp $SASDIR/sasync.conf "$SASDIR/backup/$(date +%F)_sasync.conf"
-  find $SASDIR/backup/* -type f -mtime +14 -exec rm {} \;
-  find $SASDIR/logs/* -type f -mtime +7 -exec rm {} \;
+  find $SASDIR/backup/* -type f -mtime +14 -exec rm -f {} \;
+  find $SASDIR/logs/* -type f -mtime +7 -exec rm -f {} \;
   mkdir -p ~/.parallel
   touch ~/.parallel/will-cite
   tm_ck=`tmux --help &>/dev/null;echo $?`
