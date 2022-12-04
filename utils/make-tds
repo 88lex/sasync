@@ -1,12 +1,27 @@
 #!/usr/bin/env bash
+# This script is a simple wrapper for mawaya's fclone backed command `add-drive`
+# https://github.com/mawaya/rclone/releases
+# For a couple TDs you can simply use the fclone command manually
+# 
+# `gdrive` is a mydrive or td that has full administrative permissions - used for authentication
+# `members` is an existing TD whose members/groups you want to mirror in the new TDs
+# `declare -a prefix`` is a common prefix or prefixes for the TDs you want to create [optional]
+# `declare -a td` are the non common suffices for the new drives. Keep parentheses and use double quotes
+# Note: gdrive and members include colon: while prefix and td list do not
+# The default entries below would create 10 TDs with the same members/perms as my-td.
+# That is, TDs named `goober-001` .. `goober-010` and `gawber-001` .. `gawber-010`
 
-gdrive="my-google-account:"
+gdrive="mydrive:"
 members="my-td:"
-prefix="goober"
-declare -a td=("001" "002" "003" "004" "005" "006" "007" "008" "009" "010")
+declare -a prefix=("goober" "gawber")
+declare -a td=("-001" "-002" "-003" "-004" "-005" "-006" "-007" "-008" "-009" "-010")
 
-for i in "${td[@]}"; do
-  fclone backend add-drive $gdrive $prefix-$i -o copy-members=$members
+for j in "${prefix[@]}"; do
+  for i in "${td[@]}"; do
+    echo "Creating new TD named $j$i"
+    fclone backend add-drive $gdrive $j$i --tpslimit=1 -o copy-members=$members
+    sleep 10s
+  done
 done
 
-fclone backend lsdrives $gdrive | grep $prefix
+fclone backend lsdrives $gdrive | grep "$prefix"
