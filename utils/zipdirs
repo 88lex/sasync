@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+# `zipdirs` zips files and folders to /dest folder from /src/common folder
+# SYNTAX: zipdirs /src /dest /common
+# #   - Creates dest/common/files.zip src/common/files. This syntax allows making trees if/as you wish in /dest 
+#   - e.g. If you have folders /videos/2022 and /videos/2023 in /media then `./zipdirs /media /backup /videos` 
+#     zips files and folders from /media/2022 and 2023 into /backup/videos/2022.zip and 2023.zip 
+#   - Optional flags must precede source, destination and common arguments (e.g. ./zipdirs -i .srt /src /dest /common)
+#       -i .srt will include only files with the suffix .srt
+#       -a .srt.zip will create file1.srt.zip rather than file1.zip
+#       -a `date +%y%m%d`.zip will create file1.20230108.zip (Note date element requires backticks)
+#       -j 5 will limit parallel zipping to 5 concurrent jobs (default=10)
+#       -m 3 [For testing] will limit the maximum number of files or folders to be zipped (defaults=9999999).
+#       -t 0.2 will sleep 0.2 sec between each folder processed. Can use to pace if load too high (default=0)
+#       EXTRA FLAGS WHICH ARE GENERALLY NOT NEEDED
+#       -r {BE VERY CAREFUL WITH THIS] Will remove all files with exact archive_suffix which
+#           do not match source. e.g. src has folder /AAA and not /BBB, dest has AAA.zip and BBB.zip
+#       -s /src/dir Not necessary as /source is first argument after flags. Use if needed
+#       -d /dest/dir Not necessary as /destimation is second argument after flags. Use if needed
+#       -c /common Not necessary as /common is third argument after flags. Use if needed
+
+# Variable defaults
+max_dirs=9999999
+include_file_type="*"
+archive_suffix=".zip"
+max_jobs=50
+sleep_time=0
+remove_files=false
+
+while getopts ":i:m:a:rj:t:s:d:c:" opt; do
+  case $opt in
+    i) include_file_type="$OPTARG" ;;
+    m) max_dirs="$OPTARG" ;;
+    a) archive_suffix=".${OPTARG#.}" ;;
+    r) remove_files=true ;;
+    j) max_jobs="$OPTARG" ;;
+    t) sleep_time="$OPTARG"  ;;
+    s) src_base_dir="$OPTARG" ;;
+    d) dest_base_dir="$OPTARG" ;;
+    c) common_dir="$OPTARG" ;;
+    \?) echo "Invalid option -$OPTARG" >&2; exit 1 ;;
+    :) echo "Option -$OPTARG requires an argument." >&2; exit 1 ;;
+  esac
+done
+shift "$(($OPTIND - 1))"
+
+if ([[ -z "$src_base_dir" ]] || [[ -z "$dest_base_dir" ]]) && ([[ -z "$1" ]] || [[ -z "$2" ]]); then
+  echo "Error: Both source dir and destination dir must be specified" >&2; exit 1
+fi
+
+src_base_dir="$(echo "$1" | sed -e 's:/*$::' -e 's:^/*:/:')"
+dest_base_dir="$(echo "$2" | sed -e 's:/*$::' -e 's:^/*:/:')"
+common_dir="$(echo "$3" | sed -e 's:/*$::' -e 's:^/*:/:')"
+
+# Create an array of all the files in the source directory
+cd "$src_base_dir"
+src_files_all=($(printf '%s\n' ".$common_dir/*" | sort))
+src_files_max=("${src_files_all[@]:0:$max_dirs}")
+mkdir -p $dest_base_dir$common_dir
+
+# Create zip file for each folder or file at root of the source directory 
+start_time=$(date +%s%N)
+for i in "${src_files_max[@]}"; do
+    h=$(basename "$i")
+    dest_file="$dest_base_dir$common_dir/$h$archive_suffix"
+    echo dest_file = "$dest_file"
+    sleep $sleep_time
+    zip -0  -FS -r "$dest_file" "$i" -i """*$include_file_type""" &
+    while [ $(jobs -r -p | wc -l) -ge $max_jobs ]; do sleep 1; done
+done; wait
+zip_time=$(echo "($(date +%s%N) - $start_time)/1000000000" | bc -l)
+
+# Remove files from destination that no longer exist in the source
+start_time=$(date +%s%N)
+if [[ $remove_files == true ]]; then
+    src_files_base=("${src_files_all[@]}")
+    for i in "${!src_files_base[@]}"; do
+        src_files_base[i]=$(basename "${src_files_base[i]}$archive_suffix")
+        # echo src file base = ${src_files_base[i]}
+    done
+    for j in $dest_base_dir$common_dir/*$archive_suffix; do
+        k=$(basename "$j")
+        if [[ ! "${src_files_base[@]}" =~ "$k" ]]; then
+            rm -rf "$j" &
+            sleep $sleep_time
+        fi
+    done; wait
+fi
+rm_time=$(echo "($(date +%s%N) - $start_time)/60000000000000" | bc -l)
+total_time=$(echo "$zip_time + $rm_time" | bc -l)
+
+# Print run times
+printf "Time used to zip files:    %.1f min\n" $zip_time
+printf "Time used to remove files: %.1f min\n" $rm_time
+printf "Total run time:            %.1f min\n" $total_time

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+src_dir="$(echo "$1" | sed -e 's:/*$::' -e 's:^/*:/:')"
+files_all=($(printf '%s\n' "$src_dir/*" | grep ".zip" | sort))
+
+for file in "${files_all[@]}"; do
+  echo "Checking $file..."
+  unzip -t "$file" | grep "errors" > /dev/null
+  if [ $? -ne 0 ]; then
+    echo "$file" >> zipbad.txt
+  fi
+done
